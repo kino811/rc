@@ -1,0 +1,283 @@
+*uganda.txt*    Vim version 7.4 대상.  새로 고침: 2013 Jul 06
+
+
+		     VIM 상세 설명서 - Bram Moolenaar 저
+				       정지용 역
+
+
+			*uganda* *Uganda* *copying* *copyright* *license*
+요약
+								*iccf* *ICCF*
+Vim은 자선 소프트웨어(Charityware)입니다.  Vim을 얼마든지 사용하고 복사해도
+되지만, 동시에 우간다의 도움이 필요한 아이들에게 기부 하는 것을 권장합니다.
+아래의 |kcc|를 보거나 다음 URL의 ICCF 웹 사이트를 방문해보세요.
+
+	http://iccf-holland.org/
+	http://www.vim.org/iccf/
+	http://www.iccf.nl/
+
+또한 Vim의 개발을 지원할 수도 있습니다.  Vim을 지원하면 기능 투표에 참여할 수
+있습니다.  |sponsor|를 확인해보세요.  어떤 방식이든 돈은 우간다로 향합니다.
+
+Vim 문서에는 Open Publication License가 적용됩니다.  |manual-copyright|를
+참고하세요.
+
+=== begin of license ===
+
+VIM LICENSE
+
+I)  There are no restrictions on distributing unmodified copies of Vim except
+    that they must include this license text.  You can also distribute
+    unmodified parts of Vim, likewise unrestricted except that they must
+    include this license text.  You are also allowed to include executables
+    that you made from the unmodified Vim sources, plus your own usage
+    examples and Vim scripts.
+
+II) It is allowed to distribute a modified (or extended) version of Vim,
+    including executables and/or source code, when the following four
+    conditions are met:
+    1) This license text must be included unmodified.
+    2) The modified Vim must be distributed in one of the following five ways:
+       a) If you make changes to Vim yourself, you must clearly describe in
+	  the distribution how to contact you.  When the maintainer asks you
+	  (in any way) for a copy of the modified Vim you distributed, you
+	  must make your changes, including source code, available to the
+	  maintainer without fee.  The maintainer reserves the right to
+	  include your changes in the official version of Vim.  What the
+	  maintainer will do with your changes and under what license they
+	  will be distributed is negotiable.  If there has been no negotiation
+	  then this license, or a later version, also applies to your changes.
+	  The current maintainer is Bram Moolenaar <Bram@vim.org>.  If this
+	  changes it will be announced in appropriate places (most likely
+	  vim.sf.net, www.vim.org and/or comp.editors).  When it is completely
+	  impossible to contact the maintainer, the obligation to send him
+	  your changes ceases.  Once the maintainer has confirmed that he has
+	  received your changes they will not have to be sent again.
+       b) If you have received a modified Vim that was distributed as
+	  mentioned under a) you are allowed to further distribute it
+	  unmodified, as mentioned at I).  If you make additional changes the
+	  text under a) applies to those changes.
+       c) Provide all the changes, including source code, with every copy of
+	  the modified Vim you distribute.  This may be done in the form of a
+	  context diff.  You can choose what license to use for new code you
+	  add.  The changes and their license must not restrict others from
+	  making their own changes to the official version of Vim.
+       d) When you have a modified Vim which includes changes as mentioned
+	  under c), you can distribute it without the source code for the
+	  changes if the following three conditions are met:
+	  - The license that applies to the changes permits you to distribute
+	    the changes to the Vim maintainer without fee or restriction, and
+	    permits the Vim maintainer to include the changes in the official
+	    version of Vim without fee or restriction.
+	  - You keep the changes for at least three years after last
+	    distributing the corresponding modified Vim.  When the maintainer
+	    or someone who you distributed the modified Vim to asks you (in
+	    any way) for the changes within this period, you must make them
+	    available to him.
+	  - You clearly describe in the distribution how to contact you.  This
+	    contact information must remain valid for at least three years
+	    after last distributing the corresponding modified Vim, or as long
+	    as possible.
+       e) When the GNU General Public License (GPL) applies to the changes,
+	  you can distribute the modified Vim under the GNU GPL version 2 or
+	  any later version.
+    3) A message must be added, at least in the output of the ":version"
+       command and in the intro screen, such that the user of the modified Vim
+       is able to see that it was modified.  When distributing as mentioned
+       under 2)e) adding the message is only required for as far as this does
+       not conflict with the license used for the changes.
+    4) The contact information as required under 2)a) and 2)d) must not be
+       removed or changed, except that the person himself can make
+       corrections.
+
+III) If you distribute a modified version of Vim, you are encouraged to use
+     the Vim license for your changes and make them available to the
+     maintainer, including the source code.  The preferred way to do this is
+     by e-mail or by uploading the files to a server and e-mailing the URL.
+     If the number of changes is small (e.g., a modified Makefile) e-mailing a
+     context diff will do.  The e-mail address to be used is
+     <maintainer@vim.org>
+
+IV)  It is not allowed to remove this license from the distribution of the Vim
+     sources, parts of it or from a modified version.  You may use this
+     license for previous Vim releases instead of the license that they came
+     with, at your option.
+
+=== end of license ===
+
+Note:
+
+- Vim을 사용하면서 행복하신가요?  부디 아래 내용을 읽으시고 우간다의 도움이
+  필요한 아이들을 돕는 것을 고려해 보심으로써 그 행복을 나누어주시면 어떨까요?
+
+- Vim의 개발을 더 지원하고 싶으시다면, |sponsor|가 되는 것을 고려해보세요.
+  어떤 방식이든 돈은 우간다로 향합니다.
+
+- 리처드 스톨만(Richard Stallman)에 따르면, Vim 라이선스는 GNU GPL과
+  호환된다고 합니다.  그가 확인한 이후로는 몇 가지 사소한 변경만 있었으므로,
+  이 사실에는 변화가 없을 겁니다.
+
+- Vim을 GNU GPL에 속하는 라이브러리와 링크하면, 더 이상의 배포는 GNU GPL에
+  따라 제한을 받습니다.  Vim에서는 아무 것도 바꾸지 않았어도 마찬가지입니다.
+
+- 한번 GNU GPL에 속하는 변경 사항이 포함되면, 그 이후의 모든 변경 사항 역시
+  GNU GPL 혹은 호환 라이선스 하에 들어갑니다.
+
+- Vim을 수정한 버전을 배포한다면, 배포하시는 분의 이름과 연락처를
+  "--with-modified-by" configure 인자나 MODIFIED_BY define으로 넣을 수
+  있습니다.
+
+==============================================================================
+키발레 어린이 센터(Kibaale Children's Centre)	*kcc* *Kibaale*  *charity*
+
+키발레 어린이 센터(Kibaale Children's Centre, KCC)는 동아프리카 우간다 남부,
+탄자니아 근처의 작은 마을인 키발레에 위치해있습니다.  이 지역은 라카이
+지구(Rakai District)로 알려져있습니다.  대부분의 사람이 농업에 종사합니다.
+사람들은 가난하지만, 음식은 충분합니다.  하지만 이 지구는 다른 세계 어느
+곳보다도 AIDS로 고통받고 있습니다.  약 10%에서 30%의 사람들이 HIV에
+감염되어있을 것으로 추정됩니다.  부모가 죽음으로써 많은 고아가 생겨났습니다.
+이 지구에서만 전체 35만 인구 중 약 6만명의 아이들이 한 부모 혹은 양 부모를
+모두 잃었습니다.  이 상황은 여전히 계속되고 있습니다.
+
+아이들은 도움이 매우 필요합니다.  KCC는 도움이 필요한 아이들에게 음식과 의료,
+교육을 제공하기 위해 열심히 노력하고 있습니다.  음식과 의료는 아이들이 지금
+건강하도록 만들어주고, 교육은 그들이 장래에 그들 스스로를 돌볼 수 있도록
+만들어줍니다.  KCC는 기독교 기반의 단체이지만, 종교를 가리지 않고 모든
+아이들을 돕고 있습니다.
+
+이 지역의 문제를 해결하는 핵심은 바로 교육입니다.  지난 이디 아민 정권 치하와
+그 뒤의 내전 상황에서 이들은 방치되어 왔습니다.  이제 정부는 다시 안정되었고,
+아이들과 부모들은 어떻게 자신을 돌보고, 감염을 예방할 수 있는지 배워야합니다.
+이미 아프거나 굶주린 사람들을 돕기도 하지만, 주 목표는 사람들이 병에 걸리지
+않도록 예방하고, 몸에 좋은 식량을 생산하는 방법을 가르치는 것입니다.
+
+대부분의 고아는 대가족 안에서 생활합니다.  삼촌이나 누나가 그들을 돌봅니다.
+이 대가족은 크고 수입은 (만약 있다면) 낮습니다. 몸에 좋은 음식을 먹는다면 운이
+좋은 아이인 겁니다.  의복이나 의료, 학교 교육은 모두 제대로 공급되지 않고
+있습니다.  이 궁핍한 아이들을 돕기 위해 후원 제도를 운영하고 있습니다.  한
+아이를 재정적으로 입양할 수 있습니다.  한 달에 몇 천 원이면 아이에게 필수적인
+물건들을 주고, 건강하게 해주고, 학교에 보낼 수 있습니다.  또한 KCC가 아이와
+아이가 속한 가족에게 필요한 모든 것을 지원할 수 있습니다.
+
+아이를 직접적으로 돕는 것 이외에도, 아이가 자라는 환경 역시 개선될 필요가
+있습니다.  KCC는 학교들이 지도 방법을 개선하도록 돕습니다.  센터에는 모델
+학교가 있고, 교사 양성도 하고 있습니다.  의료 인력도 훈련하고 있고, 위생
+교육을 실시하고 각 가정에 제대로 된 변소를 짓도록 알리고 있습니다.  저는
+시멘트 판 공장 설립을 돕기도 했습니다.  이는 좋은 변소를 짓는 데 사용되며,
+원가 이하로 판매됩니다.
+
+이 프로젝트에는 아이들과 그 가족들에게 의료를 제공하는 작은 병원도 있습니다.
+필요한 경우, 병원으로의 후송도 지원합니다.  백신 프로그램도 진행되고 있으며,
+전염병이 발생하면 도움을 주기도 합니다 (홍역과 콜레라가 발생한 적이 있습니다).
+							*donate*
+저는 1994년 여름에서 1995년 여름까지 1년 내내 센터에서 자원봉사를 했습니다.
+저는 센터의 확장을 돕고, 물 및 위생 영역에서 일했습니다.  저는 KCC가 주는
+도움이 정말로 도움이 된다는 것을 깨달았습니다.  제가 네덜란드로 돌아왔을 때,
+저는 계속해서 KCC를 후원하고 싶었습니다.  그래서 저는 기금을 만들고, 후원
+제도를 조직했습니다.  다음 중 한 가지 방법으로 도움 주는 것을 고려해주세요.
+
+1.  초등학생 아이를 후원하기: 17유로/월(혹은 그 이상).
+2.  중학생 아이를 후원하기: 25유로/월(혹은 그 이상).
+3.  병원 후원하기: 매월 혹은 매 분기 약정
+4.  일시 후원하기
+
+아동 후원을 하는 다른 조직들에 비해 매우 적은 금액입니다.  이는 돈이 곧바로
+센터에 가기 때문입니다.  오직 5% 이하의 금액만이 관리에 사용됩니다.  이는 이
+조직이 자원봉사자들에 의해 운영되는 작은 조직이기 때문에 가능합니다.  아동을
+후원하고 싶으시다면, 최소 1년 이상 지속해 주시는 것이 좋습니다.
+
+돈이 어디에 사용될지 어떻게 알 수 있을까요?  무엇보다, Vim의 개발자로서 저를
+믿으실 수 있을 겁니다.  저는 센터에서 일하시는 분들을 믿습니다.  개인적으로도
+아는 사이이고요.  그뿐 아니라 센터는 월드 비전과 세이브더칠드런으로부터 후원을
+받고, 감사도 받고 있습니다.  또한 퍼시픽 아카데미 아웃리치 협회(Pacific
+Academy Outreach Society)의 감독을 받고 있습니다.  센터는 일 년에 한 번 정도씩
+현지에서 진행 점검도 받습니다(저희가 비용을 댑니다).  저도 1993년 이래로
+센터에 여러 번 방문했습니다.  ICCF 웹 사이트에서 방문 보고서를 확인하실 수
+있습니다.
+
+더 질문이 있으시다면 저에게 이메일을 보내주세요: <Bram@vim.org>.
+
+센터의 주소는 다음과 같습니다:
+			Kibaale Children's Centre
+			p.o. box 1658
+			Masaka, Uganda, East Africa
+
+돈 보내기:						*iccf-donations*
+
+ICCF 웹 사이트에서 최신 정보를 확인하세요! URL은 |iccf|를 보세요.
+
+
+신용 카드:	신용 카드가 있으시다면, PayPal을 사용해서 돈을 보내실 수
+		있습니다.  인터넷을 통해 돈을 지불하는 가장 보편화된
+		방식이지요.  사용하기 아주 쉽습니다.  아래 링크에서 자세한
+		방법을 확인해보세요:
+		    https://www.paypal.com/en_US/mrb/pal=XAC62PML3GF8Q
+		돈을 보내실 이메일 주소는 아래와 같습니다:
+		    Bram@iccf-holland.org
+		400 유로($500) 이상을 보내실 때는 수표를 보내시는 편이 더
+		좋습니다.
+
+전세계:		우편환을 이용하세요.  어느 나라에서든 대개 우체국을 통해서
+		보내실 수 있습니다.  다음 이름을 사용하세요(제 여권상
+		이름입니다): "Abraham Moolenaar".  가능하다면 통화는 유로를
+		사용해 주세요.
+
+미국:		아래의 방법으로 보내실 수 있습니다.
+		안타깝게도 느헤미야 그룹 아웃리치 협회(Nehemiah Group Outreach
+		Society, NGOS)에 수표를 보내는 방법은 이제 쓰실 수 없습니다.
+		IRS 세금영수증을 받으실 수 있는 방법을 찾는 중입니다.
+		아동 후원에 대해서는 캐나다의 KCF에 연락해주세요(아래를
+		참조하세요).  미국 수표를 보내서 은행 비용을 줄일 수 있습니다.
+
+캐나다:		캐나다 서레이에 있는 키발레 칠드런 펀드(Kibaale Children's
+		Fund, KCF)에 연락하세요.  키발레 아이들을 후원하는 캐나다인
+		후원자들을 관리하는 곳입니다.  KCF는 보내주신 돈 전액을 우간다
+		현장에 보냅니다.  일시 후원금을 바로 보내실 수도 있습니다.
+		보내실 때는 저에게 미리 알려주시면 Vim 덕분에 기부되었다는
+		것을 확인할 수 있습니다.  후원에 대한 정보는 KCF에
+		문의해주세요.
+			Kibaale Children's Fund c/o Pacific Academy
+			10238-168 Street
+			Surrey, B.C. V4N 1Z4
+			Canada
+			전화: 604-581-5353
+		키발레 친드런 펀드에 기부하시면 세금영수증을 받아 세금을
+		돌려받는 데 사용하실 수 있습니다.
+
+네덜란드:	Lisse의 "Stichting ICCF Holland" 계좌로 이체해주세요.
+		네덜란드에 사신다면 세액 공제를 받으실 수 있습니다.
+			Postbank, nr. 4548774
+			IBAN: NL95 INGB 0004 5487 74
+
+독일:		세액 공제가 가능한 기부를 하실 수 있습니다.
+		ICCF 웹 사이트에서 최신 정보를 확인하세요.
+			http://iccf-holland.org/germany.html
+
+유럽:		가능하다면 은행 이체를 해주세요.  거래하시는 은행에 이를 위한
+		신청서가 있을 겁니다.  은행 코드(swift code)와 계좌번호(IBAN
+		number)는 아래 "기타" 부분에 있습니다.
+		다른 방법도 가능할 겁니다.  후원에 관해서는 정보를
+		요청해주세요.
+
+기타:		가능하다면 아래 계좌들 중 하나로 이체해주세요:
+		    Postbank, account 4548774
+				Swift code: INGB NL 2A
+				IBAN: NL95 INGB 0004 5487 74
+			예금주 "stichting ICCF Holland", Lisse
+		    위 계좌가 안된다면:
+		    Rabobank Lisse, account 3765.05.117
+				Swift code: RABO NL 2U
+			예금주 "Bram Moolenaar", Lisse
+		아니면 유로나 미국 달러 수표를 아래 주소로 보내주세요.  최소
+		금액은 $70입니다 (제가 이용하는 은행이 작은 금액의 외환 수표는
+		받지 않네요.  죄송합니다)
+
+수표를 보내실 주소:
+			Bram Moolenaar
+			Finsterruetihof 1
+			8134 Adliswil
+			Switzerland
+
+이 주소는 매우 오랜 시간 동안 유효할 겁니다.
+
+ vim:tw=78:ts=8:ft=help:norl:

@@ -1,0 +1,1382 @@
+*quickref.txt*  Vim version 7.4 대상.  새로 고침: 2013 Jun 29
+
+
+		     VIM 상세 설명서 - Bram Moolenaar 저
+				       정지용 역
+
+			    빠른 참조 안내
+
+							 *quickref* *Contents*
+ 태그	  주제				 태그	  주제		~
+|Q_ct|	도움말 파일 목록		|Q_re|	반복하기 명령
+|Q_lr|	움직임: 좌우			|Q_km|	키 매핑
+|Q_ud|	움직임: 위아래			|Q_ab|	약어
+|Q_tm|	움직임: 텍스트 오브젝트		|Q_op|	옵션
+|Q_pa|	움직임: 패턴 찾기		|Q_ur|	실행 취소/다시 하기 명령
+|Q_ma|	움직임: 마크			|Q_et|	외부 명령
+|Q_vm|	움직임: 기타			|Q_qf|	퀵픽스 명령
+|Q_ta|	움직임: 태그 사용하기		|Q_vc|	기타 명령
+|Q_sc|	스크롤 하기			|Q_ce|	Ex: 명령줄 편집
+|Q_in|	입력: 내용 입력하기		|Q_ra|	Ex: 범위
+|Q_ai|	입력: 키			|Q_ex|	Ex: 특수 문자
+|Q_ss|	입력: 특수 키			|Q_st|	Vim 시작하기
+|Q_di|	입력: 다이그래프		|Q_ed|	파일 편집하기
+|Q_si|	입력: 특별한 입력		|Q_fl|	인자 목록 사용하기
+|Q_de|	바꾸기: 내용 지우기		|Q_wq|	저장하고 나가기
+|Q_cm|	바꾸기: 복사하고 옮기기		|Q_ac|	자동 명령
+|Q_ch|	바꾸기: 내용 바꾸기		|Q_wi|	여러 창 명령
+|Q_co|	바꾸기: 복잡한 바꾸기		|Q_bu|	버퍼 목록 명령
+|Q_vi|	시각 모드			|Q_sy|	문법 강조
+|Q_to|	텍스트 오브젝트			|Q_gu|	GUI 명령
+					|Q_fo|	접기
+
+------------------------------------------------------------------------------
+N은 명령 앞에 선택적으로 붙일 수 있는 숫자를 나타내기 위해 사용하였습니다.
+------------------------------------------------------------------------------
+*Q_lr*		좌우 움직임
+
+|h|	N  h		왼쪽 (마찬가지: CTRL-H 또는 <BS>, <Left> 키)
+|l|	N  l		오른쪽 (마찬가지: <Space> 또는 <Right> 키)
+|0|	   0		줄의 첫 글자로 (마찬가지: <Home> 키)
+|^|	   ^		줄의 공백이 아닌 첫 글자로
+|$|	N  $		줄의 마지막 글자로 (N-1 줄 아래)
+			   (마찬가지: <End> key)
+|g0|	   g0		화면 줄의 첫 글자로 (긴 줄이 넘어가는 경우 "0"과 다름)
+|g^|	   g^		화면 줄의 공백이 아닌 첫 글자로 (긴 줄이 넘어가는 경우
+			   "^"와 다름)
+|g$|	N  g$		화면 줄의 마지막 글자로 (긴 줄이 넘어가는 경우 "$"와
+			   다름)
+|gm|	   gm		화면 줄의 가운데로
+|bar|	N  |		N 번째 칸으로 (기본 값: 1)
+|f|	N  f{char}	오른쪽으로 N번째 {char}가 나오는 곳으로
+|F|	N  F{char}	왼쪽으로 N번째 {char}가 나오는 곳으로
+|t|	N  t{char}	오른쪽으로 N번째 {char}가 나오는 곳 앞으로
+|T|	N  T{char}	왼쪽으로 N번째 {char}가 나오는 곳 앞으로
+|;|	N  ;		마지막 "f" 나 "F", "t", "T"를 N 번 반복
+|,|	N  ,		마지막 "f" 나 "F", "t", "T"를 반대 방향으로 N 번 반복
+------------------------------------------------------------------------------
+*Q_ud*		위아래 움직임
+
+|k|	N  k		N 줄 위로 (마찬가지: CTRL-P 나 <Up>)
+|j|	N  j		N 줄 아래로 (마찬가지: CTRL-J 나 CTRL-N, <NL>, <Down>)
+|-|	N  -		N 줄 위의 공백이 아닌 첫 글자로
+|+|	N  +		N 줄 아래의 공백이 아닌 첫 글자로 (마찬가지: CTRL-M 나
+			   <CR>)
+|_|	N  _		N-1 줄 아래의 공백이 아닌 첫 글자로
+|G|	N  G		N 번째 줄로 (기본 값: 마지막 줄), 공백이 아닌 첫
+			   글자로
+|gg|	N  gg		N 번째 줄로 (기본 값: 첫 번째 줄), 공백이 아닌 첫
+			   글자로
+|N%|	N  %		파일의 N 퍼센트 위치에 있는 줄로.  N은 필수이고,
+			   빼먹은 경우 |%| 명령이 됨
+|gk|	N  gk		N 화면 줄 위로 (긴 줄이 넘어가는 경우 "k"와 다름)
+|gj|	N  gj		N 화면 줄 아래로 (긴 줄이 넘어가는 경우 "j"와 다름)
+------------------------------------------------------------------------------
+*Q_tm*		텍스트 오브젝트 움직임
+
+|w|	N  w		N 어절(word) 전진
+|W|	N  W		N 공백으로 구분한 어절(|WORD|) 전진
+|e|	N  e		어절의 끝이 N번 나올 때까지 전진
+|E|	N  E		공백으로 구분한 어절(|WORD|)의 끝이 N번 나올 때까지
+			   전진
+|b|	N  b		N 어절 후진
+|B|	N  B		N 공백으로 구분한 어절(|WORD|) 후진
+|ge|	N  ge		어절의 끝이 N번 나올 때까지 후진
+|gE|	N  gE		공백으로 구분한 어절(|WORD|)의 끝이 N번 나올 때까지
+			   후진
+
+|)|	N  )		N 문장 전진
+|(|	N  (		N 문장 후진
+|}|	N  }		N 문단 전진
+|{|	N  {		N 문단 후진
+|]]|	N  ]]		N 절(section) 전진. 절의 시작으로
+|[[|	N  [[		N 절(section) 후진. 절의 시작으로
+|][|	N  ][		N 절(section) 전진. 절의 끝으로
+|[]|	N  []		N 절(section) 후진. 절의 끝으로
+|[(|	N  [(		닫히지 않은 '('으로 N 번 후진
+|[{|	N  [{		닫히지 않은 '{'으로 N 번 후진
+|[m|	N  [m		메서드의 시작으로 N번 후진(Java용)
+|[M|	N  [M		메서드의 끝으로 N번 후진(Java용)
+|])|	N  ])		닫히지 않은 ')'으로 N 번 전진
+|]}|	N  ]}		닫히지 않은 '}'으로 N 번 전진
+|]m|	N  ]m		메서드의 시작으로 N번 전진(Java용)
+|]M|	N  ]M		메서드의 끝으로 N번 전진(Java용)
+|[#|	N  [#		닫히지 않은 "#if"나 "#else"로 N 번 후진
+|]#|	N  ]#		닫히지 않은 "#else"나 "#endif"로 N 번 전진
+|[star|	N  [*		주석 "/*"의 시작으로 N 번 후진
+|]star|	N  ]*		주석 "*/"의 끝으로 N 번 전진
+------------------------------------------------------------------------------
+*Q_pa*		패턴 찾기
+
+|/|	N  /{pattern}[/[offset]]<CR>
+			아래로 N 번째 나타나는 {pattern}을 찾기
+|?|	N  ?{pattern}[?[offset]]<CR>
+			위로 N 번째 나타나는 {pattern}을 찾기
+|/<CR>|	N  /<CR>	마지막 찾기를 아래로 가면서 반복
+|?<CR>|	N  ?<CR>	마지막 찾기를 위로 가면서 반복
+|n|	N  n		마지막 찾기 반복
+|N|	N  N		마지막 찾기를 반대 방향으로 가면서 반복
+|star|	N  *		커서 밑의 식별자를 아래로 가면서 찾기
+|#|	N  #		커서 밑의 식별자를 위로 가면서 찾기
+|gstar|	N  g*		"*"와 비슷하지만 부분 일치도 찾음
+|g#|	N  g#		"#"와 비슷하지만 부분 일치도 찾음
+|gd|	   gd		커서 밑 식별자의 지역 선언으로 감
+|gD|	   gD		커서 밑 식별자의 전역 선언으로 감
+
+|pattern|		찾기 패턴의 특수 문자들
+
+			뜻		      magic   nomagic	~
+		     아무 문자나 하나에 일치	.	\.
+		            줄의 시작에 일치	^	^
+			        <EOL>에 일치	$	$
+		          어절의 시작에 일치	\<	\<
+			    어절의 끝에 일치	\>	\>
+	       범위 안의 문자 중 하나에 일치	[a-z]	\[a-z]
+	       범위 밖의 문자 중 하나에 일치	[^a-z]	\[^a-z]
+		     식별자 문자 하나에 일치	\i	\i
+		       상동.  단 숫자는 제외	\I	\I
+		     키워드 문자 하나에 일치	\k	\k
+		       상동.  단 숫자는 제외	\K	\K
+		     파일명 문자 하나에 일치	\f	\f
+		       상동.  단 숫자는 제외	\F	\F
+		출력 가능한 문자 하나에 일치	\p	\p
+		       상동.  단 숫자는 제외	\P	\P
+		       공백 문자 하나에 일치	\s	\s
+		     비공백 문자 하나에 일치	\S	\S
+
+				<Esc>에 일치	\e	\e
+				<Tab>에 일치	\t	\t
+				 <CR>에 일치	\r	\r
+				 <BS>에 일치	\b	\b
+
+		   직전 요소 0개 이상에 일치	*	\*
+		   직전 요소 1개 이상에 일치	\+	\+
+	       직전 요소 0개 혹은 1개에 일치	\=	\=
+	  직전 요소 2개 이상 5개 이하에 일치	\{2,5}  \{2,5}
+	 하나만 일치해도 되는 두 대안을 구분	\|	\|
+		   패턴을 하나의 요소로 묶음	\(\)	\(\)
+
+|search-offset|		찾기 명령 뒤에는 줄 수 있는 오프셋
+
+    [num]	[num] 줄 아래, 첫 번째 칸
+    +[num]	[num] 줄 아래, 첫 번째 칸
+    -[num]	[num] 줄 위, 첫 번째 칸
+    e[+num]	일치가 끝나는 곳에서 오른쪽으로 [num] 문자
+    e[-num]	일치가 끝나는 곳에서 왼쪽으로 [num] 문자
+    s[+num]	일치가 시작하는 곳에서 오른쪽으로 [num] 문자
+    s[-num]	일치가 시작하는 곳에서 왼쪽으로 [num] 문자
+    b[+num]	위 s[+num]과 동일 (begin(시작)을 생각하세요)
+    b[-num]	위 s[-num]과 동일 (begin(시작)을 생각하세요)
+    ;{search-command}	이어서 {search-command}를 실행
+------------------------------------------------------------------------------
+*Q_ma*		마크와 움직임
+
+|m|        m{a-zA-Z}	현재 위치를 마크 {a-zA-Z}로 지정
+|`a|       `{a-z}	현재 파일의 마크 {a-z}로 이동
+|`A|       `{A-Z}	어느 파일이든 마크 {A-Z}로 이동
+|`0|       `{0-9}	Vim을 예전에 끝냈던 위치로 이동
+|``|       ``		마지막으로 뛰기(jump) 전의 위치로 이동
+|`quote|   `"		이 파일을 마지막으로 편집했을 때의 위치로 이동
+|`[|       `[		직전에 넣었거나 오퍼레이터를 쓴 부분의 시작으로 이동
+|`]|       `]		직전에 넣었거나 오퍼레이터를 쓴 부분의 끝으로 이동
+|`<|       `<		(직전의) 시각 모드 영역의 시작으로 이동
+|`>|       `>		(직전의) 시각 모드 영역의 끝으로 이동
+|`.|       `.		이 파일에서 마지막으로 바꾼 곳으로 이동
+|'|        '{a-zA-Z0-9[]'"<>.}
+			`와 동일.  하지만 줄의 공백이 아닌 첫 문자로 이동
+|:marks|  :marks	유효한 마크들을 출력
+|CTRL-O|  N  CTRL-O	뜀(jump) 목록에서 N 번째 이전 위치로 이동
+|CTRL-I|  N  CTRL-I	뜀 목록에서 N 번째 나중 위치로 이동
+|:ju|     :ju[mps]	뜀 목록을 출력
+------------------------------------------------------------------------------
+*Q_vm*		기타 움직임
+
+|%|	   %		이 줄에서 다음에 나오는 중괄호나 대괄호, 주석,
+			   "#if"/"#else"/"#endif"를 찾고, 그와 쌍을 이루는
+			   곳으로 이동
+|H|	N  H		창에서 N 번째 줄의 공백이 아닌 첫 문자로 이동
+|M|	   M		창에서 정중앙인 줄의 공백이 아닌 첫 문자로 이동
+|L|	N  L		창에서 밑에서 N 번째 줄의 공백이 아닌 첫 문자로 이동
+
+|go|	N  go			버퍼의 N 번째 바이트로 이동
+|:go|	:[range]go[to] [off]	버퍼의 [off] 번째 바이트로 이동
+------------------------------------------------------------------------------
+*Q_ta*		태그 사용하기
+
+|:ta|      :ta[g][!] {tag}	{tag} 태그로 이동
+|:ta|      :[count]ta[g][!]	태그 목록에서 [count] 번째 최신 태그로 이동
+|CTRL-]|      CTRL-]		변경 사항이 없다면 커서 밑의 태그로 이동
+|:ts|      :ts[elect][!] [tag]	일치하는 태그들을 보여주고 하나를 선택 이동
+|:tjump|   :tj[ump][!] [tag]	[tag] 태그로 이동하거나, 일치하는 태그가
+				   여럿이면 목록에서 선택
+|:ltag|    :lt[ag][!] [tag]	[tag] 태그로 이동하고 일치하는 태그들을 위치
+				   리스트에 추가
+
+|:tags|    :tags		태그 목록을 출력
+|CTRL-T|   N  CTRL-T		태그 목록에서 N 번째 이전 태그로 돌아감
+|:po|      :[count]po[p][!]	태그 목록에서 [count] 번째 이전 태그로 돌아감
+|:tnext|   :[count]tn[ext][!]	[count] 번째 다음 일치하는 태그로 이동
+|:tp|      :[count]tp[revious][!] [count] 번째 이전 일치하는 태그로 이동
+|:tr|      :[count]tr[ewind][!]	[count] 번째 일치하는 태그로 이동
+|:tl|      :tl[ast][!]		마지막으로 일치하는 태그로 이동
+
+|:ptag|    :pt[ag] {tag}	{tag} 태그를 보여주는 미리보기 창을 열기
+|CTRL-W_}|    CTRL-W }		CTRL-]와 유사.  태그를 미리보기 창에서 보여줌
+|:pts|     :pts[elect]		":tselect"와 유사.  태그를 미리보기 창에서
+				   보여줌
+|:ptjump|  :ptj[ump]		":tjump"와 유사.  태그를 미리보기 창에서
+				   보여줌
+|:pclose|  :pc[lose]		태그 미리보기 창을 닫음
+|CTRL-W_z|    CTRL-W z		태그 미리보기 창을 닫음
+------------------------------------------------------------------------------
+*Q_sc*		스크롤 하기
+
+|CTRL-E|	N  CTRL-E	N 화면 줄 아래로 (기본 값: 1)
+|CTRL-D|	N  CTRL-D	N 화면 줄 아래로 (기본 값: 1/2 창)
+|CTRL-F|	N  CTRL-F	N 화면 줄 전진 (아래로)
+|CTRL-Y|	N  CTRL-Y	N 화면 줄 위로 (기본 값: 1)
+|CTRL-U|	N  CTRL-U	N 화면 줄 위로 (기본 값: 1/2 창)
+|CTRL-B|	N  CTRL-B	N 화면 줄 후진 (위로)
+|z<CR>|		   z<CR> 나 zt	현재 줄을 창의 맨 위로 다시 그림
+|z.|		   z.	 나 zz	현재 줄을 창의 정중앙으로 다시 그림
+|z-|		   z-	 나 zb	현재 줄을 창의 맨 아래로 다시 그림
+
+'wrap'이 꺼져있을 때만 동작합니다:
+|zh|		N  zh		화면을 N 문자 오른쪽으로
+|zl|		N  zl		화면을 N 문자 왼쪽으로
+|zH|		N  zH		화면을 화면 폭 절반만큼 오른쪽으로
+|zL|		N  zL		화면을 화면 폭 절반만큼 왼쪽으로
+------------------------------------------------------------------------------
+*Q_in*		내용 입력하기
+
+|a|	N  a	커서 뒤에 내용을 붙임 (N 번 반복)
+|A|	N  A	줄 끝에 내용을 붙임 (N 번)
+|i|	N  i	커서 앞에 내용을 삽입 (N 번) (마찬가지: <Insert>)
+|I|	N  I	줄의 공백이 아닌 첫 문자 앞에 내용을 삽입 (N 번)
+|gI|	N  gI	줄의 첫 칸에 내용을 삽입 (N 번)
+|o|	N  o	현재 줄 아래에 새로운 줄을 만들고 내용을 붙임 (N 번)
+|O|	N  O	현재 줄 위에 새로운 줄을 만들고 내용을 붙임 (N 번)
+|:startinsert|  :star[tinsert][!]  입력 모드 시작.  [!] 사용시 덧붙임
+|:startreplace| :startr[eplace][!]  바꾸기 모드 시작.  [!] 사용시 줄의 끝에서
+
+시각 블록 모드에서:
+|v_b_I|	   I	선택한 모든 줄의 앞에 같은 내용 삽입
+|v_b_A|	   A	선택한 모든 줄의 뒤에 같은 내용을 덧붙임
+------------------------------------------------------------------------------
+*Q_ai*		입력 모드 키
+
+|insert-index|	입력 모드 명령의 알파벳 순 목록
+
+입력 모드 나가기:
+|i_<Esc>|	<Esc>		  입력 모드를 끝내고 보통 모드로 돌아감
+|i_CTRL-C|	CTRL-C		  <Esc>와 동일하지만 약어를 사용하지 않음
+|i_CTRL-O|	CTRL-O {command}  {command}를 실행하고 입력 모드로 돌아옴
+
+돌아다니기:
+|i_<Up>|	화살표 키	  커서를 좌/우/상/하로 움직임
+|i_<S-Left>|	시프트 좌/우	  한 어절 좌/우
+|i_<S-Up>|	시프트 상/하	  화면 전체만큼 위/아래
+|i_<End>|	<End>		  줄의 마지막 문자 뒤로 커서를 옮김
+|i_<Home>|	<Home>		  줄의 첫 문자로 커서를 옮김
+------------------------------------------------------------------------------
+*Q_ss*		입력 모드 특수 키
+
+|i_CTRL-V|	CTRL-V {char}..	  문자를 그대로 입력, 혹은 10진수 값 입력
+|i_<NL>|	<NL> 나 <CR> 나 CTRL-M 나 CTRL-J
+				  새 줄 시작
+|i_CTRL-E|	CTRL-E		  커서 아랫줄의 문자를 입력
+|i_CTRL-Y|	CTRL-Y		  커서 윗줄의 문자를 입력
+
+|i_CTRL-A|	CTRL-A		  전에 입력한 내용을 입력
+|i_CTRL-@|	CTRL-@		  전에 입력한 내용을 입력하고 입력 모드를 나감
+|i_CTRL-R|	CTRL-R {0-9a-z%#:.-="}  레지스터의 내용을 입력
+
+|i_CTRL-N|	CTRL-N		  커서 앞 내용과 일치하는 다음 식별자 후보를
+				     입력
+|i_CTRL-P|	CTRL-P		  커서 앞 내용과 일치하는 이전 식별자 후보를
+				     입력
+|i_CTRL-X|	CTRL-X ...	  커서 앞의 단어를 다양한 방법으로 완성
+
+|i_<BS>|	<BS> 나 CTRL-H	  커서 앞의 글자를 지움
+|i_<Del>|	<Del>		  커서가 위치한 글자를 지움
+|i_CTRL-W|	CTRL-W		  커서 앞의 어절을 지움
+|i_CTRL-U|	CTRL-U		  현재 줄에서 입력한 모든 문자를 지움
+|i_CTRL-T|	CTRL-T		  현재 줄의 맨 앞에 shiftwidth만큼 들여쓰기
+				       추가
+|i_CTRL-D|	CTRL-D		  현재 줄의 맨 앞에서 shiftwidth만큼 들여쓰기
+				       제거
+|i_0_CTRL-D|	0 CTRL-D	  현재 줄의 모든 들여쓰기를 지움
+|i_^_CTRL-D|	^ CTRL-D	  현재 줄의 모든 들여쓰기를 지우고 다음 줄의
+				       들여쓰기를 복구
+------------------------------------------------------------------------------
+*Q_di*		다이그래프
+
+|:dig|	   :dig[raphs]		현재 다이그래프의 목록을 출력
+|:dig|	   :dig[raphs] {char1}{char2} {number} ...
+				목록에 다이그래프(들) 추가
+
+입력 / 명령줄 모드에서:
+|i_CTRL-K|	CTRL-K {char1} {char2}
+				  다이그래프 입력
+|i_digraph|	{char1} <BS> {char2}
+				  'digraph' 옵션이 켜져있으면 다이그래프 입력
+------------------------------------------------------------------------------
+*Q_si*		특별한 입력
+
+|:r|	   :r [file]	   커서 밑에 [file] 파일의 내용을 입력
+|:r!|	   :r! {command}   커서 밑에 {command} 명령의 표준 출력을 그대로 입력
+------------------------------------------------------------------------------
+*Q_de*		내용 지우기
+
+|x|	N  x		커서 위치 및 그 이후의 N 문자를 지움
+|<Del>|	N  <Del>	커서 위치 및 그 이후의 N 문자를 지움
+|X|	N  X		커서 앞의 N 문자를 지움
+|d|	N  d{motion}	{motion} 움직임으로 지나가는 내용을 지움
+|v_d|	   {visual}d	강조된 내용을 지움
+|dd|	N  dd		N 줄을 지움
+|D|	N  D		줄의 끝까지 (와 N-1 줄을 더) 지움
+|J|	N  J		N-1 줄을 붙임 (<EOL>들을 지움)
+|v_J|	   {visual}J	강조된 내용을 한 줄로 붙임
+|gJ|	N  gJ		"J"와 같지만 공백을 추가하지 않음
+|v_gJ|	   {visual}gJ	"{visual}J"와 같지만 공백을 추가하지 않음
+|:d|	:[range]d [x]	[range] 줄을 지움 [레지스터 x에 넣음]
+------------------------------------------------------------------------------
+*Q_cm*		내용 복사하고 옮기기
+
+|quote|	  "{char}	다음 지우기, 복사, 넣기에 {char} 레지스터를 사용
+|:reg|	  :reg		모든 레지스터의 내용을 출력
+|:reg|	  :reg {arg}	{arg}에 명시한 레지스터의 내용을 출력
+|y|	  N  y{motion}	{motion} 움직임으로 지나가는 내용을 레지스터로 복사
+|v_y|	     {visual}y	강조된 내용을 레지스터로 복사
+|yy|	  N  yy		N 줄을 레지스터로 복사
+|Y|	  N  Y		N 줄을 레지스터로 복사
+|p|	  N  p		커서 뒤에 레지스터 내용을 넣음 (N 번 반복)
+|P|	  N  P		커서 앞에 레지스터 내용을 넣음 (N 번 반복)
+|]p|	  N  ]p		p와 같지만, 현재 줄에 맡게 들여쓰기를 조정
+|[p|	  N  [p		P와 같지만, 현재 줄에 맡게 들여쓰기를 조정
+|gp|	  N  gp		p와 같지만, 커서를 넣은 내용 뒤로 옮김
+|gP|	  N  gP		P와 같지만, 커서를 넣은 내용 뒤로 옮김
+------------------------------------------------------------------------------
+*Q_ch*		내용 바꾸기
+
+|r|	  N  r{char}	N 문자를 {char} 문자로 바꿈
+|gr|	  N  gr{char}	N 문자를 형식이 흐트러지지 않게 {char} 문자로 바꿈
+|R|	  N  R		바꾸기 모드에 들어감 (입력된 내용을 N 번 반복)
+|gR|	  N  gR		가상 바꾸기 모드에 들어감.  바꾸기 모드와 같지만
+			   형식이 흐트러지지 않음
+|v_b_r|	     {visual}r{char}
+			시각 블록 모드에서 선택한 영역의 문자를 {char} 문자로
+			   바꿈
+
+	(고치기 = 내용을 지우고 입력 모드로 들어감)
+|c|	  N  c{motion}	{motion}으로 지나가는 내용을 고치기
+|v_c|	     {visual}c	강조된 내용을 고치기
+|cc|	  N  cc		N 줄을 고치기
+|S|	  N  S		N 줄을 고치기
+|C|	  N  C		줄의 끝까지 (그리고 N-1 줄을 더) 고치기
+|s|	  N  s		N 개의 문자를 고치기
+|v_b_c|	     {visual}c	시각 블록 모드에서 선택한 줄들을 입력한 내용으로
+			   고치기
+|v_b_C|	     {visual}C	시각 블록 모드에서 선택한 줄들의 끝까지를 입력한
+			   내용으로 고치기
+
+|~|	  N  ~		N 문자의 대소문자를 뒤집고 커서를 뒤로 옮김
+|v_~|	     {visual}~	강조된 내용의 대소문자를 뒤집음
+|v_u|	     {visual}u	강조된 내용을 모두 소문자로 바꿈
+|v_U|	     {visual}U	강조된 내용을 모두 대문자로 바꿈
+|g~|	     g~{motion} {motion}으로 지나가는 내용의 대소문자를 뒤집음
+|gu|	     gu{motion} {motion}으로 지나가는 내용을 모두 소문자로 바꿈
+|gU|	     gU{motion} {motion}으로 지나가는 내용을 모두 대문자로 바꿈
+|v_g?|	     {visual}g? 강조된 내용에 rot13 인코딩을 적용
+|g?|	     g?{motion} {motion}으로 지나가는 내용에 rot13 인코딩을 적용
+
+|CTRL-A|  N  CTRL-A	커서 위치에 있거나 그 다음에 나오는 숫자에 N을 더함
+|CTRL-X|  N  CTRL-X	커서 위치에 있거나 그 다음에 나오는 숫자에서 N을 뺌
+
+|<|	  N  <{motion}	{motion}으로 지나가는 내용에서 shiftwidth만큼
+			   들여쓰기를 지움
+|<<|	  N  <<		N 줄의 들여쓰기를 shiftwidth 만큼 지움
+|>|	  N  >{motion}	{motion}으로 지나가는 내용을 shiftwidth만큼 더
+			   들여쓰기
+|>>|	  N  >>		N 줄을 shiftwidth만큼 더 들여쓰기
+|gq|	  N  gq{motion}	{motion}으로 지나가는 내용을 'textwidth' 길이에 맞게
+			   맞춤
+|:ce|	  :[range]ce[nter] [width]
+			[range] 범위의 줄들을 가운데 맞춤
+|:le|	  :[range]le[ft] [indent]
+			[range] 범위의 줄들을 왼쪽 맞춤([indent]만큼 들여쓰기)
+|:ri|	  :[range]ri[ght] [width]
+			[range] 범위의 줄들을 오른쪽 맞춤
+------------------------------------------------------------------------------
+*Q_co*		복잡한 바꾸기
+
+|!|	   N  !{motion}{command}<CR>
+			움직임으로 지나가는 내용을 {command} 명령으로 처리
+|!!|	   N  !!{command}<CR>
+			N 줄을 {command} 명령으로 처리
+|v_!|	      {visual}!{command}<CR>
+			강조된 내용을 {command} 명령으로 처리
+|:range!|  :[range]! {command}<CR>
+			[range] 범위의 줄들을 {command} 명령으로 처리
+|=|	   N  ={motion}
+			움직임으로 지나가는 내용을 'equalprg'을 통해 처리
+|==|	   N  ==	N 줄을 'equalprg'을 통해 처리
+|v_=|	      {visual}=
+			강조된 내용을 'equalprg'을 통해 처리
+|:s|	   :[range]s[ubstitute]/{pattern}/{string}/[g][c]
+			[range] 범위에서 {pattern} 패턴을 {string} 내용으로
+			   바꾸기
+			   [g]가 있으면, {pattern}이 나오는 모든 곳을 바꿈
+			   [c]가 있으면 바꿀 때마다 물어봄
+|:s|	   :[range]s[ubstitute] [g][c]
+			이전 ":s"를 새로운 범위와 옵션으로 반복
+|&|	      &		이전 ":s"를 현재 줄에서 옵션 없이 반복
+|:ret|	   :[range]ret[ab][!] [tabstop]
+			'tabstop'을 새 값으로 바꾸고 이에 따라 공백을 조정
+------------------------------------------------------------------------------
+*Q_vi*		시각 모드
+
+|visual-index|	시각 모드 명령 목록
+
+|v|        v		문자 단위 강조 시작  }  커서를 움직이거나,
+|V|        V		줄 단위 강조 시작    }  오퍼레이터로 강조된
+|CTRL-V|   CTRL-V	블록 방식 강조 시작  }  내용에 영향을 줌
+|v_o|      o		커서의 위치를 강조된 내용의 반대쪽 끝으로 옮김
+|gv|       gv		이전 시각 모드 때 상태로 시각 모드 시작
+|v_v|      v		문자 단위로 강조하거나 시각 모드를 끝냄
+|v_V|      V		줄 단위로 강조하거나 시각 모드를 끝냄
+|v_CTRL-V| CTRL-V	블록 방식으로 강조하거나 시각 모드를 끝냄
+------------------------------------------------------------------------------
+*Q_to*		텍스트 오브젝트 (시각 모드에서 혹은 오퍼레이터 다음)
+
+|v_aw|	   N  aw	어절("a word") 선택 
+|v_iw|	   N  iw	안쪽 어절("inner word") 선택
+|v_aW|	   N  aW	공백으로 구분한 어절("a |WORD|") 선택
+|v_iW|	   N  iW	안쪽 공배으로 구분한 어절("inner |WORD|") 선택
+|v_as|	   N  as	문장("a sentence") 선택
+|v_is|	   N  is	안쪽 문장("inner sentence") 선택
+|v_ap|	   N  ap	문단("a paragraph") 선택
+|v_ip|	   N  ip	안쪽 문단("inner paragraph") 선택
+|v_ab|	   N  ab	"[("에서 "])"까지의 블록("a block") 선택
+|v_ib|	   N  ib	"[("에서 "])"까지의 안쪽 블록("inner block") 선택
+|v_aB|	   N  aB	"[{"에서 "]}"까지의 블록("a Block") 선택
+|v_iB|	   N  iB	"[{"에서 "]}"까지의 안쪽 블록("inner Block") 선택
+|v_a>|	   N  a>	꺾쇠 블록("a <> block") 선택
+|v_i>|	   N  i>	안쪽 꺾쇠 블록("inner <> block") 선택
+|v_at|	   N  at	<aaa>에서 </aaa>까지의 태그 블록("a tag block") 선택
+|v_it|	   N  it	<aaa>에서 </aaa>까지의 안쪽 태그 블록("inner tag
+			   block") 선택
+|v_a'|	   N  a'	작은따옴표 문자열("a single quoted string") 선택
+|v_i'|	   N  i'	안쪽 작은따옴표 문자열("inner single quoted string")
+			   선택
+|v_aquote| N  a"	큰따옴표 문자열("a double quoted string") 선택
+|v_iquote| N  i"	안쪽 큰따옴표 문자열("inner double quoted string")
+			   선택
+|v_a`|	   N  a`	백틱 문자열("a backward quoted string") 선택
+|v_i`|	   N  i`	안쪽 백틱 문자열("inner backward quoted string") 선택
+
+------------------------------------------------------------------------------
+*Q_re*		반복하기 명령
+
+|.|	   N  .		마지막 변경을 반복 (숫자만 N으로 바꾸서)
+|q|	      q{a-z}	입력하는 문자를 {a-z} 레지스터에 기록
+|q|	      q{A-Z}	입력하는 문자를 {a-z} 레지스터에 추가로 기록
+|q|	      q		기록 종료
+|@|	   N  @{a-z}	{a-z} 레지스터의 내용을 실행 (N 번 반복)
+|@@|	   N  @@	직전 @{a-z} 명령을 반복 (N 번 반복)
+|:@|	   :@{a-z}	{a-z} 레지스터의 내용을 Ex 명령으로 실행
+|:@@|	   :@@		직전 :@{a-z} 명령을 반복
+|:g|	   :[range]g[lobal]/{pattern}/[cmd]
+			[range] 범위에서 {pattern}이 일치하는 줄에 대해 Ex
+			   명령 [cmd](기본 값: ":p")를 실행
+|:g|	   :[range]g[lobal]!/{pattern}/[cmd]
+			[range] 범위에서 {pattern}이 일치하지 않는 줄에 대해
+			   Ex 명령 [cmd](기본 값: ":p")를 실행
+|:so|	   :so[urce] {file}
+			{file} 파일에서 Ex 명령들을 읽음
+|:so|	   :so[urce]! {file}
+			{file} 파일에서 Vim 명령들을 읽음
+|:sl|	   :sl[eep] [sec]
+			[sec] 초 동안 아무 것도 하지 않음
+|gs|	   N  gs	N 초 동안 아무 것도 하지 않음
+------------------------------------------------------------------------------
+*Q_km*		키 매핑
+
+|:map|       :ma[p] {lhs} {rhs}	  보통, 시각 모드에서 {lhs}를 {rhs}로 매핑
+|:map!|      :ma[p]! {lhs} {rhs}  입력, 명령줄 모드에서 {lhs}를 {rhs}로 매핑
+|:noremap|   :no[remap][!] {lhs} {rhs}
+				  ":map"과 같지만 {rhs}에서 다시 매핑이 되지
+				     않음
+|:unmap|     :unm[ap] {lhs}	  보통, 시각 모드에서 {lhs}의 매핑을 지움
+|:unmap!|    :unm[ap]! {lhs}	  입력, 명령줄 모드에서 {lhs}의 매핑을 지움
+|:map_l|     :ma[p] [lhs]	  보통, 시각 모드에서 ( [lhs]로 시작하는) 매핑
+				     목록을 출력
+|:map_l!|    :ma[p]! [lhs]	  입력, 명령줄 모드에서 ( [lhs]로 시작하는)
+				     매핑 목록을 출력
+|:cmap|      :cmap/:cunmap/:cnoremap
+				  ":map!"/":unmap!"/":noremap!"와 동일하나
+				     명령줄 모드만 관리
+|:imap|      :imap/:iunmap/:inoremap
+				  ":map!"/":unmap!"/":noremap!"와 동일하나
+				     입력 모드만 관리
+|:nmap|      :nmap/:nunmap/:nnoremap
+				  ":map!"/":unmap!"/":noremap!"와 동일하나
+				     보통 모드만 관리
+|:vmap|      :vmap/:vunmap/:vnoremap
+				  ":map!"/":unmap!"/":noremap!"와 동일하나
+				     시각 모드만 관리
+|:omap|      :omap/:ounmap/:onoremap
+				  ":map!"/":unmap!"/":noremap!"와 동일하나
+				     오퍼레이터 대기일 때만 관리
+|:mapc|      :mapc[lear]	  보통, 시각 모드의 모든 매핑을 지움
+|:mapc|      :mapc[lear]!	  입력, 명령줄 모드의 모든 매핑을 지움
+|:imapc|     :imapc[lear]	  입력 모드의 모든 매핑을 지움
+|:vmapc|     :vmapc[lear]	  시각 모드의 모든 매핑을 지움
+|:omapc|     :omapc[lear]	  오퍼레이터 대기 모드의 모든 매핑을 지움
+|:nmapc|     :nmapc[lear]	  보통 모드의 모든 매핑을 지움
+|:cmapc|     :cmapc[lear]	  명령줄 모드의 모든 매핑을 지움
+|:mkexrc|    :mk[exrc][!] [file]  현재 매핑과 약어, 설정을 [file] 파일(기본
+				     값: ".exrc")에 씀 (덮어쓰려면 ! 사용)
+|:mkvimrc|   :mkv[imrc][!] [file]
+				  ":mkexrc"와 같으나 기본 값이 ".vimrc"임
+|:mksession| :mks[ession][!] [file]
+				  ":mkvimrc"와 같으나, 현재 구성과 같이 나중에
+				     다시 계속 작업할 수 있도록 현재 파일들과
+				     창 등도 저장.  
+------------------------------------------------------------------------------
+*Q_ab*		약어
+
+|:abbreviate|	:ab[breviate] {lhs} {rhs}  {rhs}의 약어로 {lhs}를 추가
+|:abbreviate|	:ab[breviate] {lhs}	   {lhs}로 시작하는 약어를 보여줌
+|:abbreviate|	:ab[breviate]		   모든 약어를 보여줌
+|:unabbreviate|	:una[bbreviate] {lhs}	   약어 {lhs}를 지움
+|:noreabbrev|	:norea[bbrev] [lhs] [rhs]  ":ab"와 같지만 [rhs]를 다시
+					      매핑하지 않음
+|:iabbrev|	:iab/:iunab/:inoreab	   ":ab"와 같지만 입력 모드에서만 동작
+|:cabbrev|	:cab/:cunab/:cnoreab	   ":ab"와 같지만 명령줄 모드에서만
+					      동작
+|:abclear|	:abc[lear]		   모든 약어를 지움
+|:cabclear|	:cabc[lear]		   명령줄 모드의 모든 약어를 지움
+|:iabclear|	:iabc[lear]		   입력 모드의 모든 약어를 지움
+------------------------------------------------------------------------------
+*Q_op*		옵션
+
+|:set|		:se[t]			  변경한 모든 옵션을 보여줌
+|:set|		:se[t] all		  텀캡을 제외한 모든 옵션을 보여줌
+|:set|		:se[t] termcap		  모든 텀캡 옵션을 보여줌
+|:set|		:se[t] {option}		  불린 옵션을 켜거나, 문자열이나 숫자
+					     옵션의 값을 보여줌
+|:set|		:se[t] no{option}	  불린 옵션을 끔
+|:set|		:se[t] inv{option}	  불린 옵션의 값을 바꿈
+|:set|		:se[t] {option}={value}	  문자열이나 숫자 옵션에 {value} 값을
+					     설정
+|:set|		:se[t] {option}+={value}  문자열 옵션에는 {value}를 덧붙이고,
+					     숫자 옵션에는 {value}를 더함
+|:set|		:se[t] {option}-={value}  문자열 옵션에서는 {value}를 지우고,
+					     숫자 옵션에서는 {value}를 뺌
+|:set|		:se[t] {option}?	  {option}의 값을 보여줌
+|:set|		:se[t] {option}&	  {option}의 값을 기본 값으로 바꿈
+
+|:setlocal|	:setl[ocal]		  ":set"과 비슷하지만 지역 값이 있는
+					     옵션은 지역 값을 설정
+|:setglobal|	:setg[lobal]		  ":set"과 비슷하지만 지역 옵션의 전역
+					     값을 설정
+
+|:fix|		:fix[del]		  't_kD'의 값을 't_kb'의 값에 따라
+					     설정
+|:options|	:opt[ions]		  옵션을 보고 설정하기 위한 새 창을
+					     열기.  기능 별로 묶여있고, 한 줄
+					     설명과 도움말 링크가 있음
+
+각 옵션의 짧은 설명:				*option-list*
+'aleph'		  'al'	    히브리 문자 알레프(Aleph)의 아스키 코드
+'allowrevins'	  'ari'     입력 모드와 명령줄 모드에서 CTRL-_를 허용
+'altkeymap'	  'akm'     기본 두 번째 언어 설정 (페르시아어/히브리어)
+'ambiwidth'	  'ambw'    폭이 불분명한 유니코드 문자를 어떻게 할지
+'antialias'	  'anti'    맥 OS X에서 부드럽고 에일리어싱 제거된 글꼴을 사용
+'autochdir'	  'acd'     현재 창의 파일이 있는 디렉터리로 변경
+'arabic'	  'arab'    기본 두 번째 언어로 아랍어 사용
+'arabicshape'	  'arshape' 아랍 문자에 대해 쉐이핑(shaping) 사용
+'autoindent'	  'ai'	    새로운 줄의 들여쓰기를 이전 줄에서 가져옴
+'autoread'	  'ar'	    Vim 외부에서 바뀐 파일을 자동으로 읽어옴
+'autowrite'	  'aw'	    변경된 내용을 파일에 자동으로 씀
+'autowriteall'	  'awa'     'autowrite'와 비슷하나, 더 많은 명령과 함께 동작
+'background'	  'bg'	    "dark" 혹은 "light", 색으로 강조할 때 사용
+'backspace'	  'bs'	    줄의 맨 앞에 있을 때 백스페이스의 동작을 정의
+'backup'	  'bk'	    파일을 덖어쓴 후 백업 파일 보관
+'backupcopy'	  'bkc'     파일명을 바꾸는 것이 아니라 복사본을 만들어 백업
+'backupdir'	  'bdir'    백업 파일용 디렉터리 목록
+'backupext'	  'bex'     백업 파일에 사용할 확장자
+'backupskip'	  'bsk'     패턴과 일치하는 파일에 대해서는 백업을 만들지 않음
+'balloondelay'	  'bdlay'   풍선이 보여지기 전 대기 시간을 밀리초로 설정
+'ballooneval'	  'beval'   풍선 계산(balloon evaluation) 기능을 켬
+'balloonexpr'	  'bexpr'   풍선에 표시할 표현식
+'binary'	  'bin'     파일을 이진 형식으로 읽고/쓰고/편집
+'bioskey'	  'biosk'   마이크로소프트 도스: 문자 입력 시 바이오스 콜 사용
+'bomb'			    파일 앞에 바이트 순서 표식(BOM)을 붙임
+'breakat'	  'brk'     줄바꿈이 일어날 수 있는 문자들
+'browsedir'	  'bsdir'   탐색기를 어느 디렉터리에서 시작할지
+'bufhidden'	  'bh'	    버퍼가 창에서 사라질 때 어떻게 처리할지
+'buflisted'	  'bl'	    버퍼를 버퍼 목록에 표시할지
+'buftype'	  'bt'	    특수한 종류의 버퍼
+'casemap'	  'cmp'     대소문자를 바꾸는 방법을 지정
+'cdpath'	  'cd'	    ":cd" 명령으로 찾는 디렉터리 목록
+'cedit'			    명령줄 창을 열 때 사용할 키
+'charconvert'	  'ccv'     문자 인코딩 변환에 쓸 표현식
+'cindent'	  'cin'     C 프로그램식 들여쓰기
+'cinkeys'	  'cink'    'cindent'가 켜져있을 때 들여쓰기 조정을 하는 키
+'cinoptions'	  'cino'    'cindent'가 켜져있을 때 들여쓰기를 어떻게 할지
+'cinwords'	  'cinw'    'si'와 'cin'이 더 많이 들여쓰기 할 단어들
+'clipboard'	  'cb'	    클립보드를 이름 없는 레지스터로 사용
+'cmdheight'	  'ch'	    명령줄에 사용할 줄 수
+'cmdwinheight'	  'cwh'     명령줄 창의 높이
+'colorcolumn'	  'cc'	    강조할 열
+'columns'	  'co'	    화면에 표시되는 열의 수
+'comments'	  'com'     주석인 줄을 시작하는 패턴
+'commentstring'   'cms'     주석을 위한 템플릿.  폴드 마커에 사용됨
+'compatible'	  'cp'	    최대한 Vi와 호환되도록 동작
+'complete'	  'cpt'     입력 모드 자동 완성의 동작을 지정
+'completefunc'	  'cfu'     입력 모드 자동 완성에 사용할 함수
+'completeopt'	  'cot'     입력 모드 자동 완성 옵션
+'concealcursor'	  'cocu'    커서가 있는 줄의 숨길 수 있는 내용을 숨겨야 하는지
+'conceallevel'	  'cole'    숨길 수 있는 내용을 보여줄지 숨길지
+'confirm'	  'cf'	    저장하지 않았거나 읽기 전용인 파일의 처리를 확인
+'conskey'	  'consk'   키를 콘솔에서 바로 얻음 (마이크로소프트 도스 전용)
+'copyindent'	  'ci'	    'autoindent'가 기존의 들여쓰기 구조를 사용하도록
+'cpoptions'	  'cpo'     Vi 호환 동작을 위한 플래그
+'cryptmethod'	  'cm'	    파일을 저장할 때 사용할 암호화 종류
+'cscopepathcomp'  'cspc'    경로를 몇 단계나 보여줄지
+'cscopeprg'       'csprg'   cscope를 실행하는 명령
+'cscopequickfix'  'csqf'    cscope 결과에 대해 퀵픽스 창을 사용
+'cscoperelative'  'csre'    cscope.out 파일의 경로를 상대경로의 기준으로 사용
+'cscopetag'       'cst'     태그 명령에 cscope 사용
+'cscopetagorder'  'csto'    ":cstag" 탐색 순서를 결정
+'cscopeverbose'   'csverb'  cscope 데이터베이스를 추가할 때 메시지를 보여줌
+'cursorbind'	  'crb'     다른 창의 커서가 움직임에 따라 함께 커서를 움직임
+'cursorcolumn'	  'cuc'	    커서의 화면 열을 강조
+'cursorline'	  'cul'	    커서의 화면 줄을 강조
+'debug'			    모든 에러 메시지를 보려면 "msg"로 설정
+'define'	  'def'     매크로 정의를 찾을 때 쓸 패턴
+'delcombine'	  'deco'    조합된 문자를 제각각 지움
+'dictionary'	  'dict'    키워드 자동 완성에 쓸 파일명 목록
+'diff'			    현재 창에 디프 모드 사용
+'diffexpr'	  'dex'     표현식으로 디프 파일을 얻음
+'diffopt'	  'dip'     디프 모드 사용 시 옵션
+'digraph'	  'dg'	    입력 모드에서 다이그래프를 입력
+'directory'	  'dir'     스왑 파일을 위한 디렉터리명 목록
+'display'	  'dy'	    내용을 표시하는 데 대한 플래그 목록
+'eadirection'	  'ead'     'equalalways'가 어느 방향으로 동작하는지
+'edcompatible'	  'ed'	    ":substitute" 명령의 플래그를 토글
+'encoding'	  'enc'     내부에서 사용하는 인코딩
+'endofline'	  'eol'     파일의 마지막 줄에 <EOL>을 붙임
+'equalalways'	  'ea'	    창이 자동으로 같은 크기로 만들어짐
+'equalprg'	  'ep'	    "=" 명령으로 사용할 외부 프로그램
+'errorbells'	  'eb'	    에러 메시지가 나올 때 벨을 울림
+'errorfile'	  'ef'	    퀵픽스 모드에서 쓸 에러 파일의 이름
+'errorformat'	  'efm'     에러 파일의 각 줄에 대한 설명
+'esckeys'	  'ek'	    입력 모드에서 기능 키를 인식
+'eventignore'	  'ei'	    무시할 자동명령 이벤트
+'expandtab'	  'et'	    <Tab>이 입력되면 스페이스 공백들을 삽입
+'exrc'		  'ex'	    현재 디렉터리의 .vimrc와 .exrc를 읽음
+'fileencoding'	  'fenc'    멀티바이트인 내용의 파일 인코딩
+'fileencodings'   'fencs'   자동으로 인식할 문자 인코딩
+'fileformat'	  'ff'	    파일 입출력에 사용할 파일 포맷
+'fileformats'	  'ffs'     자동으로 인식할 'fileformat' 값
+'fileignorecase'  'fic'     파일명을 사용할 때 대소문자 무시
+'filetype'	  'ft'	    자동명령에 사용되는 파일의 형식
+'fillchars'	  'fcs'     특수 항목들을 표시할 때 사용할 문자들
+'fkmap'		  'fk'	    페르시아어 키보드 매핑
+'foldclose'	  'fcl'     커서가 떠나면 폴드를 접음
+'foldcolumn'	  'fdc'     폴드를 가리키기 위해 사용할 열의 폭
+'foldenable'	  'fen'     열린 모든 폴드를 표시하려면 설정
+'foldexpr'	  'fde'     'foldmethod'가 "expr"일 때 사용할 표현식
+'foldignore'	  'fdi'     'foldmethod'가 "indent"일 때 무시할 줄들
+'foldlevel'	  'fdl'     이 보다 높은 레벨의 폴드는 닫음
+'foldlevelstart'  'fdls'    파일을 열 때의 'foldlevel'
+'foldmarker'	  'fmr'     'foldmethod'가  "marker"일 때 사용할 마커
+'foldmethod'	  'fdm'     접기 방식
+'foldminlines'	  'fml'     폴드를 닫을 수 있는 최소 줄 수
+'foldnestmax'	  'fdn'     폴드의 최대 깊이
+'foldopen'	  'fdo'     어떤 명령을 쓰면 폴드를 열 것인가
+'foldtext'	  'fdt'     닫힌 폴드를 표시할 때 사용할 표현식
+'formatlistpat'   'flp'     목록 헤더 인식을 위한 패턴
+'formatoptions'   'fo'	    자동 서식화를 어떻게 할 것인지
+'formatprg'	  'fp'	    "gq" 명령으로 사용할 외부 프로그램명
+'formatexpr'	  'fex'     "gq" 명령으로 사용할 표현식
+'fsync'		  'fs'	    파일 저장 후 fsync()를 부를지
+'gdefault'	  'gd'	    ":substitute" 플래그 중 'g'를 기본으로 붙임
+'grepformat'	  'gfm'     'grepprg'의 출력 형식
+'grepprg'	  'gp'	    ":grep"으로 사용할 프로그램
+'guicursor'	  'gcr'     GUI: 커서 모양과 깜빡임을 설정
+'guifont'	  'gfn'     GUI: 사용할 글꼴(들)의 이름(들)
+'guifontset'	  'gfs'     GUI: 사용할 멀티바이트 글꼴의 이름들
+'guifontwide'	  'gfw'     두 칸을 차지하는 문자를 위한 글꼴 이름들
+'guiheadroom'	  'ghr'     GUI: 윈도우 장식을 위한 공간 크기
+'guioptions'	  'go'	    GUI: 어떤 요소와 옵션을 사용할지
+'guipty'		    GUI: ":!" 명령 사용 시 가상 터미널 사용 시도
+'guitablabel'	  'gtl'     GUI: 탭 페이지용 라벨 지정
+'guitabtooltip'   'gtt'     GUI: 탭 페이지용 툴팁 지정
+'helpfile'	  'hf'	    주 도움말 파일의 전체 경로
+'helpheight'	  'hh'	    새 도움말 창의 최소 높이
+'helplang'	  'hlg'     선호하는 도움말 언어
+'hidden'	  'hid'     버퍼를 닫더라도(|abandon|) 없애지 않음
+'highlight'	  'hl'	    다양한 상황에 대한 강조 방법 설정
+'hlsearch'	  'hls'     마지막 찾기 패턴과 일치하는 부분을 강조
+'history'	  'hi'	    명령줄에서 기억할 명령의 수
+'hkmap'		  'hk'	    히브리어 키보드 매핑
+'hkmapp'	  'hkp'     발음에 따른 히브리어 키보드 매핑
+'icon'			    Vim이 창의 아이콘 텍스트를 설정할 수 있게 함
+'iconstring'		    Vim 아이콘 텍스트로 쓸 문자열
+'ignorecase'	  'ic'	    찾기 패턴에서 대소문자를 무시
+'imactivatekey'   'imak'    XIM(X input method)을 활성화하는 키
+'imactivatefunc'  'imaf'    XIM을 활성화/비활성화 하는 함수
+'imcmdline'	  'imc'     명령줄 편집을 시작할 때 IM을 사용
+'imdisable'	  'imd'     IM을 모든 모드에서 사용하지 않음
+'iminsert'	  'imi'     입력 모드에서 :lmap이나 IM을 사용
+'imsearch'	  'ims'     찾기 패턴을 입력할 때 :lmap 이나 IM을 사용
+'imstatusfunc'    'imsf'    XIM 상태를 얻는 함수
+'include'	  'inc'     파일을 include하는 곳을 찾을 때 사용할 패턴
+'includeexpr'	  'inex'    include 줄을 처리할 때 사용할 표현식
+'incsearch'	  'is'	    찾기 패턴을 입력하는 중에도 일치하는 곳을 강조
+'indentexpr'	  'inde'    줄의 들여쓰기를 얻기 위해 사용할 표현식
+'indentkeys'	  'indk'    'indentexpr'를 이용하여 들여쓰기를 하는 키
+'infercase'	  'inf'     키워드 자동 완성 시 대소문자를 적절히 조정
+'insertmode'	  'im'	    편집을 입력 모드에서 시작
+'isfname'	  'isf'     파일명과 경로명에 쓸 수 있는 문자
+'isident'	  'isi'     식별자에 쓸 수 있는 문자
+'iskeyword'	  'isk'     키워드에 쓸 수 있는 문자
+'isprint'	  'isp'     출력 가능한 문자
+'joinspaces'	  'js'	    join 명령을 쓸 때 마침표 뒤에 공백을 두 개 넣음
+'key'			    암호화 키
+'keymap'	  'kmp'     키보드 매핑 이름
+'keymodel'	  'km'	    키를 사용하여 선택을 시작하거나 끝낼 수 있게 함
+'keywordprg'	  'kp'	    "K" 명령으로 사용할 프로그램
+'langmap'	  'lmap'    다른 언어 입력을 위한 알파벳 대응
+'langmenu'	  'lm'	    메뉴 표시에 사용할 언어
+'laststatus'	  'ls'	    유일한 창에 상태 표시줄이 있어야 할지 알려줌
+'lazyredraw'	  'lz'	    매크로 실행 중에는 화면을 다시 그리지 않음
+'linebreak'	  'lbr'     긴 줄을 공백에서 넘겨 표시
+'lines'			    화면에 표시되는 줄 수
+'linespace'	  'lsp'     글자 사이 여백으로 쓸 픽셀 수
+'lisp'			    리스프(Lisp)용 자동 들여쓰기
+'lispwords'	  'lw'	    리스프 들여쓰기에서 들여쓰기가 바뀌는 단어들
+'list'			    <Tab>과 <EOL>을 표시
+'listchars'	  'lcs'     'list'가 켜져있을 때 표시에 쓸 글자들
+'loadplugins'	  'lpl'     구동 시 플러그인 스크립트를 로드
+'macatsui'		    맥 GUI: 문자 표시에 ATSUI를 사용
+'magic'			    찾기 패턴에서 사용하는 특수 문자를 바꿈
+'makeef'	  'mef'     ":make"에서 쓸 에러 파일 이름
+'makeprg'	  'mp'	    ":make" 명령으로 사용할 프로그램
+'matchpairs'	  'mps'     "%"으로 짝을 찾을 문자들의 쌍
+'matchtime'	  'mat'     짝이 되는 괄호를 보여줄 시간을 1/10초 단위로 지정
+'maxcombine'	  'mco'     표시할 수 있는 최대 문자 조합의 수
+'maxfuncdepth'	  'mfd'     사용자 함수의 최대 재귀 호출 깊이
+'maxmapdepth'	  'mmd'     매핑의 최대 재귀 매핑 깊이
+'maxmem'	  'mm'	    버퍼 하나가 쓸 수 있는 최대 메모리 (Kbyte 단위)
+'maxmempattern'   'mmp'     패턴 찾기가 쓸 수 있는 최대 메모리 (Kbyte 단위)
+'maxmemtot'	  'mmt'     모든 버퍼를 합쳐서 쓸 수 있는 최대 메모리 (Kbyte)
+'menuitems'	  'mis'     메뉴의 최대 항목 수
+'mkspellmem'	  'msm'     |:mkspell|이 트리 압축을 시작하는 메모리 크기
+'modeline'	  'ml'	    파일의 시작이나 끝에서 모드 줄을 인식
+'modelines'	  'mls'     모드 줄을 찾을 범위 줄 수
+'modifiable'	  'ma'	    내용을 바꿀 수 없음
+'modified'	  'mod'     버퍼가 바뀐 곳이 있음
+'more'			    전체 화면이 차면 나열을 잠시 멈춤
+'mouse'			    마우스 클릭을 쓸 수 있게 함
+'mousefocus'	  'mousef'  키보드 입력이 이루어지는 창이 마우스에 따라 바뀜
+'mousehide'	  'mh'	    타자 칠 때 마우스 포인터 숨김
+'mousemodel'	  'mousem'  마우스 버튼의 의미를 바꿈
+'mouseshape'	  'mouses'  마우스 포인터의 모양을 모드에 따라 바꿈
+'mousetime'	  'mouset'  마우스 더블 클릭 시 클릭간 최대 시간 간격
+'mzquantum'	  'mzq'     MzScheme 쓰레드의 폴링 간격
+'nrformats'	  'nf'	    CTRL-A 명령이 인식하는 숫자 형식
+'number'	  'nu'	    각 줄의 앞에 줄 번호를 표시
+'numberwidth'	  'nuw'     줄 번호 표시에 사용할 열의 수
+'omnifunc'	  'ofu'     파일 형식 별 자동 완성 함수
+'opendevice'	  'odev'    마이크로소프트 윈도에서 장치를 읽고 쓸 수 있게 함
+'operatorfunc'	  'opfunc'  |g@| 오퍼레이터로 호출할 함수
+'osfiletype' 	  'oft'     더 이상 지원하지 않음
+'paragraphs'	  'para'    문단을 나누는 nroff 매크로
+'paste'			    붙여넣기 모드 활성화
+'pastetoggle'	  'pt'	    'paste'를 토글하는 키 코드
+'patchexpr'	  'pex'     파일을 패치하는 데 쓸 표현식
+'patchmode'	  'pm'	    파일의 가장 오래된 버전을 유지
+'path'		  'pa'	    "gf" 등의 명령에서 찾을 디렉터리 목록
+'preserveindent'  'pi'	    들여쓰기를 다시 할 때 기존 들여쓰기 구조를 보존
+'previewheight'   'pvh'     미리보기 창의 높이
+'previewwindow'   'pvw'     미리보기 창임을 확인
+'printdevice'	  'pdev'    :hardcopy로 사용할 프린터 이름
+'printencoding'   'penc'    인쇄 시 사용할 인코딩
+'printexpr'	  'pexpr'   :hardcopy로 PostScript 인쇄를 할 때 사용할 표현식
+'printfont'	  'pfn'     :hardcopy 인쇄 시 사용할 글꼴
+'printheader'	  'pheader' :hardcopy 인쇄 시 사용할 헤더 형식
+'printmbcharset'  'pmbcs'   :hardcopy 인쇄 시 사용할 CJK 문자셋
+'printmbfont'	  'pmbfn'   :hardcopy 인쇄 시 사용할 CJK 글꼴
+'printoptions'	  'popt'    :hardcopy 출력물의 형식을 설정
+'pumheight'	  'ph'	    팝업 메뉴의 최대 높이
+'quoteescape'	  'qe'	    문자열에서 사용하는 이스케이프 문자
+'readonly'	  'ro'	    버퍼에 쓸 수 없도록 함
+'redrawtime'	  'rdt'     'hlsearch'와 |:match| 강조의 시간 제한
+'regexpengine'	  're'	    사용할 기본 정규표현식 엔진
+'relativenumber'  'rnu'	    각 줄의 앞에 상대 줄번호를 표시
+'remap'			    매핑이 재귀적으로 매핑될 수 있게 함
+'report'		    변경 결과를 알려주는 줄 수의 한곗값
+'restorescreen'   'rs'	    Win32: 끝낼 때 화면을 복구
+'revins'	  'ri'	    입력 모드에서 문자를 거꾸로 삽입
+'rightleft'	  'rl'	    창이 오른쪽에서 왼쪽으로 쓰기 상태임
+'rightleftcmd'	  'rlc'     오른쪽에서 왼쪽으로 쓰기로 사용할 명령들
+'ruler'		  'ru'	    상태 줄에 커서가 있는 줄과 열을 표시
+'rulerformat'	  'ruf'     'ruler' 표시 형식을 직접 지정
+'runtimepath'	  'rtp'     런타임 파일을 찾을 디렉터리 목록
+'scroll'	  'scr'     CTRL-U와 CTRL-D로 스크롤 할 줄 수
+'scrollbind'	  'scb'     다른 창이 스크롤 될 때 같이 스크롤
+'scrolljump'	  'sj'	    스크롤 할 최소 줄 수
+'scrolloff'	  'so'	    커서 위나 밑에 표시할 최소 줄 수
+'scrollopt'	  'sbo'     'scrollbind'의 동작을 설정
+'sections'	  'sect'    절을 나누는 nroff 매크로
+'secure'		    현재 디렉터리의 .vimrc를 읽을 때 안전 모드를 켬
+'selection'	  'sel'     어떤 형식의 선택을 사용할지
+'selectmode'	  'slm'     언제 시각 모드 대신 선택 모드를 사용할지
+'sessionoptions'  'ssop'    |:mksession| 설정
+'shell'		  'sh'	    외부 명령 실행 시 사용할 셸 이름
+'shellcmdflag'	  'shcf'    명령 실행 시 셸에 줄 플래그
+'shellpipe'	  'sp'	    ":make" 출력을 에러 파일에 넣기 위해 사용할 문자열
+'shellquote'	  'shq'     셸 명령을 둘러쌀 따옴표 문자
+'shellredir'	  'srr'     필터의 출력을 임시 파일에 넣기 위해 사용할 문자열
+'shellslash'	  'ssl'     셸 파일 경로에 그냥 슬래시(/)를 사용
+'shelltemp'	  'stmp'    셸 명령에 임시 파일을 사용할지
+'shelltype'	  'st'	    Amiga: 셸을 어떻게 사용할지에 영향을 줌
+'shellxescape'	  'sxe'     'shellxquote'가 (일때 이스케이프할 문자
+'shellxquote'	  'sxq'     'shellquote'와 같으나 리디렉션까지 포함
+'shiftround'	  'sr'	    들여쓰기를 shiftwidth의 배수로 조정
+'shiftwidth'	  'sw'	    (자동)들여쓰기의 각 단계에 사용할 공백의 수
+'shortmess'	  'shm'     메시지의 길이를 줄이기 위한 플래그들
+'shortname'	  'sn'	    비-MS-DOS: 파일명이 8글자.3글자인 것으로 가정
+'showbreak'	  'sbr'     길어서 넘어간 줄의 처음에 표시할 문자열
+'showcmd'	  'sc'	    상태 표시줄에 (입력중인) 명령을 표시
+'showfulltag'	  'sft'     태그로 자동 완성할 때 전체 태그 패턴을 표시
+'showmatch'	  'sm'	    괄호 입력 시 짝이 되는 괄호로 잠시 갔다가 돌아옴
+'showmode'	  'smd'     상태 표시줄에 현재 모드를 표시
+'showtabline'	  'stal'    언제 탭 페이지 줄을 표시할지
+'sidescroll'	  'ss'	    수평 스크롤 시 스크롤할 최소 열의 수
+'sidescrolloff'   'siso'    커서 좌, 우에 표시할 최소 열의 수
+'smartcase'	  'scs'     찾기 패턴에 대문자가 있으면 대소문자를 구분함
+'smartindent'	  'si'	    C 프로그램을 위한 영리한 자동 들여쓰기
+'smarttab'	  'sta'     <Tab>을 입력하면 'shiftwidth'를 사용
+'softtabstop'	  'sts'     편집 시 <Tab>을 누르면 들어가는 공백의 수
+'spell'			    맞춤법 검사를 활성화
+'spellcapcheck'   'spc'     문장의 끝을 찾기 위한 패턴
+'spellfile'	  'spf'     |zg|나 |zw|가 단어를 저장할 파일
+'spelllang'	  'spl'     맞춤법 검사를 할 언어(들)
+'spellsuggest'	  'sps'     추천어를 제안하기 위해 사용할 방법(들)
+'splitbelow'	  'sb'	    split으로 생기는 창을 현재 창의 아래에 만듦
+'splitright'	  'spr'     새 창이 현재 창의 오른쪽에 생기도록 함
+'startofline'	  'sol'     커서를 줄의 공백이 아닌 첫 글자로 옮기는 명령들
+'statusline'	  'stl'     상태 표시줄의 형식을 직접 지정
+'suffixes'	  'su'	    여러 일치 후보가 있는 경우 무시할 확장자들
+'suffixesadd'	  'sua'     파일을 찾을 때 붙일 확장자들
+'swapfile'	  'swf'     버퍼에 스왑 파일을 사용할지
+'swapsync'	  'sws'     스왑 파일을 어떻게 디스크에 쓰도록 할지
+'switchbuf'	  'swb'     다른 버퍼를 열 때의 동작을 설정
+'synmaxcol'	  'smc'     문법 항목을 찾을 최대 열 수
+'syntax'	  'syn'     현재 버퍼를 위해 불러올 문법
+'tabstop'	  'ts'	    파일에서 <Tab>이 의미하는 공백 
+'tabline'	  'tal'     콘솔에서 탭 페이지 줄 표시 형식을 직접 지정
+'tabpagemax'	  'tpm'     |-p|나 "tab all"로 열리는 최대 탭 수
+'tagbsearch'	  'tbs'     태그 파일에서 이진 탐색을 사용
+'taglength'	  'tl'	    태그에서 의미가 있는 문자의 수
+'tagrelative'	  'tr'	    태그 파일의 파일명이 상대경로임
+'tags'		  'tag'     태그 명령이 사용할 파일 목록
+'tagstack'	  'tgst'    태그를 태그 스택에 넣음
+'term'			    터미널 이름
+'termbidi'	  'tbidi'   터미널이 양방향(bi-directionality)을 처리
+'termencoding'	  'tenc'    터미널이 사용하는 문자 인코딩
+'terse'			    몇몇 메시지를 줄임
+'textauto'	  'ta'	    더 이상 사용하지 않음, 'fileformats'을 사용
+'textmode'	  'tx'	    더 이상 사용하지 않음, 'fileformat'을 사용
+'textwidth'	  'tw'	    입력하는 내용의 최대 폭
+'thesaurus'	  'tsr'     키워드 자동 완성에 사용할 시소러스 파일 목록
+'tildeop'	  'top'     물결표 명령 "~"을 오퍼레이터처럼 사용
+'timeout'	  'to'	    매핑과 키 코드의 시간 제한
+'timeoutlen'	  'tm'	    시간 제한을 밀리초 단위로 지정
+'title'			    Vim이 창의 제목을 설정하도록 함
+'titlelen'		    창 제목에 사용할 'columns' 퍼센트
+'titleold'		    종료 시 복구할 기존 창 제목
+'titlestring'		    Vim 창 제목으로 사용할 문자열
+'toolbar'	  'tb'	    GUI: 도구막대에 표시할 항목
+'toolbariconsize' 'tbis'    도구막대 아이콘 크기 (GTK 2에서만 동작)
+'ttimeout'		    매핑의 시간 제한
+'ttimeoutlen'	  'ttm'     키 코드의 시간 제한을 밀리초 단위로 지정
+'ttybuiltin'	  'tbi'     내장 텀캡을 외부 텀캡보다 먼저 사용
+'ttyfast'	  'tf'	    빠른 터미널 연결을 나타냄
+'ttymouse'	  'ttym'    생성되는 마우스 코드의 종류
+'ttyscroll'	  'tsl'     스크롤하는 최대 줄의 수
+'ttytype'	  'tty'     'term'의 다른 이름
+'undodir'	  'udir'    실행 취소 파일을 어디에 저장할지
+'undofile'	  'udf'	    실행 취소 정보를 파일에 저장
+'undolevels'	  'ul'	    실행 취소 할 수 있는 최대 단계 수
+'undoreload'	  'ur'	    다시 불러올 때 실행 취소를 위해 저장할 최대 줄 수
+'updatecount'	  'uc'	    이 문자들만큼 입력한 후 스왑 파일을 디스크에 씀
+'updatetime'	  'ut'	    이 밀리초만큼 지난 후 스왑 파일을 디스크에 씀
+'verbose'	  'vbs'     참고가 될만한 메시지들을 표시
+'verbosefile'	  'vfile'   메시지를 저장할 파일
+'viewdir'	  'vdir'    :mkview로 파일을 저장할 디렉터리
+'viewoptions'	  'vop'     :mkview로 저장할 내용을 지정
+'viminfo'	  'vi'	    .viminfo 파일을 구동 및 종료 시 사용
+'virtualedit'	  've'	    가상 편집을 언제 사용할지
+'visualbell'	  'vb'	    삐 소리 대신 화면을 깜빡임(visual bell)
+'warn'			    버퍼가 변경된 경우 셸 명령을 실행하면 경고
+'weirdinvert'	  'wiv'	    이상한 반전 방식을 가진 터미널용
+'whichwrap'	  'ww'	    다른 줄로 넘어갈 수 있는 명령 키들을 지정
+'wildchar'	  'wc'	    와일드카드 확장을 위한 명령줄 문자
+'wildcharm'	  'wcm'     'wildchar'와 같지만 매핑되었을 때도 동작
+'wildignore'	  'wig'     자동 완성시키지 않을 파일들 패턴
+'wildignorecase'  'wic'     파일명 자동 완성 시 대소문자를 무시
+'wildmenu'	  'wmnu'    명령줄 자동 완성 시 메뉴를 사용
+'wildmode'	  'wim'     'wildchar' 명령줄 자동 완성 방법
+'wildoptions'	  'wop'     명령줄 자동 완성이 이루어지는 방식을 지정
+'winaltkeys'	  'wak'     윈도우 시스템이 ALT 키를 언제 처리해야하는지
+'window'	  'wi'	    CTRL-F와 CTRL-B로 스크롤 할 줄 수
+'winheight'	  'wh'	    현재 창의 최소 줄 수
+'winfixheight'	  'wfh'     창을 열거나 닫을 때 창 높이를 유지
+'winfixwidth'	  'wfw'     창을 열거나 닫을 때 창 폭을 유지
+'winminheight'	  'wmh'     임의의 창의 최소 줄 수
+'winminwidth'	  'wmw'     임의의 창의 최소 열 수
+'winwidth'	  'wiw'     현재 창의 최소 열 수
+'wrap'			    긴 줄을 다음 줄로 넘겨가며 모두 표시
+'wrapmargin'	  'wm'	    넘어가는 위치를 오른쪽 끝에서부터의 문자 수로 지정
+'wrapscan'	  'ws'	    파일의 끝을 만나면 처음으로 넘어가서 계속 찾음
+'write'			    파일에 쓸 수 있음
+'writeany'	  'wa'	    "!" 없이도 아무 파일에나 쓸 수 있음
+'writebackup'	  'wb'	    파일을 덮어쓰기 전에 백업 파일을 만듦
+'writedelay'	  'wd'	    밀리초단위로 각 문자의 입력을 지연시킴 (디버그용)
+------------------------------------------------------------------------------
+*Q_ur*		실행 취소/다시 하기 명령
+
+|u|       N  u		마지막 N 번의 변경 사항을 취소
+|CTRL-R|  N  CTRL-R	마지막 N 번의 취소한 변경 사항을 다시 수행
+|U|          U		마지막으로 변경한 줄의 내용을 복구
+------------------------------------------------------------------------------
+*Q_et*		외부 명령
+
+|:shell|	:sh[ell]	셸 시작
+|:!|		:!{command}	{command} 명령을 셸에서 실행
+|K|		   K		커서 밑의 키워드를 'keywordprg' 프로그램으로
+				   찾기 (기본 값: "man")
+------------------------------------------------------------------------------
+*Q_qf*		퀵픽스 명령
+
+|:cc|		:cc [nr]	[nr] 번 에러를 표시 (기본 값은 같은 에러를 또)
+|:cnext|	:cn		다음 에러를 표시
+|:cprevious|	:cp		이전 에러를 표시
+|:clist|	:cl		모든 에러를 보여줌
+|:cfile|	:cf		에러를 'errorfile' 파일에서 읽음
+|:cgetbuffer|	:cgetb		:cbuffer 와 같지만 첫 에러로 이동하지 않음
+|:cgetfile|	:cg		:cfile 와 같지만 첫 에러로 이동하지 않음
+|:cgetexpr|	:cgete		:cexpr 와 같지만 첫 에러로 이동하지 않음
+|:caddfile|	:caddf		현재 퀵픽스 목록에 에러 파일의 에러들을 추가
+|:caddexpr|	:cad		현재 퀵픽스 목록에 표현식으로부터 얻은
+				   에러들을 추가
+|:cbuffer|	:cb		버퍼의 내용으로부터 에러를 읽음
+|:cexpr|	:cex		표현식 결과로부터 에러를 읽음
+|:cquit|	:cq		저장 없이 (컴파일러에게) 에러 코드를 반환하며
+				   Vim 종료
+|:make|		:make [args]	make를 실행하고, 에러를 읽고, 첫 에러로 이동
+|:grep|		:gr[ep] [args]	'grepprg'를 실행하고, 일치하는 곳을 찾아 첫
+				   번째 위치로 이동
+------------------------------------------------------------------------------
+*Q_vc*		기타 명령
+
+|CTRL-L|	   CTRL-L	화면을 지우고 다시 그림
+|CTRL-G|	   CTRL-G	현재 파일의 이름과 경로, 커서 위치를 표시
+|ga|		   ga		커서가 위치한 문자의 아스키 값을 10, 16,
+				   8진수로 표시
+|g8|		   g8		UTF8 인코딩의 경우: 커서가 위치한 문자의
+				   바이트 표현을 16진수로 표시
+|g_CTRL-G|	   g CTRL-G	커서가 위치한 줄과 열, 문자 단위 위치를 표시
+|CTRL-C|	   CTRL-C	찾기 도중: 찾기를 멈춤
+|dos-CTRL-Break|   CTRL-Break	MS-DOS: 찾기 도중: 찾기를 멈춤
+|<Del>|		   <Del>	숫자를 입력하는 도중: 마지막 문자를 지움
+|:version|	:ve[rsion]	버전 정보를 표시
+|:mode|		:mode N		MS-DOS: 스크린 모드를 N으로 설정 (숫자, C80,
+				   C4350, 등.)
+|:normal|	:norm[al][!] {commands}
+				보통 모드 명령을 실행
+|Q|		   Q		"Ex" 모드로 전환
+
+|:redir|	:redir >{file}		메시지를 {file} 파일에도 씀
+|:silent|	:silent[!] {command}	{command} 명령을 조용히 실행
+|:confirm|	:confirm {command}	나가기, 저장 등을 할 때 저장하지 않은
+					   변경 사항이나 읽기 전용 파일인 경우
+					   물어봄
+|:browse|	:browse {command}	파일 선택 창을 사용하여 파일을 열거나
+					   읽고 씀
+------------------------------------------------------------------------------
+*Q_ce*		명령줄 편집
+
+|c_<Esc>|	<Esc>		   명령줄을 떠남 ('wildchar'가 <Esc>인
+				      경우에는 두 번 눌러야함)
+
+|c_CTRL-V|	CTRL-V {char}	   {char} 문자를 문자로 입력
+|c_CTRL-V|	CTRL-V {number}    십진수 문자 값으로 문자 입력(최대 세 자리)
+|c_CTRL-K|	CTRL-K {char1} {char2}
+				   다이그래프 입력 (|Q_di| 참고)
+|c_CTRL-R|	CTRL-R {0-9a-z"%#:-=}
+				   레지스터의 내용 입력
+
+|c_<Left>|	<Left>/<Right>	   커서를 좌/우로
+|c_<S-Left>|	<S-Left>/<S-Right> 커서를 어절 단위로 좌/우로
+|c_CTRL-B|	CTRL-B/CTRL-E	   커서를 명령줄의 맨 앞과 뒤로
+
+|c_<BS>|	<BS>		   커서 앞의 문자를 지움
+|c_<Del>|	<Del>		   커서 위치의 문자를 지움
+|c_CTRL-W|	CTRL-W		   커서 앞의 어절을 지움
+|c_CTRL-U|	CTRL-U		   모든 내용을 지움
+
+|c_<Up>|	<Up>/<Down>	   현재 명령줄 내용으로 시작하는 이전/나중
+				      명령줄을 불러옴
+|c_<S-Up>|	<S-Up>/<S-Down>	   히스토리에서 이전/나중 명령줄을 불러옴
+|:history|	:his[tory]	   사용했던 명령줄 명령들을 보여줌
+
+명령줄의 문맥감지 자동 완성:
+
+|c_wildchar|	'wildchar'  (기본 값: <Tab>)
+				커서 앞의 패턴에 따라 자동 완성.  복수의
+				   후보가 있는 경우, 삐 소리를 내고 첫 번째를
+				   보여줌.  한 번 더 'wildchar'를 누르면 다음
+				   후보를 보여줌
+|c_CTRL-D|	CTRL-D		커서 앞의 패턴에 맞는 모든 후보를 보여줌
+|c_CTRL-A|	CTRL-A		커서 앞의 패턴에 맞는 모든 후보를 입력
+|c_CTRL-L|	CTRL-L		커서 앞의 패턴에 맞는 후보들이 공통으로 가진
+				   부분까지 최대한 입력
+|c_CTRL-N|	CTRL-N		복수의 후보가 있는 'wildchar' 이후: 다음
+				   후보로
+|c_CTRL-P|	CTRL-P		복수의 후보가 있는 'wildchar' 이후: 이전
+				   후보로
+------------------------------------------------------------------------------
+*Q_ra*		Ex 범위
+
+|:range|	,		두 줄 번호를 구분
+|:range|	;		상동, 두 번째 줄 번호를 해석하기 전, 커서를 첫
+				   번째 줄 번호로 옮김
+
+|:range|	{number}	줄번호 그대로
+|:range|	.		현재 줄
+|:range|	$		파일의 마지막 줄
+|:range|	%		1,$와 같음 (파일 전체)
+|:range|	*		'<,'>와 같음 (시각 모드 영역)
+|:range|	't		마크 t의 위치
+|:range|	/{pattern}[/]	이후에 {pattern} 패턴이 일치하는 줄
+|:range|	?{pattern}[?]	이전에 {pattern} 패턴이 일치하는 줄
+
+|:range|	+[num]		앞서의 줄 번호에 [num] 값을 더함 (기본 값: 1)
+|:range|	-[num]		앞서의 줄 번호에서 [num] 값을 뺌 (기본 값: 1)
+------------------------------------------------------------------------------
+*Q_ex*		특수 Ex 문자
+
+|:bar|      |		두 명령을 구분 (":global"과 ":!"는 예외)
+|:quote|    "		주석을 시작
+
+|:_%|       %		현재 파일명 (파일명을 넣어야하는 곳에서만)
+|:_#|       #[num]	교대 파일명 [num] (파일명을 넣어야하는 곳에서만)
+	Note: 아래 일곱 가지는 그대로 입력하는 것입니다.  특수 키가 아닙니다!
+|:<abuf>|   <abuf>	자동명령에서 사용하는 버퍼 번호 (파일명을 넣어야하는
+			   곳에서만)
+|:<afile>|  <afile>	자동명령에서 사용하는 파일명 (파일명을 넣어야하는
+			   곳에서만)
+|:<amatch>| <amatch>	자동명령에서 사용하는 패턴과 일치한 것 (파일명을
+			   넣어야하는 곳에서만)
+|:<cword>|  <cword>	커서 위치의 어절 (파일명을 넣어야하는 곳에서만)
+|:<cWORD>|  <cWORD>	커서 위치의 공백으로 구분한 어절(WORD) (파일명을
+			   넣어야하는 곳에서만) (|WORD| 참고)
+|:<cfile>|  <cfile>	커서 위치의 파일명 (파일명을 넣어야하는 곳에서만)
+|:<sfile>|  <sfile>	":source"된 파일의 파일명. 해당 파일 내에서만
+			   (파일명을 넣어야하는 곳에서만)
+
+		"%", "#", "<cfile>", "<sfile>", "<afile>" 뒤에서
+		|::p|	    :p		전체 경로
+		|::h|	    :h		머리 (파일명 제거)
+		|::t|	    :t		꼬리 (파일명만)
+		|::r|	    :r		뿌리 (확장자 제거)
+		|::e|	    :e		확장자
+		|::s|	    :s/{pat}/{repl}/	{pat} 패턴을 {repl}로 바꿈
+------------------------------------------------------------------------------
+*Q_st*		Vim 시작하기
+
+|-vim|	   vim [options]		빈 버퍼를 편집 시작
+|-file|	   vim [options] {file} ..	하나 이상의 파일을 편집 시작
+|--|	   vim [options] -		파일을 표준입력에서 읽음
+|-tag|	   vim [options] -t {tag}	{tag} 태그와 관련된 파일을 편집
+|-qf|	   vim [options] -q [fname]	퀵픽스 모드에서 편집 시작.  첫 에러를
+					   표시
+
+	가장 유용한 Vim 인자들 (전체 목록은 |startup-options| 참고 )
+
+|-gui|	-g		    GUI 시작 (다른 옵션도 허용)
+
+|-+|	+[num]		    커서를 [num] 번째 줄에 놓음 (기본 값: 마지막 줄)
+|-+c|	+{command}	    파일을 불러온 후 {command} 명령 실행
+|-+/|	+/{pat} {file} ..   커서를 {pat} 패턴이 처음으로 나오는 곳에 놓음
+|-v|	-v		    Vi 모드. ex를 보통 모드에서 시작
+|-e|	-e		    Ex 모드, vim을 Ex 모드에서 시작
+|-R|	-R		    읽기 전용, -n도 활성화 됨
+|-m|	-m		    수정할 수 없음 ('write' 옵션을 끔)
+|-d|	-d		    디프 모드 |diff|
+|-b|	-b		    이진 모드
+|-l|	-l		    리스프 모드
+|-A|	-A		    아라비아어 모드 ('arabic' 옵션이 켜짐)
+|-F|	-F		    페르시아어 모드 ('fkmap'와 'rightleft'가 켜짐)
+|-H|	-H		    히브리어 모드 ('hkmap'와 'rightleft'가 켜짐)
+|-V|	-V		    메시지가 많이 나옴(verbose) 자세한 메시지들을 출력
+|-C|	-C		    호환, 'compatible' 옵션을 켬
+|-N|	-N		    비호환, 'compatible' 옵션을 끔
+|-r|	-r		    스왑 파일 목록을 표시
+|-r|	-r {file} ..	    중단된 편집 세션을 복구
+|-n|	-n		    스왑 파일을 만들지 않음
+|-o|	-o [num]	    [num] 개의 창을 엶 (기본 값: 파일당 하나)
+|-f|	-f		    GUI: 포그라운드 프로세스.  포크(fork)하지 않음
+			    Amiga: 창을 열기 위해 Vim을 재시작하지 않음 (예를
+			       들어 메일)
+|-s|	-s {scriptin}	    먼저 {scriptin} 파일에서 명령을 읽음
+|-w|	-w {scriptout}	    입력한 문자들을 {scriptout} 파일에 씀 (덧붙이기)
+|-W|	-W {scriptout}	    입력한 문자들을 {scriptout} 파일에 씀 (덮어쓰기)
+|-T|	-T {terminal}	    터미널 이름 설정
+|-d|	-d {device}	    Amiga: {device}를 콘솔로 쓰도록 열기
+|-u|	-u {vimrc}	    초기 설정을 기본 값 대신 {vimrc}에서 읽음
+|-U|	-U {gvimrc}	    상동.  GUI 시작 시
+|-i|	-i {viminfo}	    정보를 기본 값 대신 {viminfo}에서 읽음
+|---|	--		    옵션의 끝.  이후 인자는 모두 파일명임
+|--help|    --help	    쓸 수 있는 인자 목록을 표시하고 종료
+|--version| --version	    버전 정보를 보여주고 끝냄
+|--|	-		    파일을 표준 입력에서 읽음
+------------------------------------------------------------------------------
+*Q_ed*		파일 편집하기
+
+	   ! 없이는  : 현재 버퍼에 변경 사항이 있다면 실패
+	   !를 붙이면: 현재 버퍼의 변경 사항은 유실됨
+|:edit_f|  :e[dit][!] {file}	{file} 파일을 편집
+|:edit|    :e[dit][!]		현재 파일을 다시 불러옴
+|:enew|    :ene[w][!]		새로운 이름 없는 버퍼 편집
+|:find|    :fin[d][!] {file}	{file} 파일을 'path'에서 찾아서 편집
+
+|CTRL-^|   N  CTRL-^		교대 파일 N을 편집 (":e #N"와 같음)
+|gf|          gf  or ]f		커서 위치의 파일명을 가진 파일을 편집
+|:pwd|     :pwd			현재 디렉터리명을 출력
+|:cd|      :cd [path]		현재 디렉터리를 [path]로 바꿈
+|:cd-|     :cd -		이전 현재 디렉터리로 바꿈
+|:file|    :f[ile]		현재 파일명과 커서 위치를 출력
+|:file|    :f[ile] {name}	현재 파일명을 {name}로 바꿈
+|:files|   :files		교대 파일 목록을 출력
+------------------------------------------------------------------------------
+*Q_fl*		인자 목록 사용하기			|argument-list|
+
+|:args|	   :ar[gs]		인자 목록을 출력.  현재 파일을 "[]"로 표시
+|:all|	   :all  or :sall	인자 목록의 모든 파일 별로 창을 하나씩 엶
+|:wn|	   :wn[ext][!]		파일을 저장하고 다음 파일을 편집
+|:wn|	   :wn[ext][!] {file}	{file}이 없다면 {file}에 저장하고 다음 파일을
+				   편집.  !를 붙이면 기존 파일이 있더라도
+				   덮어씀
+|:wN|	   :wN[ext][!] [file]	파일을 저장하고 이전 파일을 편집
+
+	     현재 창에서          새 창에서	~
+|:argument|  :argu[ment] N	  :sar[gument] N	N 파일 편집
+|:next|      :n[ext]		  :sn[ext]		다음 파일 편집
+|:next_f|    :n[ext] {arglist}	  :sn[ext] {arglist}	새 인자 목록을 만들고
+							   첫 파일을 편집
+|:Next|      :N[ext]		  :sN[ext]		이전 파일 편집
+|:first|     :fir[st]		  :sfir[st]		첫 파일 편집
+|:last|      :la[st]		  :sla[st]		마지막 파일 편집
+------------------------------------------------------------------------------
+*Q_wq*		저장하고 나가기
+
+|:w|	  :[range]w[rite][!]		현재 파일에 저장
+|:w_f|	  :[range]w[rite] {file}	이미 존재하지 않는다면, {file}에 저장
+|:w_f|	  :[range]w[rite]! {file}	{file}에 저장.  이미 존재한다면 덮어씀
+|:w_a|	  :[range]w[rite][!] >>		현재 파일에 덧붙임
+|:w_a|	  :[range]w[rite][!] >> {file}	{file}에 덧붙임
+|:w_c|	  :[range]w[rite] !{cmd}	[range] 범위의 줄들을 표준입력으로
+					   {cmd} 명령을 실행시킴
+|:up|	  :[range]up[date][!]		변경 사항이 있으면 현재 파일에 저장
+|:wall|	  :wa[ll][!]			변경된 모든 버퍼를 저장
+
+|:q|	  :q[uit]		변경 사항이 없다면 현재 버퍼를 나감.  도움말이
+				   아닌 다른 버퍼가 또 없다면 Vim 종료
+|:q|	  :q[uit]!		변경 사항을 무시하고 현재 버퍼를 나감.
+				   도움말이 아닌 다른 버퍼가 또 없다면 Vim
+				   종료
+|:qa|	  :qa[ll]		변경 사항이 없다면 Vim 종료
+|:qa|	  :qa[ll]!		변경 사항을 무시하고 항상 Vim 종료
+|:cq|	  :cq			저장하지 않고 종료 후 에러 코드 반환
+
+|:wq|	  :wq[!]		현재 파일에 저장하고 종료
+|:wq|	  :wq[!] {file}		{file} 파일에 저장하고 종료
+|:xit|	  :x[it][!] [file]	":wq"와 같음.  단 변경 사항이 있을 때만 저장함
+|ZZ|	     ZZ			":x"와 같음
+|ZQ|	     ZQ			":q!"와 같음
+|:xall|	  :xa[ll][!]  or :wqall[!]
+				모든 변경된 버퍼를 저장하고 종료
+
+|:stop|	  :st[op][!]		Vim을 중지시키고 새 셸을 시작.  'aw' 옵션이
+				   켜져있고 [!]가 없다면 버퍼를 저장
+|CTRL-Z|     CTRL-Z		":stop"과 같음
+------------------------------------------------------------------------------
+*Q_ac*		자동 명령
+
+|viminfo-file|	구동 시 레지스터, 마크, 히스토리를 읽어오고, 종료시 저장함.
+
+|:rviminfo|	:rv[iminfo] [file]	viminfo 파일 [file]에서 정보를 읽어옴
+|:rviminfo|	:rv[iminfo]! [file]	상동. 기존 정보를 덮어씀
+|:wviminfo|	:wv[iminfo] [file]	viminfo 파일 [file]에 정보 추가
+|:wviminfo|	:wv[iminfo]! [file]	viminfo 파일 [file]에 정보 덮어씀
+
+|modeline|	파일 편집 시 자동으로 옵션 설정
+
+|modeline|	vim:{set-arg}: ..	파일의 맨 앞이나 맨 뒷부분('ml'옵션
+					   참고)에서 {set-arg} 부분이 ":set"
+					   명령의 인자로 사용됨
+
+|autocommand|	특정한 이벤트 발생 시 명령을 자동으로 실행
+
+|:autocmd|	:au			  모든 자동명령 보기
+|:autocmd|	:au {event}		  {event} 이벤트를 위한 모든 자동명령
+					     보기
+|:autocmd|	:au {event} {pat}	  {event} 이벤트와 {pat} 패턴을 위한
+					     모든 자동명령 보기
+|:autocmd|	:au {event} {pat} {cmd}	  {event} 이벤트와 {pat} 패턴을 위한
+					     새 자동명령 입력
+|:autocmd|	:au!			  모든 자동명령 제거
+|:autocmd|	:au! {event}		  {event} 이벤트를 위한 모든 자동명령
+					     제거
+|:autocmd|	:au! * {pat}		  {pat} 패턴을 위한 모든 자동명령 제거
+|:autocmd|	:au! {event} {pat}	  {event} 이벤트와 {pat} 패턴을 위한
+					     모든 자동명령 제거
+|:autocmd|	:au! {event} {pat} {cmd}  {event} 이벤트와 {pat} 패턴을 위한
+					     모든 자동명령을 지우고 새
+					     자동명령 입력
+------------------------------------------------------------------------------
+*Q_wi*		여러 창 명령
+
+|CTRL-W_s|	CTRL-W s  or  :split	창을 둘로 나눔
+|:split_f|	:split {file}		창을 둘로 나누고 하나에서 {file} 파일
+					   편집
+|:vsplit|	:vsplit {file}		상동.  단 창을 세로로 나눔
+|:vertical|	:vertical {cmd}		{cmd} 명령이 창을 세로로 나누도록 함
+
+|:sfind|	:sf[ind] {file}		창을 나누고, {file} 파일을 'path'에서
+					   찾은 다음 편집
+|CTRL-W_]|	CTRL-W ]		창을 나누고 커서 위치의 태그로 이동
+|CTRL-W_f|	CTRL-W f		창을 나누고 커서 위치의 파일명으로
+					   이동
+|CTRL-W_^|	CTRL-W ^		창을 나누고 교대 파일을 편집
+|CTRL-W_n|	CTRL-W n 또는 :new	빈 창을 새로 만듦
+|CTRL-W_q|	CTRL-W q 또는 :q[uit]	편집을 끝내고 창을 닫음
+|CTRL-W_c|	CTRL-W c 또는 :cl[ose]	버퍼를 숨김 상태로 만들고 창을 닫음
+|CTRL-W_o|	CTRL-W o 또는 :on[ly]	현재 창만 남기고 나머지를 모두 닫음
+
+|CTRL-W_j|	CTRL-W j		커서를 아래 창으로 옮김
+|CTRL-W_k|	CTRL-W k		커서를 위 창으로 옮김
+|CTRL-W_CTRL-W|	CTRL-W CTRL-W		커서를 아래 창으로 옮김 (순환)
+|CTRL-W_W|	CTRL-W W		커서를 위 창으로 옮김 (순환)
+|CTRL-W_t|	CTRL-W t		커서를 맨 위(top) 창으로 옮김
+|CTRL-W_b|	CTRL-W b		커서를 맨 아래(bottom) 창으로 옮김
+|CTRL-W_p|	CTRL-W p		커서를 이전(prev.)에 사용하던 창으로
+
+|CTRL-W_r|	CTRL-W r		창들을 아래 방향으로 돌림(rotate)
+|CTRL-W_R|	CTRL-W R		창들을 위 방향으로 돌림
+|CTRL-W_x|	CTRL-W x		현재 창을 다음 창과 바꿈
+
+|CTRL-W_=|	CTRL-W =		모든 창의 높이를 똑같이 맞춤
+|CTRL-W_-|	CTRL-W -		현재 창의 높이를 줄임
+|CTRL-W_+|	CTRL-W +		현재 창의 높이를 늘림
+|CTRL-W__|	CTRL-W _		현재 창의 높이를 설정 (기본 값: 매우 
+					   큼)
+------------------------------------------------------------------------------
+*Q_bu*		버퍼 목록 명령
+
+|:buffers|	:buffers 또는 :files	모든 버퍼와 파일명을 출력
+
+|:ball|		:ball	 또는 :sball	모든 인자/버퍼를 편집
+|:unhide|	:unhide  또는 :sunhide	불러온 모든 버퍼를 편집
+
+|:badd|		:badd {fname}		파일명 {fname}를 리스트에 추가
+|:bunload|	:bunload[!] [N]		버퍼 [N]을 메모리에서 내림
+|:bdelete|	:bdelete[!] [N]		버퍼 [N]을 메모리에서 내리고 버퍼
+					   리스트에서 제거
+
+		현재 창에서        새 창에서           ~
+|:buffer|	:[N]buffer [N]     :[N]sbuffer [N]     인자/버퍼 N으로
+|:bnext|	:[N]bnext [N]      :[N]sbnext [N]      다음 N 번째 인자/버퍼로
+|:bNext|	:[N]bNext [N]      :[N]sbNext [N]      이전 N 번째 인자/버퍼로
+|:bprevious|	:[N]bprevious [N]  :[N]sbprevious [N]  이전 N 번째 인자/버퍼로
+|:bfirst|	:bfirst	           :sbfirst            첫 번째 인자/버퍼로
+|:blast|	:blast	           :sblast             마지막 인자/버퍼로
+|:bmodified|	:[N]bmod [N]       :[N]sbmod [N]       N번째 수정된 버퍼로
+------------------------------------------------------------------------------
+*Q_sy*		문법 강조
+
+|:syn-on|	:syntax on		문법 강조 사용을 시작
+|:syn-off|	:syntax off		문법 강조 사용을 끝냄
+
+|:syn-keyword|	:syntax keyword {group-name} {keyword} ..
+					문법 키워드 항목 추가
+|:syn-match|	:syntax match {group-name} {pattern} ...
+					문법 매치 항목 추가
+|:syn-region|	:syntax region {group-name} {pattern} ...
+					문법 영역 항목 추가
+|:syn-sync|	:syntax sync [ccomment | lines {N} | ...]
+					문법에 어떻게 맞출 지를 지정
+|:syntax|	:syntax [list]		현재 문법 항목들을 출력
+|:syn-clear|	:syntax clear		모든 문법 항목을 제거
+
+|:highlight|	:highlight clear	모든 강조 항목을 제거
+|:highlight|	:highlight {group-name} {key}={arg} ..
+					{group-name}의 강조 방법을 지정
+
+|:filetype|	:filetype on		파일 형식 인식을 문법 강조 없이 켬
+|:filetype|	:filetype plugin indent on
+					파일 형식 인식을 자동 들여쓰기 및
+					   설정들과 함께 켬
+------------------------------------------------------------------------------
+*Q_gu*		GUI 명령
+
+|:gui|		:gui			유닉스: GUI를 시작
+|:gui|		:gui {fname} ..		상동, {fname} 파일을 편집
+
+|:menu|		:menu			모든 메뉴를 출력
+|:menu|		:menu {mpath}		{mpath}로 시작하는 메뉴를 출력
+|:menu|		:menu {mpath} {rhs}	{rhs}를 실행하는 {mpath} 메뉴를 추가
+|:menu|		:menu {pri} {mpath} {rhs}
+					상동, 우선 순위를 {pri}로 지정
+|:menu|		:menu ToolBar.{name} {rhs}
+					{rhs}를 실행하는 도구막대 항목 추가
+|:tmenu|	:tmenu {mpath} {text}	{mpath} 메뉴에 툴팁 추가
+|:unmenu|	:unmenu {mpath}		{mpath} 메뉴 제거
+------------------------------------------------------------------------------
+*Q_fo*		접기
+
+|'foldmethod'|	set foldmethod=manual	직접 접기
+		set foldmethod=indent	들여쓰기에 따라 접기
+		set foldmethod=expr	'foldexpr'에 따라 접기
+		set foldmethod=syntax	문법 영역(region)에 따라 접기
+		set foldmethod=marker	'foldmarker'에 따라 접기
+
+|zf|		zf{motion}		오퍼레이터: 폴드를 직접 정의하기
+|:fold|		:{range}fold		{range} 줄들에 폴드 정의하기
+|zd|		zd			커서 위치 폴드 하나 지우기
+|zD|		zD			커서 위치 모든 폴드 지우기
+
+|zo|		zo			커서 위치의 폴드 하나 열기
+|zO|		zO			커서 위치의 모든 폴드 열기
+|zc|		zc			커서 위치의 폴드 하나 닫기
+|zC|		zC			커서 위치의 모든 폴드 닫기
+
+|zm|		zm			더 닫기. 'foldlevel'을 줄임
+|zM|		zM			모든 폴드 닫기. 'foldlevel'을 0으로
+|zr|		zr			더 열기. 'foldlevel'을 늘림
+|zR|		zR			모든 폴드 열기. 'foldlevel'을 최고로
+
+|zn|		zn			폴드 끄기. 'foldenable'을 끔
+|zN|		zN			폴드 켜기. 'foldenable'를 켬
+|zi|		zi			'foldenable'을 토글
+
+ vim:tw=78:ts=8:ft=help:norl:

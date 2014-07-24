@@ -1,0 +1,170 @@
+*usr_43.txt*	Vim version 7.4 대상.  새로 고침: 2008년 12월 28일
+
+		      VIM 사용설명서 - Bram Moolenaar 저
+				       정지용 역
+
+			      파일 형식 플러그인 사용하기
+
+
+어떤 형식의 파일, 예를 들어 C 프로그램이나 셸 스크립트를 편집할 때 늘 일정한
+옵션과 매핑을 사용하게 됩니다.  매번 똑같은 설정을 하려면 금방 귀찮아지겠지요.
+이번 장에서는 이걸 자동으로 하는 방법을 알아보겠습니다.
+
+|43.1|	파일 형식을 위한 플러그인
+|43.2|	파일 형식 추가하기
+
+다음 장: |usr_44.txt|  나만의 문법 강조 만들기
+이전 장: |usr_42.txt|  새 메뉴 추가하기
+   차례: |usr_toc.txt|
+
+==============================================================================
+*43.1*	파일 형식을 위한 플러그인			*filetype-plugin*
+
+파일 형식 플러그인을 사용하는 방법은 이미 다룬 적이 있습니다:
+|add-filetype-plugin|.   하지만 기본 설정은 최소한의 것들만 포함하고 있기
+때문에 만족스럽지 않은 부분이 아마 생길 겁니다.  예를 들어 C 파일에 대해서
+'softtabstop' 옵션을 4로 지정하고, 세 줄짜리 주석을 넣는 매핑을 정의하고
+싶다고 합시다.  다음 두 단계만 따라서 하면 됩니다:
+
+							*your-runtime-dir*
+1. 자신만의 런타임 디렉터리를 만듭니다.  유닉스에서는 보통 "~/.vim" 입니다.
+   이 디렉터리에 "ftplugin" 디렉터리를 만드세요: >
+
+	mkdir ~/.vim
+	mkdir ~/.vim/ftplugin
+<
+   유닉스가 아니라면, 'runtimepath' 옵션 값으로 Vim이 "ftplugin" 디렉터리를
+   어디서 찾는지 확인해봅시다: >
+
+	set runtimepath
+
+<  아마 첫 번째 디렉터리 이름(첫 쉼표 이전까지)을 사용하면 될 겁니다.  만약
+   기본 값이 마음에 들지 않는다면, |vimrc| 파일에서 'runtimepath' 옵션의 맨
+   앞에 원하는 디렉터리 이름을 추가할 수도 있습니다.
+
+2. "~/.vim/ftplugin/c.vim" 파일을 다음 내용으로 만듭니다: >
+
+	setlocal softtabstop=4
+	noremap <buffer> <LocalLeader>c o/**************<CR><CR>/<Esc>
+
+이제 C 파일을 편집해봅시다.  'softtabstop'이 4인 걸 확인할 수 있을 겁니다.
+하지만 다른 파일을 편집하면 기본 값인 0으로 돌아갑니다.  위에서 ":setlocal"
+명령을 사용했기 때문이지요.  이 명령은 'softtabstop' 옵션이 현재 버퍼에서만
+유효하도록 만듭니다.  다른 버퍼를 편집하면, 그 버퍼에 설정된 값으로 바뀌지요.
+새로운 버퍼라면 기본 값이나 가장 최근에 ":set" 명령으로 지정한 값이 됩니다.
+
+마찬가지로 "\c" 매핑도 다른 버퍼를 열면 사라집니다.  ":map <buffer>"  명령은
+현재 버퍼에만 유효한 매핑을 만들기 때문이지요.  이 기능은 ":map!"나 ":vmap" 등
+모든 매핑 명령에서 쓸 수 있습니다.  매핑의 <LocalLeader>는 "maplocalleader"
+변수의 값으로 바뀝니다.
+
+파일 형식 플러그인의 예는 아래 디렉터리에서 볼 수 있습니다: >
+
+	$VIMRUNTIME/ftplugin/
+
+파일 형식 플러그인을 만드는 데 대한 자세한 내용은 |write-plugin|를 참고하세요.
+
+==============================================================================
+*43.2*	파일 형식 추가하기
+
+Vim에서 인식하지 못하는 형식의 파일을 사용한다면, 다음과 같이 인식시켜
+보십시오.  먼저 자신만의 런타임 디렉터리가 필요한데, 위 |your-runtime-dir|를
+참고하세요.
+
+"filetype.vim" 파일을 만들고, 해당 형식의 파일을 위한 자동명령들을 넣으세요.
+(자동명령은 |40.3|에서 설명했습니다.)  예: >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead *.xyz	setf xyz
+	augroup END
+
+위 예에는 ".xyz"로 끝나는 모든 파일을 "xyz" 파일 형식(filetype)으로
+인식합니다.  ":augroup" 명령은 이 자동명령을 "filetypedetect" 그룹에 넣습니다.
+이렇게 하면 ":filetype off" 명령으로 모든 파일 형식 인식을 위한 자동명령을
+없앨 수 있습니다.  "setf" 명령은 'filetype' 옵션 값을 이미 설정되어있지
+않다면, 주어진 값으로 바꿉니다.  이로써 'filetype'이 두 번 설정되지 않게
+해줍니다.
+
+파일명을 검사하기 위해 다른 많은 패턴들을 쓸 수 있습니다.  디렉터리명도 검사할
+수 있습니다.  |autocmd-patterns|를 참고하세요.  예를 들어
+"/usr/share/scripts/" 밑에 있는 파일은 모두 "ruby" 파일이지만 정해진 확장자를
+갖지는 않는다고 합시다.  위 예를 아래와 같이 고치면 됩니다: >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead *.xyz			setf xyz
+	au BufNewFile,BufRead /usr/share/scripts/*	setf ruby
+	augroup END
+
+하지만 /usr/share/scripts/README.txt 파일을 편집한다면 이건 루비 파일이
+아닙니다.  "*"로 끝나는 패턴은 순식간에 너무 많은 파일과 일치하게 된다는
+문제점이 있습니다.  이 문제를 피하려면 filetype.vim 파일을 'runtimepath'의
+끝에 있는 다른 디렉터리에 넣으세요.  예를 들어 유닉스라면
+"~/.vim/after/filetype.vim"을 쓰면 됩니다.
+   그리고 ~/.vim/filetype.vim 에 텍스트 파일 인식 기능을 넣으면 됩니다: >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead *.txt			setf text
+	augroup END
+
+이 파일은 'runtimepath'에서 가장 먼저 만나는 것입니다.  그리고 가장 마지막으로
+만나는 ~/.vim/after/filetype.vim에 아래 내용을 넣으세요: >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead /usr/share/scripts/*	setf ruby
+	augroup END
+
+이제 Vim은 "filetype.vim"파일을 'runtimepath'에 있는 각 디렉터리들에서
+찾습니다.  먼저 ~/.vim/filetype.vim을 찾습니다.  *.txt 파일을 처리하는
+자동명령이 여기서 정의됩니다.  그리고 'runtimepath'의 중간인 $VIMRUNTIME에서
+filetype.vim 파일을 찾습니다.  마지막으로 ~/.vim/after/filetype.vim을 찾고,
+/usr/share/scripts의 파일들을 루비 파일로 인식하는 자동명령이 정의됩니다.
+   이제 /usr/share/scripts/README.txt를 편집하면, Vim은 자동명령을 정의된
+순서대로 검사합니다.  *.txt 패턴이 일치하고, "setf text"가 실행되며 파일
+형식이 "text"가 됩니다.  루비 파일을 위한 패턴도 역시 일치하고 "setf ruby"가
+실행됩니다.  하지만 'filetype'이 이미 "text"로 설정되었으므로 아무 일도
+일어나지 않습니다.
+   /usr/share/scripts/foobar 파일을 편집한다면 동일한 자동명령 검사가
+이루어집니다.  이번에는 루비 파일을 위한 패턴만 일치하므로 "setf ruby"가
+실행되며 'filetype'이 "ruby"가 됩니다.
+
+
+내용으로 인식하기
+-----------------
+
+만약 파일명으로 형식을 인식할 수 없다면, 파일 내용으로 인식을 해야 할 수도
+있습니다.  예를 들어, 스크립트 파일들은 다음과 같이 시작하곤 합합니다:
+
+	#!/bin/xyz ~
+
+이 스크립트를 인식하려면 자신만의 런타임 디렉터리(filetype.vim을 만들었던
+곳과 같은 곳)에 "scripts.vim" 파일을 만듭니다.  다음과 같은 내용이 들어가면
+됩니다:
+>
+
+	if did_filetype()
+	  finish
+	endif
+	if getline(1) =~ '^#!.*[/\\]xyz\>'
+	  setf xyz
+	endif
+
+맨 처음의 did_filetype()은 이미 파일명으로 파일 형식이 인식된 경우에는 내용을
+검사하지 않도록 하는 것입니다.  "setf" 명령이 아무 효과가 없을 테니 시간
+낭비를 하지 말자는 것이죠.
+   scripts.vim 파일은 기본 filetype.vim 파일 내에서 자동명령으로 실행됩니다.
+따라서, 다음과 같은 순서로 검사가 이루어집니다:
+
+	1. 'runtimepath'에서 $VIMRUNTIME 앞에 오는 filetype.vim 파일들
+	2. $VIMRUNTIME/filetype.vim의 앞부분
+	3. 'runtimepath' 내의 모든 scripts.vim 파일들
+	4. $VIMRUNTIME/filetype.vim의 나머지 부분
+	5. 'runtimepath'에서 $VIMRUNTIME 뒤에 오는 filetype.vim 파일들
+
+만약 이걸로도 충분치 않다면, 모든 파일에 대하여 실행되는 자동명령을 만든 다음
+스크립트를 실행하거나 함수를 호출해서 파일의 내용을 검사하세요.
+
+==============================================================================
+
+다음 장: |usr_44.txt|  나만의 문법 강조 만들기
+
+저작권: |manual-copyright| 참고  vim:tw=78:ts=8:ft=help:norl:
