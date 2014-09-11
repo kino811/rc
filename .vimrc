@@ -1,9 +1,9 @@
-set tabstop=4 
+set tabstop=4
 set shiftwidth=4
 set expandtab
 syntax enable
-set number
 colorscheme slate
-set autoindent 
+set autoindent
 set cindent
 set hlsearch
+set fileencodings=ucs-bom,utf-8,korea,default
