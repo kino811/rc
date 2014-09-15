@@ -4,6 +4,10 @@ set hlsearch
 set autoindent cindent
 set fileencodings=ucs-bom,utf-8,korea,default
 set encoding=utf-8
+set ruler
+set incsearch
+set nowrapscan
+set hlsearch
 
 syntax enable
 colorscheme slate
