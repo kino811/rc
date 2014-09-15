@@ -23,6 +23,9 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
+autocmd BufReadPost Makefile
+  \ set noexpandtab
+
 colorscheme slate
 
 "abbreviation(약어)
