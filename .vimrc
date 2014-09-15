@@ -8,6 +8,7 @@ set ruler
 set incsearch
 set nowrapscan
 set hlsearch
+set showcmd
 
 syntax enable
 colorscheme slate
