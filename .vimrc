@@ -4,8 +4,28 @@ set hlsearch
 set autoindent cindent
 set fileencodings=ucs-bom,utf-8,korea,default
 set encoding=utf-8
+set ruler
+set incsearch
+set nowrapscan
+set showcmd
 
-syntax enable
+"VMS 시스템에는 백업을 자동으로 하기에 백업을 켤필요 없다.
+"백업 파일은 ~파일이름 식으로 저장된다.
+if has("vms")
+  set nobackup
+else
+  set backup
+endif
+
+"색을 사용할수 있는경우 문법 강조를 사용하도록 한다.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+autocmd BufReadPost Makefile
+  \ set noexpandtab
+
 colorscheme slate
 
 "abbreviation(약어)
