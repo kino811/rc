@@ -24,6 +24,7 @@ endif
 
 autocmd BufRead,BufReadPost,BufNewFile Makefile
   \ set noexpandtab
+  \ set nocindent
 
 colorscheme slate
 
