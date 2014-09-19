@@ -7,3 +7,4 @@ colorscheme slate
 set autoindent 
 set cindent
 set hlsearch
+set tags+=./tags
