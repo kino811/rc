@@ -13,6 +13,21 @@ set tags+=./tags
 
 colorscheme slate
 filetype plugin indent on
+set omnifunc=syntaxcomplete#Complete
+
+
+" ---------------------------------------------------------------------------
+syntax on
+set nocompatible
+filetype off
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+" let Vundle manage Vundle
+" " required!
+Bundle 'gmarik/vundle'
+" " My bundles here:
+Bundle 'davidhalter/jedi-vim'
+filetype plugin indent on " required!
 
 " -----------------------------------------------------------------------------------
 " 조건식
