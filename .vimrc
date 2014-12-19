@@ -1,5 +1,58 @@
-" ----------------------------------------------------------------------------------
-" set
+" Plugins setting " {{{
+" vundle " {
+set nocompatible
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'gmarik/Vundle.vim'
+Plugin 'pathogen.vim'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'https://github.com/nosami/Omnisharp.git'
+Plugin 'Python-3.x-Standard-Library-Reference'
+Plugin 'Python-2.x-Standard-Library-Reference'
+Plugin 'python.vim'
+Plugin 'csharp.vim'
+Plugin 'lua_omni'
+Plugin 'OmniCppComplete'
+Plugin 'taglist.vim'
+Plugin 'The-NERD-tree'
+Plugin 'ctrlp.vim'
+Plugin 'git://github.com/tpope/vim-dispatch.git'
+Plugin 'Syntastic'
+call vundle#end()
+filetype plugin indent on
+" vundle " }
+
+" pathogen " {
+execute pathogen#infect()
+" pathogen " }
+
+" omnisharp " {
+filetype plugin indent on
+let g:Omnisharp_host = "http://localhost:2000"
+let g:OmniSharp_timeout = 1
+set noshowmatch
+augroup omnisharp_commands
+  autocmd!
+  autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+  autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
+  autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
+  autocmd BufWritePost *.cs call OmniSharp#AddToProject()
+  autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+  autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+  autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
+  autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
+augroup END
+nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
+vnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
+nnoremap <leader>ss :OmniSharpStartServer<cr>
+nnoremap <leader>sp :OmniSharpStopServer<cr>
+"Don't ask to save when changing buffers (i.e. when jumping to a type
+"definition)
+set hidden
+" omnisharp " }
+" Plugins setting " }}}
+
 set tabstop=4 shiftwidth=4
 set expandtab
 set autoindent cindent
@@ -13,68 +66,37 @@ set tags+=./tags
 
 colorscheme slate
 filetype plugin indent on
-set omnifunc=syntaxcomplete#Complete
-
-
-" ---------------------------------------------------------------------------
 syntax on
-set nocompatible
-filetype off
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
-" let Vundle manage Vundle
-" " required!
-Bundle 'gmarik/vundle'
-" " My bundles here:
-Bundle 'davidhalter/jedi-vim'
-filetype plugin indent on " required!
 
-" -----------------------------------------------------------------------------------
-" 조건식
-"VMS 시스템에는 백업을 자동으로 하기에 백업을 켤필요 없다.
-"백업 파일은 ~파일이름 식으로 저장된다.
-if has("vms")
-  set nobackup
-else
-  set backup
-endif
-
+" set highlight " {
 "색을 사용할수 있는경우 문법 강조를 사용하도록 한다.
 if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch
 endif
-
-" ------------------------------------------------------------------------------
-"abbreviation(약어)
+" set highlight " }
+"
+" abbreviation(약어) " {
 "abbreviate(ab)
 "iabbrev(ia)
 abbreviate mail: kino811@gmail.com
 iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
-
-" -----------------------------------------------------------------------------
-" 자동 명령
-
+" abbreviation(약어) " }
+"
+" auto command " {
 "setlocal - 현재파일에 대해서만 적용함
 autocmd FileType text setlocal textwidth=78
-
-autocmd BufRead,BufReadPost,BufNewFile Makefile
-  \ set noexpandtab
-  \ set nocindent
-
+autocmd BufRead,BufReadPost,BufNewFile Makefile set noexpandtab 
+autocmd BufRead,BufReadPost,BufNewFile Makefile set nocindent
 augroup filetypedetect
    au BufNewFile,BufRead *.nsh setf nsis 
 augroup END
-
-" ------------------------------------------------------------------------
-" 변수 설정
+" auto command " }
+"
+" set var " {
 "todo: set gnu grep path
 "let Grep_Path = ''
 let Grep_OpenQuickfixWindow = 1
 let Grep_Default_Options = '-rn'
-
-" ----------------------------------------------------------------------------
-" tip
-
-"특정 파일에만 고유한 옵션을 지정하고 싶은경우, 파일 첫행에 다음과 같이 적으면 됨
-"/* vim: set ts=2 sw=2: */
+" set var " }
+"
