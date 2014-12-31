@@ -7,7 +7,7 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'pathogen.vim'
 Plugin 'davidhalter/jedi-vim'
-Plugin 'https://github.com/nosami/Omnisharp.git'
+Plugin 'https://github.com/OmniSharp/omnisharp-vim.git'
 Plugin 'Python-3.x-Standard-Library-Reference'
 Plugin 'Python-2.x-Standard-Library-Reference'
 Plugin 'python.vim'
