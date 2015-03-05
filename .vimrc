@@ -1,4 +1,4 @@
-" Plugins setting " {{{
+" Plugins setting " {{
 " vundle " {
 set nocompatible
 filetype off
@@ -7,7 +7,7 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'pathogen.vim'
 Plugin 'davidhalter/jedi-vim'
-Plugin 'https://github.com/OmniSharp/omnisharp-vim.git'
+Plugin 'OmniSharp/omnisharp-vim.git'
 Plugin 'Python-3.x-Standard-Library-Reference'
 Plugin 'Python-2.x-Standard-Library-Reference'
 Plugin 'python.vim'
@@ -17,8 +17,9 @@ Plugin 'OmniCppComplete'
 Plugin 'taglist.vim'
 Plugin 'The-NERD-tree'
 Plugin 'ctrlp.vim'
-Plugin 'git://github.com/tpope/vim-dispatch.git'
+Plugin 'tpope/vim-dispatch.git'
 Plugin 'Syntastic'
+Plugin 'a.vim'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
@@ -51,7 +52,7 @@ nnoremap <leader>sp :OmniSharpStopServer<cr>
 "definition)
 set hidden
 " omnisharp " }
-" Plugins setting " }}}
+" Plugins setting " }}
 
 set tabstop=4 shiftwidth=4
 set expandtab
