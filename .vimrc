@@ -20,6 +20,8 @@ Plugin 'ctrlp.vim'
 Plugin 'tpope/vim-dispatch.git'
 Plugin 'Syntastic'
 Plugin 'a.vim'
+Plugin 'xmledit'
+Plugin 'bling/vim-airline.git'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
@@ -52,6 +54,11 @@ nnoremap <leader>sp :OmniSharpStopServer<cr>
 "definition)
 set hidden
 " omnisharp " }
+"
+" vim-airline " {
+let g:airline#extensions#tabline#enabled = 1
+" vim-airline " }
+" 
 " Plugins setting " }}
 
 set tabstop=4 shiftwidth=4
@@ -101,3 +108,9 @@ let Grep_OpenQuickfixWindow = 1
 let Grep_Default_Options = '-rn'
 " set var " }
 "
+
+" map " {
+map <C-Tab> :bnext<Enter>
+map <C-S-Tab> :bprevious<Enter>
+" map " }
+
