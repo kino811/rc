@@ -22,6 +22,10 @@ Plugin 'Syntastic'
 Plugin 'a.vim'
 Plugin 'xmledit'
 Plugin 'bling/vim-airline.git'
+Plugin 'vim-pandoc/vim-pandoc'
+Plugin 'vim-pandoc/vim-pandoc-syntax'
+Plugin 'mattn/webapi-vim.git'
+Plugin 'lambdalisue/vim-pandoc-preview'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
