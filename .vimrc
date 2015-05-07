@@ -116,5 +116,11 @@ let Grep_Default_Options = '-rn'
 " map " {
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
+nnoremap \16 viwy:python print int(""", 16)<Enter>
 " map " }
 
+" my funcs " {
+function Test()
+    echo "Test"
+endfunction
+" my funcs " }
