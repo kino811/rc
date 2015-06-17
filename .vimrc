@@ -7,7 +7,7 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'pathogen.vim'
 Plugin 'davidhalter/jedi-vim'
-Plugin 'OmniSharp/omnisharp-vim.git'
+Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'Python-3.x-Standard-Library-Reference'
 Plugin 'Python-2.x-Standard-Library-Reference'
 Plugin 'python.vim'
@@ -17,15 +17,14 @@ Plugin 'OmniCppComplete'
 Plugin 'taglist.vim'
 Plugin 'The-NERD-tree'
 Plugin 'ctrlp.vim'
-Plugin 'tpope/vim-dispatch.git'
+Plugin 'tpope/vim-dispatch'
 Plugin 'Syntastic'
 Plugin 'a.vim'
 Plugin 'xmledit'
-Plugin 'bling/vim-airline.git'
+Plugin 'bling/vim-airline'
 Plugin 'vim-pandoc/vim-pandoc'
 Plugin 'vim-pandoc/vim-pandoc-syntax'
-Plugin 'mattn/webapi-vim.git'
-Plugin 'lambdalisue/vim-pandoc-preview'
+Plugin 'mattn/webapi-vim'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
@@ -112,15 +111,28 @@ let Grep_OpenQuickfixWindow = 1
 let Grep_Default_Options = '-rn'
 " set var " }
 "
+" my funcs " {
+function Test()
+    echo "Test"
+endfunction
+
+function ShowPreviewMarkdownFromPandoc()
+    !pandoc -s -o temp.html %
+    if has("mac")
+        " todo:
+        !open temp.html
+    elseif has("win32")
+        !start explorer temp.html
+    endif
+endfunction
+" my funcs " }
 
 " map " {
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
 nnoremap \16 viwy:python print int(""", 16)<Enter>
 " map " }
-
-" my funcs " {
-function Test()
-    echo "Test"
-endfunction
-" my funcs " }
+"
+" my command {
+command ShowPreviewMarkdownFromPandoc call ShowPreviewMarkdownFromPandoc()
+" my command }
