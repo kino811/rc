@@ -112,11 +112,7 @@ let Grep_Default_Options = '-rn'
 " set var " }
 "
 " my funcs " {
-function Test()
-    echo "Test"
-endfunction
-
-function ShowPreviewMarkdownFromPandoc()
+function ShowPreviewOfMarkdownFromPandoc()
     !pandoc -s -o temp.html %
     if has("mac")
         " todo:
@@ -127,12 +123,12 @@ function ShowPreviewMarkdownFromPandoc()
 endfunction
 " my funcs " }
 
-" map " {
+" maps " {
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
-nnoremap \16 viwy:python print int(""", 16)<Enter>
-" map " }
+nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
+" maps " }
 "
-" my command {
-command ShowPreviewMarkdownFromPandoc call ShowPreviewMarkdownFromPandoc()
-" my command }
+" commands {
+command! MarkdownPreviewFromPandoc call ShowPreviewOfMarkdownFromPandoc()
+" commands }
