@@ -182,13 +182,25 @@ let Grep_Default_Options = '-rn'
 " set var " }
 "
 " my funcs " {
-function ShowPreviewOfMarkdownFromPandoc()
+function! ShowPreviewOfMarkdownFromPandoc()
     !pandoc -s -o temp.html %
     if has("mac")
         " todo:
         !open temp.html
     elseif has("win32")
         !start explorer temp.html
+    endif
+endfunction
+
+function! FindReferenceAPIFromUnity3D()
+    let s:unity_ref_site = "http://docs.unity3d.com/ScriptReference/30_search.html?q="
+    normal viWy
+    let s:copied_for_unity_ref = @"
+
+    if has("mac")
+        exe "!open " . s:unity_ref_site . s:copied_for_unity_ref
+    elseif has("win32")
+        !start explorer . s:unity_ref_site . s:copied_for_unity_ref
     endif
 endfunction
 " my funcs " }
@@ -201,4 +213,5 @@ nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
 "
 " commands {
 command! MarkdownPreviewFromPandoc call ShowPreviewOfMarkdownFromPandoc()
+command! FindReferenceAPIFromUnity3D call FindReferenceAPIFromUnity3D()
 " commands }
