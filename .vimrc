@@ -150,14 +150,14 @@ filetype plugin indent on
 syntax on
 
 " set highlight " {
-"색을 사용할수 있는경우 문법 강조를 사용하도록 한다.
+" use syntax-highlighting when usable color.
 if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch
 endif
 " set highlight " }
 "
-" abbreviation(약어) " {
+" abbreviation " {
 "abbreviate(ab)
 "iabbrev(ia)
 abbreviate mail: kino811@gmail.com
@@ -165,7 +165,7 @@ iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 " abbreviation(약어) " }
 "
 " auto command " {
-"setlocal - 현재파일에 대해서만 적용함
+"setlocal - apply current file only.
 autocmd FileType text setlocal textwidth=78
 autocmd BufRead,BufReadPost,BufNewFile Makefile set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile set nocindent
