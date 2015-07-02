@@ -1,0 +1,18 @@
+[gui]
+[gui]
+	recentrepo = C:/Users/myonghwa.Jung/.emacs.d
+[user]
+	email = kino811@gmail.com
+	name = Myonghwa, Jung
+[core]
+	editor = vim
+[merge]
+	tool = vimdiff
+[push]
+	default = matching
+[diff]
+	tool = vimdiff
+[alias]
+	logall = log --oneline --decorate --all --graph
+[credential]
+	helper = cache
