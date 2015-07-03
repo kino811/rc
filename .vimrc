@@ -162,11 +162,10 @@ endif
 "iabbrev(ia)
 abbreviate mail: kino811@gmail.com
 iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
-" abbreviation(약어) " }
+" abbreviation " }
 "
 " auto command " {
 "setlocal - apply current file only.
-autocmd FileType text setlocal textwidth=78
 autocmd BufRead,BufReadPost,BufNewFile Makefile set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile set nocindent
 augroup filetypedetect
