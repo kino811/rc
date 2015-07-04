@@ -190,14 +190,22 @@ function! ShowPreviewOfMarkdownFromPandoc()
 endfunction
 
 function! FindReferenceAPIFromUnity3D()
-    let s:unity_ref_site = "http://docs.unity3d.com/ScriptReference/30_search.html?q="
-    normal viWy
-    let s:copied_for_unity_ref = @"
+    let s:ref_site = "http://docs.unity3d.com/ScriptReference/30_search.html?q="
 
     if has("mac")
-        exe "!open " . s:unity_ref_site . s:copied_for_unity_ref
+        exe '!open "' . s:ref_site . '<cword>"'
     elseif has("win32")
-        !start explorer . s:unity_ref_site . s:copied_for_unity_ref
+        exe '!start explorer "' . s:ref_site . '<cword>"'
+    endif
+endfunction
+
+function! FindReferenceAPIFromMSDN()
+    let s:ref_site = 'http://www.google.com/search?hl=en&btnI=I\%27m+Feeling+Lucky&q=site\%3Amsdn.microsoft.com\%20'
+
+    if has("mac")
+        exe '!open "' . s:ref_site . '<cword>"'
+    elseif has("win32")
+        exe '!start explorer "' . s:ref_site . '<cword>"'
     endif
 endfunction
 " my funcs " }
@@ -211,4 +219,5 @@ nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
 " commands {
 command! MarkdownPreviewFromPandoc call ShowPreviewOfMarkdownFromPandoc()
 command! FindReferenceAPIFromUnity3D call FindReferenceAPIFromUnity3D()
+command! FindReferenceAPIFromMSDN call FindReferenceAPIFromMSDN()
 " commands }
