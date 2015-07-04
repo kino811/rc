@@ -35,25 +35,28 @@ execute pathogen#infect()
 
 " omnisharp " {
 filetype plugin on
+" Selection server type. 
+" v1, roslyn
+let g:OmniSharp_server_type = 'v1'
 " This is the default value, setting it isn't actually necessary
-let g:Omnisharp_host = "http://localhost:2000"
+let g:Omnisharp_host="http://localhost:2000"
 " Timeout in seconds to wait for a response from the server
-let g:OmniSharp_timeout = 1
+let g:OmniSharp_timeout=1
 " Showmatch significantly slows down omnicomplete
 " when the first match contains parentheses.
 set noshowmatch
 " Dont't autoselect first item in omnicaomplete, show if only one item (for
 " preview).
 " Remove preview if you don't want to see any documentation whatsoever.
-"set completeopt=longest,menuone,preview
+set completeopt=longest,menuone,preview
 " Move the preview window (code documentation) to the bottom of the screen, so
 " it doesn't move the code!
 " You might also want to look at the echodoc plugin.
-"set splitbelow
+set splitbelow
 " Get code issues and syntax errors.
-"let g:syntastic_cs_checkers = ['syntax', 'semantic', 'issues']
+let g:syntastic_cs_checkers=['syntax', 'semantic', 'issues']
 " If you are using the omnisharp-roslyn backend, use the following.
-"let g:syntastic_cs_checkers = ['code_checker']
+let g:syntastic_cs_checkers=['code_checker']
 
 augroup omnisharp_commands
   autocmd!
@@ -79,7 +82,7 @@ augroup omnisharp_commands
   autocmd FileType cs nnoremap <leader>if :OmniSharpFindImplementations<cr>
   autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
   autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
-  autocmd FileType cs nnoremap <leader>fu : OmniSharpFindUsages<cr>
+  autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
   " Finds members in the current buffer
   autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
   " Cursor can be anywhere on the line containing an issue.
@@ -147,23 +150,22 @@ filetype plugin indent on
 syntax on
 
 " set highlight " {
-"색을 사용할수 있는경우 문법 강조를 사용하도록 한다.
+" use syntax-highlighting when usable color.
 if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch
 endif
 " set highlight " }
 "
-" abbreviation(약어) " {
+" abbreviation " {
 "abbreviate(ab)
 "iabbrev(ia)
 abbreviate mail: kino811@gmail.com
 iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
-" abbreviation(약어) " }
+" abbreviation " }
 "
 " auto command " {
-"setlocal - 현재파일에 대해서만 적용함
-autocmd FileType text setlocal textwidth=78
+"setlocal - apply current file only.
 autocmd BufRead,BufReadPost,BufNewFile Makefile set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile set nocindent
 augroup filetypedetect
