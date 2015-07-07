@@ -1,11 +1,9 @@
-[gui]
-[gui]
-	recentrepo = C:/Users/myonghwa.Jung/.emacs.d
 [user]
 	email = kino811@gmail.com
 	name = Myonghwa, Jung
 [core]
 	editor = vim
+	crlf = input
 [merge]
 	tool = vimdiff
 [push]
@@ -15,5 +13,6 @@
 [alias]
 	logall = log --oneline --decorate --all --graph
 	logfull = log --oneline --decorate --graph
+	st = status
 [credential]
 	helper = cache
