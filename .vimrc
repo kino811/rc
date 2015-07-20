@@ -143,6 +143,7 @@ set incsearch
 set nowrapscan
 set showcmd
 set tags+=./tags
+set termencoding=korea
 
 colorscheme slate
 filetype plugin indent on
