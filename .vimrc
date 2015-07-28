@@ -28,11 +28,6 @@ call vundle#end()
 filetype plugin indent on
 " vundle " }
 
-" powerline " {
-set guifont=DejaVu\ Sans\ Mono\ for\ PowerLine\ 9
-set laststatus=2
-" powerline " }
-
 " pathogen " {
 execute pathogen#infect()
 " pathogen " }
