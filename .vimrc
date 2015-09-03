@@ -167,6 +167,8 @@ set showcmd
 set tags+=./tags
 set termencoding=korea
 
+lang mes en_US
+
 colorscheme slate
 filetype plugin indent on
 syntax on
