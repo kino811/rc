@@ -24,6 +24,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
 Plugin 'davidhalter/jedi-vim'
+Plugin 'aklt/plantuml-syntax'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
