@@ -164,7 +164,7 @@ set ruler
 set incsearch
 set nowrapscan
 set showcmd
-set tags+=./tags
+set tags=./tags,./../tags,./*/tags
 set termencoding=korea
 
 colorscheme slate
@@ -204,12 +204,13 @@ let Grep_Default_Options = '-rn'
 "
 " my funcs " {
 function! ShowPreviewOfMarkdownFromPandoc()
-    !pandoc -s -o temp.html %
+    let s:html_name = expand('%:p:r') . '.html'
+    exe '!pandoc -s -o ' . s:html_name . ' ' . expand('%:p')
     if has("mac")
         " todo:
-        !open temp.html
+        exe '!open "' . s:html_name . '"'
     elseif has("win32")
-        !start explorer temp.html
+        exe '!start explorer "' . s:html_name . '"'
     endif
 endfunction
 
