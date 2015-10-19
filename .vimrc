@@ -24,6 +24,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
 Plugin 'davidhalter/jedi-vim'
+Plugin 'aklt/plantuml-syntax'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
@@ -167,6 +168,8 @@ set showcmd
 set tags=./tags,./../tags,./*/tags
 set termencoding=korea
 
+lang mes en_US
+
 colorscheme slate
 filetype plugin indent on
 syntax on
@@ -190,8 +193,15 @@ iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 "setlocal - apply current file only.
 autocmd BufRead,BufReadPost,BufNewFile Makefile set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile set nocindent
+
 augroup filetypedetect
-   au BufNewFile,BufRead *.nsh setf nsis 
+    autocmd BufNewFile,BufRead *.nsh setf nsis 
+augroup END
+
+augroup lua
+    autocmd!
+    autocmd FileType lua map <F5> :!lua %<CR>
+    autocmd FileType lua setlocal number
 augroup END
 " auto command " }
 "
