@@ -173,6 +173,8 @@ set showcmd
 set tags=./tags,./../tags,./*/tags
 set termencoding=korea
 set helplang=ko
+
+set sessionoptions-=options
 set sessionoptions+=unix,slash
 
 lang mes en
