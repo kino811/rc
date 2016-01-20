@@ -1,3 +1,8 @@
+set langmenu=en_US
+let $LANG = 'en_US'
+so $VIMRUNTIME/delmenu.vim
+so $VIMRUNTIME/menu.vim
+
 " Plugins setting " {{
 " vundle " {
 set nocompatible
@@ -167,21 +172,18 @@ set nowrapscan
 set showcmd
 set tags=./tags,./../tags,./*/tags
 set termencoding=korea
+set helplang=ko
+set sessionoptions+=unix,slash
 
-lang mes en_US
+lang mes en
 
 colorscheme slate
-filetype plugin indent on
-syntax on
+filetype on
+filetype plugin on
+filetype indent on
+syntax enable
+set hlsearch
 
-" set highlight " {
-" use syntax-highlighting when usable color.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
-endif
-" set highlight " }
-"
 " abbreviation " {
 "abbreviate(ab)
 "iabbrev(ia)
@@ -213,7 +215,7 @@ let Grep_Default_Options = '-rn'
 " set var " }
 "
 " my funcs " {
-function! ShowPreviewOfMarkdownFromPandoc()
+function! MarkdownPreviewFromPandoc()
     let s:html_name = expand('%:p:r') . '.html'
     exe '!pandoc -s -o ' . s:html_name . ' ' . expand('%:p')
     if has("mac")
@@ -243,6 +245,16 @@ function! FindReferenceAPIFromMSDN()
         exe '!start explorer "' . s:ref_site . '<cword>"'
     endif
 endfunction
+
+function! TranslateWordFromEnToKr()
+    let s:ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
+
+    if has('mac')
+        exe '!open "' . s:ref_site . '<cword>"'
+    elseif has('win32')
+        exe '!start explorer "' . s:ref_site . '<cword>"'
+    endif
+endfunction
 " my funcs " }
 
 " maps " {
@@ -252,7 +264,8 @@ nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
 " maps " }
 "
 " commands {
-command! MarkdownPreviewFromPandoc call ShowPreviewOfMarkdownFromPandoc()
+command! MarkdownPreviewFromPandoc call MarkdownPreviewFromPandoc()
 command! FindReferenceAPIFromUnity3D call FindReferenceAPIFromUnity3D()
 command! FindReferenceAPIFromMSDN call FindReferenceAPIFromMSDN()
+command! TranslateWordFromEnToKr call TranslateWordFromEnToKr()
 " commands }
