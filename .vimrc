@@ -177,8 +177,6 @@ set helplang=ko
 set sessionoptions-=options
 set sessionoptions+=unix,slash
 
-lang mes en
-
 colorscheme slate
 filetype on
 filetype plugin on
