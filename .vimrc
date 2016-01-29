@@ -171,7 +171,8 @@ set incsearch
 set nowrapscan
 set showcmd
 set tags=./tags,./../tags,./*/tags
-set termencoding=korea
+"set termencoding=korea
+set termencoding=utf-8
 set helplang=ko
 
 set sessionoptions-=options
