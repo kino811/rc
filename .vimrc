@@ -1,11 +1,12 @@
 set langmenu=en_US
 let $LANG = 'en_US'
+let mapleader = ","
 so $VIMRUNTIME/delmenu.vim
 so $VIMRUNTIME/menu.vim
+set nocompatible
 
 " Plugins setting " {{
 " vundle " {
-set nocompatible
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -155,12 +156,14 @@ let g:pymode_folding = 0
 
 augroup python
     autocmd!
-    autocmd FIleType python setlocal number
+    autocmd FIleType python     setlocal number
+    autocmd BufEnter *.py       map <F5> :!python %<CR>
 augroup END
 
 " 
 " Plugins setting " }}
 
+set backspace=start
 set tabstop=4 shiftwidth=4
 set expandtab
 set autoindent cindent
@@ -170,7 +173,12 @@ set ruler
 set incsearch
 set nowrapscan
 set showcmd
+
 set tags=./tags,./../tags,./*/tags
+set tags+=D:/project/Project_AD/repository/trunk/Real-work/commonLib/tags
+set tags+=D:/dev/lib/corelib/protobuf-2.3.0/tags
+set tags+=D:/dev/lib/G3DX9/trunk/tags
+
 "set termencoding=korea
 set termencoding=utf-8
 set helplang=ko
@@ -194,18 +202,26 @@ iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 "
 " auto command " {
 "setlocal - apply current file only.
-autocmd BufRead,BufReadPost,BufNewFile Makefile set noexpandtab 
-autocmd BufRead,BufReadPost,BufNewFile Makefile set nocindent
+autocmd BufRead,BufReadPost,BufNewFile Makefile  set noexpandtab 
+autocmd BufRead,BufReadPost,BufNewFile Makefile  set nocindent
 
 augroup filetypedetect
-    autocmd BufNewFile,BufRead *.nsh setf nsis 
+    autocmd BufNewFile,BufRead *.nsh     setf nsis 
 augroup END
 
 augroup lua
     autocmd!
-    autocmd FileType lua map <F5> :!lua %<CR>
-    autocmd FileType lua setlocal number
+    autocmd FileType lua     map <F5> :!lua %<CR>
+    autocmd BufEnter *.lua   map <F5> :!lua %<CR>
+    autocmd FileType lua     setlocal number
 augroup END
+
+augroup dosbatch
+    autocmd!
+    autocmd FileType dosbatch    map <F5> :!start %:p<Enter>
+    autocmd BufEnter *.bat       map <F5> :!start %:p<Enter>
+augroup END
+
 " auto command " }
 "
 " set var " {
@@ -262,6 +278,7 @@ endfunction
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
 nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
+map <C-S-P> :CtrlPCurWD<CR>
 " maps " }
 "
 " commands {
@@ -269,4 +286,12 @@ command! MarkdownPreviewFromPandoc call MarkdownPreviewFromPandoc()
 command! FindReferenceAPIFromUnity3D call FindReferenceAPIFromUnity3D()
 command! FindReferenceAPIFromMSDN call FindReferenceAPIFromMSDN()
 command! TranslateWordFromEnToKr call TranslateWordFromEnToKr()
+"
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+endif
 " commands }
