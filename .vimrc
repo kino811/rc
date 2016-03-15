@@ -4,6 +4,7 @@ let mapleader = ","
 so $VIMRUNTIME/delmenu.vim
 so $VIMRUNTIME/menu.vim
 set nocompatible
+set clipboard=unnamed
 
 " Plugins setting " {{
 " vundle " {
@@ -213,7 +214,6 @@ augroup lua
     autocmd!
     autocmd FileType lua     map <F5> :!lua %<CR>
     autocmd BufEnter *.lua   map <F5> :!lua %<CR>
-    autocmd FileType lua     setlocal number
 augroup END
 
 augroup dosbatch
@@ -278,7 +278,7 @@ endfunction
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
 nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
-map <C-S-P> :CtrlPCurWD<CR>
+map <S-P> :CtrlPCurWD<CR>
 " maps " }
 "
 " commands {
