@@ -278,7 +278,7 @@ endfunction
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
 nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
-map <S-P> :CtrlPCurWD<CR>
+map <leader><C-P> :CtrlPCurWD<CR>
 " maps " }
 "
 " commands {
