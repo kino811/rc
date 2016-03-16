@@ -4,7 +4,7 @@ let mapleader = ","
 so $VIMRUNTIME/delmenu.vim
 so $VIMRUNTIME/menu.vim
 set nocompatible
-set clipboard=unnamed
+"set clipboard=unnamed
 
 " Plugins setting " {{
 " vundle " {
@@ -175,7 +175,7 @@ set incsearch
 set nowrapscan
 set showcmd
 
-set tags=./tags,./../tags,./*/tags
+set tags=./tags,tags,**/tags
 set tags+=D:/project/Project_AD/repository/trunk/Real-work/commonLib/tags
 set tags+=D:/dev/lib/corelib/protobuf-2.3.0/tags
 set tags+=D:/dev/lib/G3DX9/trunk/tags
