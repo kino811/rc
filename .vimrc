@@ -150,7 +150,7 @@ let g:pymode_rope = 0
 let g:pymode_doc = 1
 let g:pymode_doc_key = 'K'
 let g:pymode_lint = 1
-let g:pymode_lint_checker = "pyflakes,pep8"
+let g:pymode_lint_checkers = ['pyflakes']
 let g:pymode_lint_write = 1
 let g:pymode_virtualenv = 1
 let g:pymode_breakpoint = 1
@@ -164,8 +164,13 @@ let g:pymode_folding = 0
 
 augroup python
     autocmd!
-    autocmd FIleType python     setlocal number
-    autocmd BufEnter *.py       map <F5> :!python %<CR>
+    autocmd FIleType python setlocal number
+
+    if has("mac")
+        autocmd BufEnter *.py map <F5> :!python %<CR>
+    elseif has("win32")
+        autocmd BufEnter *.py map <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
+    endif
 augroup END
 
 " 
@@ -219,14 +224,20 @@ augroup END
 
 augroup lua
     autocmd!
-    autocmd FileType lua     map <F5> :!lua %<CR>
-    autocmd BufEnter *.lua   map <F5> :!lua %<CR>
+
+    if has("mac")
+        autocmd BufEnter *.lua map <F5> :!lua %<CR>
+    elseif has("win32")
+        autocmd BufEnter *.lua map <F5> :!start cmd /c "pushd %:p:h && lua %:t"<CR>
+    endif
 augroup END
 
 augroup dosbatch
     autocmd!
-    autocmd FileType dosbatch    map <F5> :!start %:p<Enter>
-    autocmd BufEnter *.bat       map <F5> :!start %:p<Enter>
+
+    if has("win32")
+        autocmd BufEnter *.bat map <F5> :!start cmd /c "pushd %:p:h && %:t"<CR>
+    endif
 augroup END
 
 " auto command " }
