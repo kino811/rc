@@ -32,9 +32,16 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'aklt/plantuml-syntax'
+Plugin 'vim-scripts/sokoban.vim'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
+"
+
+" sokoban {
+"let g:SokobanLevelDirectory = "~/.vim/bundle/sokoban.vim/"
+" sokoban }
+
 
 " pathogen " {
 execute pathogen#infect()
@@ -272,6 +279,16 @@ function! TranslateWordFromEnToKr()
         exe '!start explorer "' . s:ref_site . '<cword>"'
     endif
 endfunction
+
+function! TranslateWordFromEnToKrThat(word)
+    let s:ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
+
+    if has('mac')
+        exe '!open "' . s:ref_site . a:word . '"'
+    elseif has('win32')
+        exe '!start explorer "' . s:ref_site . a:word . '"'
+    endif
+endfunction
 " my funcs " }
 
 " maps " {
@@ -282,10 +299,11 @@ map <leader><C-P> :CtrlPCurWD<CR>
 " maps " }
 "
 " commands {
-command! MarkdownPreviewFromPandoc call MarkdownPreviewFromPandoc()
-command! FindReferenceAPIFromUnity3D call FindReferenceAPIFromUnity3D()
-command! FindReferenceAPIFromMSDN call FindReferenceAPIFromMSDN()
-command! TranslateWordFromEnToKr call TranslateWordFromEnToKr()
+command! MarkdownPreviewFromPandoc :call MarkdownPreviewFromPandoc()
+command! FindReferenceAPIFromUnity3D :call FindReferenceAPIFromUnity3D()
+command! FindReferenceAPIFromMSDN :call FindReferenceAPIFromMSDN()
+command! TranslateWordFromEnToKr :call TranslateWordFromEnToKr()
+command! -nargs=1 TranslateWordFromEnToKrThat :call TranslateWordFromEnToKrThat(<f-args>)
 "
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
