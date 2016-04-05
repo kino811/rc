@@ -32,7 +32,7 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'aklt/plantuml-syntax'
-Plugin 'vim-scripts/sokoban.vim'
+Plugin 'TeTrIs.vim'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
