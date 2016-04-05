@@ -219,7 +219,6 @@ autocmd BufRead,BufReadPost,BufNewFile Makefile  set noexpandtab
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set nocindent
 
 augroup filetypedetect
-    autocmd!
     autocmd BufNewFile,BufRead *.nsh setf nsis 
 augroup END
 
