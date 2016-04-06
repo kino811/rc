@@ -34,6 +34,7 @@ Plugin 'davidhalter/jedi-vim'
 Plugin 'aklt/plantuml-syntax'
 Plugin 'TeTrIs.vim'
 Plugin 'Visual-Mark'
+Plugin 'Mark'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
