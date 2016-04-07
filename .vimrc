@@ -162,7 +162,12 @@ let g:pymode_syntax_all = 1
 let g:pymode_syntax_indent_errors = g:pymode_syntax_all
 let g:pymode_syntax_space_errors = g:pymode_syntax_all
 let g:pymode_folding = 0
+let g:pymode_run_bind = '<leader>r'
 " python-mode " }
+"
+" jedi-vim {
+let g:jedi#rename_command = ''
+" jedi-vim }
 
 augroup python
     autocmd!
@@ -318,6 +323,8 @@ command! FindReferenceAPIFromUnity3D :call FindReferenceAPIFromUnity3D()
 command! FindReferenceAPIFromMSDN :call FindReferenceAPIFromMSDN()
 command! TranslateWordFromEnToKr :call TranslateWordFromEnToKr()
 command! -nargs=1 TranslateWordFromEnToKrThat :call TranslateWordFromEnToKrThat(<f-args>)
+command! SetLocalDirToThisFileDir :lcd %:p:h
+command! MakeSessionToDefault :mks! ~\session.vim
 "
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
