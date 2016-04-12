@@ -35,6 +35,7 @@ Plugin 'aklt/plantuml-syntax'
 Plugin 'TeTrIs.vim'
 Plugin 'Visual-Mark'
 Plugin 'Mark'
+Plugin 'kshenoy/vim-signature'
 call vundle#end()
 filetype plugin indent on
 " vundle " }
@@ -43,7 +44,6 @@ filetype plugin indent on
 " sokoban {
 "let g:SokobanLevelDirectory = "~/.vim/bundle/sokoban.vim/"
 " sokoban }
-
 
 " pathogen " {
 execute pathogen#infect()
@@ -167,6 +167,7 @@ let g:pymode_run_bind = '<leader>r'
 "
 " jedi-vim {
 let g:jedi#rename_command = ''
+let g:jedi#completions_command = "<C-N>"
 " jedi-vim }
 
 augroup python
@@ -325,6 +326,7 @@ command! TranslateWordFromEnToKr :call TranslateWordFromEnToKr()
 command! -nargs=1 TranslateWordFromEnToKrThat :call TranslateWordFromEnToKrThat(<f-args>)
 command! SetLocalDirToThisFileDir :lcd %:p:h
 command! MakeSessionToDefault :mks! ~\session.vim
+command! OpenExplorerFromThisFile :!start explorer %:p:h
 "
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
