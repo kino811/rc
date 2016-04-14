@@ -4,7 +4,7 @@ let mapleader = ","
 so $VIMRUNTIME/delmenu.vim
 so $VIMRUNTIME/menu.vim
 set nocompatible
-"set clipboard=unnamed
+set clipboard=unnamed
 
 " Plugins setting " {{
 " vundle " {
