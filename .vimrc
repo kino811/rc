@@ -1,13 +1,5 @@
-set langmenu=en_US
-let $LANG = 'en_US'
-let mapleader = ","
-so $VIMRUNTIME/delmenu.vim
-so $VIMRUNTIME/menu.vim
-set nocompatible
-set clipboard=unnamed
-
 " Plugins setting " {{
-" vundle " {
+" vundle {
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -30,26 +22,35 @@ Plugin 'powerline/powerline'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
-Plugin 'davidhalter/jedi-vim'
+"Plugin 'davidhalter/jedi-vim'
 Plugin 'aklt/plantuml-syntax'
 Plugin 'TeTrIs.vim'
 Plugin 'Visual-Mark'
 Plugin 'Mark'
 Plugin 'kshenoy/vim-signature'
+Plugin 'lua.vim'
+Plugin 'xolox/vim-misc'
+Plugin 'xolox/vim-lua-ftplugin'
+Plugin 'SimpylFold'
+Plugin 'indentpython.vim'
+Plugin 'Valloric/YouCompleteMe'
 call vundle#end()
 filetype plugin indent on
-" vundle " }
-"
+" vundle }
+
+" SimpyLFold {
+let g:SimpylFold_docstring_preview=1
+" SimpyLFold }
 
 " sokoban {
 "let g:SokobanLevelDirectory = "~/.vim/bundle/sokoban.vim/"
 " sokoban }
 
-" pathogen " {
+" pathogen {
 execute pathogen#infect()
-" pathogen " }
+" pathogen }
 
-" omnisharp " {
+" omnisharp {
 filetype plugin on
 " Selection server type. 
 " v1, roslyn
@@ -145,9 +146,9 @@ nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 "Don't ask to save when changing buffers (i.e. when jumping to a type
 "definition)
 set hidden
-" omnisharp " }
+" omnisharp }
 
-" python-mode " {
+" python-mode {
 let g:pymode_rope = 0
 let g:pymode_doc = 1
 let g:pymode_doc_key = 'K'
@@ -163,27 +164,25 @@ let g:pymode_syntax_indent_errors = g:pymode_syntax_all
 let g:pymode_syntax_space_errors = g:pymode_syntax_all
 let g:pymode_folding = 0
 let g:pymode_run_bind = '<leader>r'
-" python-mode " }
+" python-mode }
 "
 " jedi-vim {
 let g:jedi#rename_command = ''
 let g:jedi#completions_command = "<C-N>"
 " jedi-vim }
 
-augroup python
-    autocmd!
-    autocmd FIleType python setlocal number
-
-    if has("mac")
-        autocmd BufEnter *.py map <F5> :!python %<CR>
-    elseif has("win32")
-        autocmd BufEnter *.py map <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
-    endif
-augroup END
 
 " 
-" Plugins setting " }}
+" Plugins setting }}
 
+so $VIMRUNTIME/delmenu.vim
+so $VIMRUNTIME/menu.vim
+
+let mapleader = ","
+let $LANG = 'en_US'
+
+set nocompatible
+set langmenu=en_US
 set backspace=start
 set tabstop=4 shiftwidth=4
 set expandtab
@@ -207,13 +206,19 @@ set helplang=ko
 set sessionoptions-=options
 set sessionoptions+=unix,slash
 
+set hlsearch
+set grepprg=grep\ -n
+
+set foldmethod=indent
+set foldlevel=99
+
 colorscheme slate
+
 filetype on
 filetype plugin on
 filetype indent on
+
 syntax enable
-set hlsearch
-set grepprg=grep\ -n
 
 " abbreviation " {
 "abbreviate(ab)
@@ -226,6 +231,26 @@ iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 "setlocal - apply current file only.
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set nocindent
+au BufNewFile,BufRead *.py,*.pyw,*.c,*.h,*.cpp match BadWhitespace /\s\+$/
+
+augroup python
+    autocmd!
+    autocmd FIleType python setlocal number
+    au BufNewFile,BufRead *.py 
+        \ set tabstop=4
+        \ set softtabstop=4
+        \ set shiftwidth=4
+        \ set textwidth=79
+        \ set expandtab
+        \ set autoindent
+        \ set fileformat=unix
+
+    if has("mac")
+        autocmd BufEnter *.py map <F5> :!python %<CR>
+    elseif has("win32")
+        autocmd BufEnter *.py map <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
+    endif
+augroup END
 
 augroup filetypedetect
     autocmd BufNewFile,BufRead *.nsh setf nsis 
@@ -315,7 +340,8 @@ endfunction
 map <C-Tab> :bnext<Enter>
 map <C-S-Tab> :bprevious<Enter>
 nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
-map <leader><C-P> :CtrlPCurWD<CR>
+map <Leader><C-P> :CtrlPCurWD<CR>
+nnoremap <Leader><C-F> :NERDTreeFind<CR>
 " maps " }
 "
 " commands {
