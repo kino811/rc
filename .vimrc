@@ -18,11 +18,9 @@ Plugin 'xmledit'
 Plugin 'vim-pandoc/vim-pandoc'
 Plugin 'vim-pandoc/vim-pandoc-syntax'
 Plugin 'mattn/webapi-vim'
-Plugin 'powerline/powerline'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
-"Plugin 'davidhalter/jedi-vim'
 Plugin 'aklt/plantuml-syntax'
 Plugin 'TeTrIs.vim'
 Plugin 'Visual-Mark'
@@ -34,17 +32,101 @@ Plugin 'xolox/vim-lua-ftplugin'
 Plugin 'SimpylFold'
 Plugin 'indentpython.vim'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/syntastic'
+Plugin 'nvie/vim-flake8'
+"Plugin 'jistr/vim-nerdtree-tabs'
+Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
 call vundle#end()
 filetype plugin indent on
 " vundle }
+"
+
+set langmenu=en_US
+let $LANG = 'en_US'
+
+so $VIMRUNTIME/delmenu.vim
+so $VIMRUNTIME/menu.vim
+
+let mapleader = ","
+
+set clipboard=unnamed
+set nocompatible
+set backspace=start
+set tabstop=4 shiftwidth=4
+set expandtab
+set autoindent cindent
+set fileencodings=ucs-bom,utf-8,korea,default
+set encoding=utf-8
+set ruler
+set incsearch
+set nowrapscan
+set showcmd
+
+set tags=./tags,tags
+set tags+=D:/project/Project_AD/repository/trunk/Real-work/commonLib/tags
+set tags+=D:/dev/lib/corelib/protobuf-2.3.0/tags
+set tags+=D:/dev/lib/G3DX9/trunk/tags
+
+"set termencoding=korea
+set termencoding=utf-8
+set helplang=ko
+
+set sessionoptions-=options
+set sessionoptions+=unix,slash
+
+set hlsearch
+set grepprg=grep\ -n
+
+set foldmethod=indent
+set foldlevel=99
+
+colorscheme slate
+
+filetype on
+filetype plugin on
+filetype indent on
+
+syntax enable
+
+"
+" NERDTree {
+let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+" NERDTree }
+"
+" Syntax Checking/Highlighting for python {
+let python_highlight_all=1
+syntax on
+" Syntax Checking/Highlighting for python }
+"
+
+" YouCompleteMe {
+let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'
+let g:ycm_autoclose_preview_window_after_completion=1
+let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
+let g:ycm_python_binary_path='c:\usr\bin\python.exe'
+nnoremap <Leader>g :YcmCompleter GoTo<CR>
+nnoremap <Leader>d :YcmCompleter GoToDeclaration<CR>
+nnoremap <Leader>t :YcmCompleter GetType<CR>
+nnoremap <Leader>p :YcmCompleter GetParent<CR>
+nnoremap <Leader>k :YcmCompleter GetDoc<CR>
+" YouCompleteMe }
+" 
+" Virtualenv Support for pythno {
+" python with virtualenv support
+py << EOF
+import os
+import sys
+if 'VIRTUAL_ENV' in os.environ:
+    project_base_dir = os.environ['VIRTUAL_ENV']
+    activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+    execfile(activate_this, dict(__file__=activate_this))
+EOF
+" Virtualenv Support for pythno }
 
 " SimpyLFold {
 let g:SimpylFold_docstring_preview=1
 " SimpyLFold }
-
-" sokoban {
-"let g:SokobanLevelDirectory = "~/.vim/bundle/sokoban.vim/"
-" sokoban }
 
 " pathogen {
 execute pathogen#infect()
@@ -166,59 +248,10 @@ let g:pymode_folding = 0
 let g:pymode_run_bind = '<leader>r'
 " python-mode }
 "
-" jedi-vim {
-let g:jedi#rename_command = ''
-let g:jedi#completions_command = "<C-N>"
-" jedi-vim }
-
 
 " 
 " Plugins setting }}
 
-so $VIMRUNTIME/delmenu.vim
-so $VIMRUNTIME/menu.vim
-
-let mapleader = ","
-let $LANG = 'en_US'
-
-set nocompatible
-set langmenu=en_US
-set backspace=start
-set tabstop=4 shiftwidth=4
-set expandtab
-set autoindent cindent
-set fileencodings=ucs-bom,utf-8,korea,default
-set encoding=utf-8
-set ruler
-set incsearch
-set nowrapscan
-set showcmd
-
-set tags=./tags,tags
-set tags+=D:/project/Project_AD/repository/trunk/Real-work/commonLib/tags
-set tags+=D:/dev/lib/corelib/protobuf-2.3.0/tags
-set tags+=D:/dev/lib/G3DX9/trunk/tags
-
-"set termencoding=korea
-set termencoding=utf-8
-set helplang=ko
-
-set sessionoptions-=options
-set sessionoptions+=unix,slash
-
-set hlsearch
-set grepprg=grep\ -n
-
-set foldmethod=indent
-set foldlevel=99
-
-colorscheme slate
-
-filetype on
-filetype plugin on
-filetype indent on
-
-syntax enable
 
 " abbreviation " {
 "abbreviate(ab)
@@ -231,19 +264,12 @@ iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 "setlocal - apply current file only.
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set nocindent
-au BufNewFile,BufRead *.py,*.pyw,*.c,*.h,*.cpp match BadWhitespace /\s\+$/
+"au BufNewFile,BufRead *.py,*.pyw,*.c,*.h,*.cpp match BadWhitespace /\s\+$/
 
 augroup python
     autocmd!
     autocmd FIleType python setlocal number
-    au BufNewFile,BufRead *.py 
-        \ set tabstop=4
-        \ set softtabstop=4
-        \ set shiftwidth=4
-        \ set textwidth=79
-        \ set expandtab
-        \ set autoindent
-        \ set fileformat=unix
+    au BufNewFile,BufRead *.py set tabstop=4 softtabstop=4 shiftwidth=4 textwidth=79 expandtab autoindent fileformat=unix
 
     if has("mac")
         autocmd BufEnter *.py map <F5> :!python %<CR>
