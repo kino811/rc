@@ -112,7 +112,7 @@ nnoremap <Leader>p :YcmCompleter GetParent<CR>
 nnoremap <Leader>k :YcmCompleter GetDoc<CR>
 " YouCompleteMe }
 " 
-" Virtualenv Support for pythno {
+" Virtualenv Support for python {
 " python with virtualenv support
 py << EOF
 import os
@@ -122,7 +122,7 @@ if 'VIRTUAL_ENV' in os.environ:
     activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
     execfile(activate_this, dict(__file__=activate_this))
 EOF
-" Virtualenv Support for pythno }
+" Virtualenv Support for python }
 
 " SimpyLFold {
 let g:SimpylFold_docstring_preview=1
@@ -363,9 +363,9 @@ endfunction
 " my funcs " }
 
 " maps " {
-map <C-Tab> :bnext<Enter>
-map <C-S-Tab> :bprevious<Enter>
-nnoremap <leader>16 viwy:python print int(""", 16)<Enter>
+map <C-Tab> :bnext<CR>
+map <C-S-Tab> :bprevious<CR>
+nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
 map <Leader><C-P> :CtrlPCurWD<CR>
 nnoremap <Leader><C-F> :NERDTreeFind<CR>
 " maps " }
