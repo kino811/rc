@@ -15,8 +15,6 @@ Plugin 'tpope/vim-dispatch'
 Plugin 'Syntastic'
 Plugin 'a.vim'
 Plugin 'xmledit'
-Plugin 'vim-pandoc/vim-pandoc'
-Plugin 'vim-pandoc/vim-pandoc-syntax'
 Plugin 'mattn/webapi-vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
@@ -36,6 +34,8 @@ Plugin 'scrooloose/syntastic'
 Plugin 'nvie/vim-flake8'
 Plugin 'bling/vim-airline'
 Plugin 'shougo/unite.vim'
+Plugin 'kannokanno/previm'
+Plugin 'tyru/open-browser.vim'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -87,6 +87,18 @@ filetype plugin on
 filetype indent on
 
 syntax enable
+
+" previm {
+if has('mac')
+    let g:previm_open_cmd = 'open -a Safari'
+elseif has('win32')
+    "let g:previm_open_cmd = 'start explorer'
+endif
+augroup PrevimSettings
+    autocmd!
+    autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+augroup END
+" previm }
 
 "
 " NERDTree {
@@ -310,7 +322,7 @@ let Grep_Default_Options = '-rn'
 " set var " }
 "
 " my funcs " {
-function! MarkdownPreviewFromPandoc()
+function! MakeMarkdownAndPreviewFromPandoc()
     let s:html_name = expand('%:p:r') . '.html'
     exe '!pandoc -s -o ' . s:html_name . ' ' . expand('%:p')
     if has("mac")
@@ -371,7 +383,7 @@ nnoremap <Leader><C-F> :NERDTreeFind<CR>
 " maps " }
 "
 " commands {
-command! MarkdownPreviewFromPandoc :call MarkdownPreviewFromPandoc()
+command! MakeMarkdownAndPreviewFromPandoc :call MakeMarkdownAndPreviewFromPandoc()
 command! FindReferenceAPIFromUnity3D :call FindReferenceAPIFromUnity3D()
 command! FindReferenceAPIFromMSDN :call FindReferenceAPIFromMSDN()
 command! TranslateWordFromEnToKr :call TranslateWordFromEnToKr()
