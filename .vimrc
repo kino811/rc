@@ -63,9 +63,6 @@ set nowrapscan
 set showcmd
 
 set tags=./tags,tags
-set tags+=D:/project/Project_AD/repository/trunk/Real-work/commonLib/tags
-set tags+=D:/dev/lib/corelib/protobuf-2.3.0/tags
-set tags+=D:/dev/lib/G3DX9/trunk/tags
 
 "set termencoding=korea
 set termencoding=utf-8
