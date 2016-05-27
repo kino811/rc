@@ -36,6 +36,7 @@ Plugin 'bling/vim-airline'
 Plugin 'shougo/unite.vim'
 Plugin 'kannokanno/previm'
 Plugin 'tyru/open-browser.vim'
+Plugin 'majutsushi/tagbar'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -377,6 +378,7 @@ map <C-S-Tab> :bprevious<CR>
 nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
 map <Leader><C-P> :CtrlPCurWD<CR>
 nnoremap <Leader><C-F> :NERDTreeFind<CR>
+nmap <Leader>tb :TagbarToggle<CR>
 " maps " }
 "
 " commands {
