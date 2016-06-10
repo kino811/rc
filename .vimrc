@@ -275,6 +275,13 @@ iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set noexpandtab 
 autocmd BufRead,BufReadPost,BufNewFile Makefile  set nocindent
 "au BufNewFile,BufRead *.py,*.pyw,*.c,*.h,*.cpp match BadWhitespace /\s\+$/
+"
+
+augroup csharp
+    autocmd!
+    if has("mac")
+        autocmd BufEnter *.cs map <F5> :!mcs %:p && mono %:p:r.exe<CR>
+augroup END
 
 augroup python
     autocmd!
