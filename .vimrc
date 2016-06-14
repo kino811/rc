@@ -281,6 +281,7 @@ augroup csharp
     autocmd!
     if has("mac")
         autocmd BufEnter *.cs map <F5> :!mcs %:p && mono %:p:r.exe<CR>
+    endif
 augroup END
 
 augroup python
@@ -328,55 +329,86 @@ let Grep_Default_Options = '-rn'
 "
 " my funcs " {
 function! MakeMarkdownAndPreviewFromPandoc()
-    let s:html_name = expand('%:p:r') . '.html'
-    exe '!pandoc -s -o ' . s:html_name . ' ' . expand('%:p')
+    let html_name = expand('%:p:r') . '.html'
+    exe '!pandoc -s -o ' . html_name . ' ' . expand('%:p')
     if has("mac")
         " todo:
-        exe '!open "' . s:html_name . '"'
+        exe '!open "' . html_name . '"'
     elseif has("win32")
-        exe '!start explorer "' . s:html_name . '"'
+        exe '!start explorer "' . html_name . '"'
     endif
 endfunction
 
 function! FindReferenceAPIFromUnity3D()
-    let s:ref_site = "http://docs.unity3d.com/ScriptReference/30_search.html?q="
+    let ref_site = "http://docs.unity3d.com/ScriptReference/30_search.html?q="
 
     if has("mac")
-        exe '!open "' . s:ref_site . '<cword>"'
+        exe '!open "' . ref_site . '<cword>"'
     elseif has("win32")
-        exe '!start explorer "' . s:ref_site . '<cword>"'
+        exe '!start explorer "' . ref_site . '<cword>"'
     endif
 endfunction
 
 function! FindReferenceAPIFromMSDN()
-    let s:ref_site = 'http://www.google.com/search?hl=en&btnI=I\%27m+Feeling+Lucky&q=site\%3Amsdn.microsoft.com\%20'
+    let ref_site = 'http://www.google.com/search?hl=en&btnI=I\%27m+Feeling+Lucky&q=site\%3Amsdn.microsoft.com\%20'
 
     if has("mac")
-        exe '!open "' . s:ref_site . '<cword>"'
+        exe '!open "' . ref_site . '<cword>"'
     elseif has("win32")
-        exe '!start explorer "' . s:ref_site . '<cword>"'
+        exe '!start explorer "' . ref_site . '<cword>"'
     endif
 endfunction
 
 function! TranslateWordFromEnToKr()
-    let s:ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
+    let ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
 
     if has('mac')
-        exe '!open "' . s:ref_site . '<cword>"'
+        exe '!open "' . ref_site . '<cword>"'
     elseif has('win32')
-        exe '!start explorer "' . s:ref_site . '<cword>"'
+        exe '!start explorer "' . ref_site . '<cword>"'
     endif
 endfunction
 
 function! TranslateWordFromEnToKrThat(word)
-    let s:ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
+    let ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
 
     if has('mac')
-        exe '!open "' . s:ref_site . a:word . '"'
+        exe '!open "' . ref_site . a:word . '"'
     elseif has('win32')
-        exe '!start explorer "' . s:ref_site . a:word . '"'
+        exe '!start explorer "' . ref_site . a:word . '"'
     endif
 endfunction
+
+function! OpenFTPServerCurrentDir(empty, ...)
+    let port = 2121
+    if a:0 > 0
+        let port = a:1
+    endif
+
+    if has('mac')
+        let fork_cmd = 'open'
+    elseif has('win32')
+        let fork_cmd = 'start'
+    endif
+
+    exe '!' . fork_cmd . ' python -m pyftpdlib ' . port . ''
+endfunc
+
+function! OpenHTTPServerCurrentDir(empty, ...)
+    let port = 8000
+    if a:0 > 0
+        let port = a:1
+    endif
+
+    if has('mac')
+        let fork_cmd = 'open'
+    elseif has('win32')
+        let fork_cmd = 'start'
+    endif
+
+    exe '!' . fork_cmd . ' python -m SimpleHTTPServer ' . port . ''
+endfunction
+
 " my funcs " }
 
 " maps " {
@@ -397,12 +429,13 @@ command! -nargs=1 TranslateWordFromEnToKrThat :call TranslateWordFromEnToKrThat(
 command! SetLocalDirToThisFileDir :lcd %:p:h
 command! MakeSessionToDefault :mks! ~\session.vim
 command! OpenExplorerFromThisFile :!start explorer %:p:h
+command! -nargs=? OpenFTPServerCurrentDir :call OpenFTPServerCurrentDir('', <f-args>)
+command! -nargs=? OpenHTTPServerCurrentDir :call OpenHTTPServerCurrentDir('', <f-args>)
 "
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
 " Only define it when not defined already.
 if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
+  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
 endif
 " commands }
