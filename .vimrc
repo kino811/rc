@@ -5,10 +5,9 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'pathogen.vim'
+Plugin 'scrooloose/nerdtree'
 Plugin 'OmniSharp/omnisharp-vim'
 Plugin 'csharp.vim'
-Plugin 'lua_omni'
-Plugin 'OmniCppComplete'
 Plugin 'taglist.vim'
 Plugin 'ctrlp.vim'
 Plugin 'tpope/vim-dispatch'
@@ -17,26 +16,22 @@ Plugin 'a.vim'
 Plugin 'xmledit'
 Plugin 'mattn/webapi-vim'
 Plugin 'tpope/vim-fugitive'
-Plugin 'scrooloose/nerdtree'
 Plugin 'klen/python-mode'
 Plugin 'aklt/plantuml-syntax'
-Plugin 'TeTrIs.vim'
 Plugin 'Visual-Mark'
 Plugin 'Mark'
 Plugin 'kshenoy/vim-signature'
-Plugin 'lua.vim'
 Plugin 'xolox/vim-misc'
-Plugin 'xolox/vim-lua-ftplugin'
 Plugin 'SimpylFold'
 Plugin 'indentpython.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/syntastic'
 Plugin 'nvie/vim-flake8'
-Plugin 'bling/vim-airline'
 Plugin 'shougo/unite.vim'
 Plugin 'kannokanno/previm'
 Plugin 'tyru/open-browser.vim'
 Plugin 'majutsushi/tagbar'
+Plugin 'bling/vim-airline'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -121,18 +116,6 @@ nnoremap <Leader>t :YcmCompleter GetType<CR>
 nnoremap <Leader>p :YcmCompleter GetParent<CR>
 nnoremap <Leader>k :YcmCompleter GetDoc<CR>
 " YouCompleteMe }
-" 
-" Virtualenv Support for python {
-" python with virtualenv support
-py << EOF
-import os
-import sys
-if 'VIRTUAL_ENV' in os.environ:
-    project_base_dir = os.environ['VIRTUAL_ENV']
-    activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
-    execfile(activate_this, dict(__file__=activate_this))
-EOF
-" Virtualenv Support for python }
 
 " SimpyLFold {
 let g:SimpylFold_docstring_preview=1
@@ -151,6 +134,7 @@ let g:OmniSharp_server_type = 'v1'
 let g:Omnisharp_host="http://localhost:2000"
 " Timeout in seconds to wait for a response from the server
 let g:OmniSharp_timeout=1
+let g:OmniSharp_selector_ui='ctrlp'
 " Showmatch significantly slows down omnicomplete
 " when the first match contains parentheses.
 set noshowmatch
