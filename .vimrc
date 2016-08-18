@@ -1,10 +1,10 @@
-set rtp+=~/.vim
+set rtp+=./
 
 " Plugins setting " {{
 " vundle {
 set nocompatible
 filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
+set rtp+=~/rc/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'pathogen.vim'
@@ -22,6 +22,8 @@ Plugin 'majutsushi/tagbar'
 Plugin 'bling/vim-airline'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'kshenoy/vim-signature'
+Plugin 'sirver/ultisnips'
+Plugin 'honza/vim-snippets'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -77,6 +79,15 @@ endif
 filetype on
 filetype plugin on
 filetype indent on
+
+" UltiSnips {
+let g:UltiSnipsUsePythonVersion = 3
+let g:UltiSnipsSnippetsDir = '~/rc/.vim/UltiSnips'
+let g:UltiSnipsExpandTrigger='<tab>'
+let g:UltiSnipsJumpForwardTrigger='<tab>'
+let g:UltiSnipsJumpBackwardTrigger='<s-tab>'
+let g:UltiSnipsEditSplit='vertical'
+" UltiSnips }
 
 " pathogen {
 execute pathogen#infect()
@@ -386,25 +397,6 @@ endfunction
 
 " my funcs " }
 
-" maps " {
-"about buffer
-nmap <leader>bb :b #<cr>
-nmap <leader>bn :bnext<cr>
-nmap <leader>bp :bprev<cr>
-nmap <leader>bf :bfirst<cr>
-nmap <leader>bl :blast<cr>
-"about CtrlP
-nmap <leader>cp :CtrlP<cr>
-nmap <leader>cpw :CtrlPCurWD<cr>
-nmap <leader>cpb :CtrlPBuffer<cr>
-
-nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
-"about NerdTree
-nnoremap <leader>nt :NERDTreeToggle<cr>
-nnoremap <leader>ntf :NERDTreeFind<cr>
-
-nmap <Leader>tb :TagbarToggle<CR>
-" maps " }
 "
 " commands {
 command! MakeMarkdownAndPreviewFromPandoc :call MakeMarkdownAndPreviewFromPandoc()
@@ -425,3 +417,26 @@ if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis | wincmd p | diffthis
 endif
 " commands }
+
+" maps " {
+"about buffer
+nmap <leader>bb :b #<cr>
+nmap <leader>bn :bnext<cr>
+nmap <leader>bp :bprev<cr>
+nmap <leader>bf :bfirst<cr>
+nmap <leader>bl :blast<cr>
+"about CtrlP
+nmap <leader>cp :CtrlP<cr>
+nmap <leader>cpw :CtrlPCurWD<cr>
+nmap <leader>cpb :CtrlPBuffer<cr>
+
+nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
+"about NerdTree
+nnoremap <leader>nt :NERDTreeToggle<cr>
+nnoremap <leader>ntf :NERDTreeFind<cr>
+
+nmap <Leader>tb :TagbarToggle<CR>
+
+nmap <leader>ts :TranslateWordFromEnToKr<cr>
+nmap <leader>tsw :TranslateWordFromEnToKrThat<cr>
+" maps " }
