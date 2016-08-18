@@ -1,5 +1,8 @@
+set rtp+=~/.vim
+
 " Plugins setting " {{
 " vundle {
+set nocompatible
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -11,27 +14,14 @@ Plugin 'csharp.vim'
 Plugin 'taglist.vim'
 Plugin 'ctrlp.vim'
 Plugin 'tpope/vim-dispatch'
-Plugin 'Syntastic'
-Plugin 'a.vim'
-Plugin 'xmledit'
-Plugin 'mattn/webapi-vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'klen/python-mode'
-Plugin 'aklt/plantuml-syntax'
-Plugin 'Visual-Mark'
-Plugin 'Mark'
-Plugin 'kshenoy/vim-signature'
-Plugin 'xolox/vim-misc'
-Plugin 'SimpylFold'
-Plugin 'indentpython.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/syntastic'
-Plugin 'nvie/vim-flake8'
 Plugin 'shougo/unite.vim'
-Plugin 'kannokanno/previm'
 Plugin 'tyru/open-browser.vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'bling/vim-airline'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'kshenoy/vim-signature'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -44,9 +34,9 @@ so $VIMRUNTIME/delmenu.vim
 so $VIMRUNTIME/menu.vim
 
 let mapleader = ","
+let maplocalleader = "<space>"
 
 set clipboard=unnamed
-set nocompatible
 set backspace=start
 set tabstop=4 shiftwidth=4
 set expandtab
@@ -73,13 +63,24 @@ set grepprg=grep\ -n
 set foldmethod=indent
 set foldlevel=99
 
-colorscheme slate
+syntax enable
+
+" set colorscheme
+"colorscheme slate
+if has('gui_running')
+    set background=dark
+    colorscheme solarized
+else 
+    colorscheme slate
+endif
 
 filetype on
 filetype plugin on
 filetype indent on
 
-syntax enable
+" pathogen {
+execute pathogen#infect()
+" pathogen }
 
 " previm {
 if has('mac')
@@ -121,9 +122,6 @@ nnoremap <Leader>k :YcmCompleter GetDoc<CR>
 let g:SimpylFold_docstring_preview=1
 " SimpyLFold }
 
-" pathogen {
-execute pathogen#infect()
-" pathogen }
 
 " omnisharp {
 filetype plugin on
@@ -153,17 +151,10 @@ let g:syntastic_cs_checkers=['code_checker']
 
 augroup omnisharp_commands
   autocmd!
-  " Set autocomplete function to OmniSharp (if not using YouCompleteMe
-  " completion plugin)
-  autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 
-  " Synchonous build (bocks Vim)
-  "autocmd FileType cs nnoremap <F5> :wa!<cr>:OmniSharpBuild<cr>
-  
-  " Build can also run asynchronously with vim-dispatch installed
+  autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
   autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
-  " Automatic syntax check on events (TextChanged requires Vim 7.4)
-  autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
+  autocmd BufEnter,InsertLeave *.cs SyntasticCheck
   " Automatically add new cs files to the nearest project on save
   autocmd BufWritePost *.cs call OmniSharp#AddToProject()
   " Show type information automatically when the cursor stops moving
@@ -396,11 +387,22 @@ endfunction
 " my funcs " }
 
 " maps " {
-map <C-Tab> :bnext<CR>
-map <C-S-Tab> :bprevious<CR>
+"about buffer
+nmap <leader>bb :b #<cr>
+nmap <leader>bn :bnext<cr>
+nmap <leader>bp :bprev<cr>
+nmap <leader>bf :bfirst<cr>
+nmap <leader>bl :blast<cr>
+"about CtrlP
+nmap <leader>cp :CtrlP<cr>
+nmap <leader>cpw :CtrlPCurWD<cr>
+nmap <leader>cpb :CtrlPBuffer<cr>
+
 nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
-map <Leader><C-P> :CtrlPCurWD<CR>
-nnoremap <Leader><C-F> :NERDTreeFind<CR>
+"about NerdTree
+nnoremap <leader>nt :NERDTreeToggle<cr>
+nnoremap <leader>ntf :NERDTreeFind<cr>
+
 nmap <Leader>tb :TagbarToggle<CR>
 " maps " }
 "
