@@ -117,11 +117,15 @@ syntax on
 "
 
 " YouCompleteMe {
-let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'
-let g:ycm_autoclose_preview_window_after_completion=1
+let g:ycm_global_ycm_extra_conf='~/rc/.vim/.ycm_extra_conf.py'
+let g:ycm_autoclose_preview_window_after_completion=0
 let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
-let g:ycm_python_binary_path='c:\usr\bin\python.exe'
+if has('win32')
+    let g:ycm_python_binary_path='c:\usr\bin\python3.exe'
+elseif has('mac')
+    let g:ycm_python_binary_path='/usr/bin/python3'
+endif
 nnoremap <Leader>g :YcmCompleter GoTo<CR>
 nnoremap <Leader>d :YcmCompleter GoToDeclaration<CR>
 nnoremap <Leader>t :YcmCompleter GetType<CR>
@@ -133,6 +137,10 @@ nnoremap <Leader>k :YcmCompleter GetDoc<CR>
 let g:SimpylFold_docstring_preview=1
 " SimpyLFold }
 
+"  syntastic {
+"to disable all style messageds
+let g:syntastic_quiet_messages = {"type": "style"}
+"  syntastic }
 
 " omnisharp {
 filetype plugin on
@@ -146,19 +154,19 @@ let g:OmniSharp_timeout=1
 let g:OmniSharp_selector_ui='ctrlp'
 " Showmatch significantly slows down omnicomplete
 " when the first match contains parentheses.
-set noshowmatch
+"set noshowmatch
 " Dont't autoselect first item in omnicaomplete, show if only one item (for
 " preview).
 " Remove preview if you don't want to see any documentation whatsoever.
-set completeopt=longest,menuone,preview
+"set completeopt=longest,menuone,preview
 " Move the preview window (code documentation) to the bottom of the screen, so
 " it doesn't move the code!
 " You might also want to look at the echodoc plugin.
-set splitbelow
+"set splitbelow
 " Get code issues and syntax errors.
 let g:syntastic_cs_checkers=['syntax', 'semantic', 'issues']
 " If you are using the omnisharp-roslyn backend, use the following.
-let g:syntastic_cs_checkers=['code_checker']
+"let g:syntastic_cs_checkers=['code_checker']
 
 augroup omnisharp_commands
   autocmd!
@@ -191,36 +199,6 @@ augroup omnisharp_commands
   autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
 augroup END
 
-" This setting controls how long to wait (in ms) before fetching type / symbol
-" information.
-"set updatetime=500
-
-" Remove 'Press Enter to continue' message when type information is longer
-" than one line.
-"set cmdheight=2
-
-" Contextual code actions (requires CtrlP or unite.vim).
-nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
-" Run code actions with text selected in visual mode to extract method.
-vnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
-" Remane with dialog
-nnoremap <leader>nm :OmniSharpRename<cr>
-"nnoremap <F2> :OmniSharpRename<cr>
-" Rename without dialog - with cursor on the symbol to rename... ':Rename
-" newname'
-command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
-
-" Force OmniSharp to reload the solution. Useful when switching branches etc.
-nnoremap <leader>rl :OmniSharpReloadSolution<cr>
-nnoremap <leader>cf :OmniSharpCodeFormat<cr>
-" Load the current .cs file to the nearest project
-nnoremap <leader>tp :OmniSharpAddToProject<cr>
-" (Expreimental - uses vim-dispatch or vimproc plugin) - Start the omnisharp
-" server for the current solution.
-nnoremap <leader>ss :OmniSharpStartServer<cr>
-nnoremap <leader>sp :OmniSharpStopServer<cr>
-" Add syntax highlighting for types and interfaces.
-nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 "Don't ask to save when changing buffers (i.e. when jumping to a type
 "definition)
 set hidden
@@ -429,7 +407,7 @@ nmap <leader>bl :blast<cr>
 nmap <leader>cp :CtrlP<cr>
 nmap <leader>cpw :CtrlPCurWD<cr>
 nmap <leader>cpb :CtrlPBuffer<cr>
-
+" about python
 nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
 "about NerdTree
 nnoremap <leader>nt :NERDTreeToggle<cr>
@@ -439,4 +417,24 @@ nmap <Leader>tb :TagbarToggle<CR>
 
 nmap <leader>ts :TranslateWordFromEnToKr<cr>
 nmap <leader>tsw :TranslateWordFromEnToKrThat<cr>
+
+" about OmniSharp
+" Contextual code actions (requires CtrlP or unite.vim).
+nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
+" Run code actions with text selected in visual mode to extract method.
+vnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
+" Remane with dialog
+nnoremap <leader>nm :OmniSharpRename<cr>
+" Force OmniSharp to reload the solution. Useful when switching branches etc.
+nnoremap <leader>rl :OmniSharpReloadSolution<cr>
+nnoremap <leader>cf :OmniSharpCodeFormat<cr>
+" Load the current .cs file to the nearest project
+nnoremap <leader>tp :OmniSharpAddToProject<cr>
+" (Expreimental - uses vim-dispatch or vimproc plugin) - Start the omnisharp
+" server for the current solution.
+nnoremap <leader>ss :OmniSharpStartServer<cr>
+nnoremap <leader>sp :OmniSharpStopServer<cr>
+" Add syntax highlighting for types and interfaces.
+nnoremap <leader>th :OmniSharpHighlightTypes<cr>
+
 " maps " }
