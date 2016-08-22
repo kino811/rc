@@ -1,8 +1,8 @@
+set nocompatible
 set rtp+=./
 
-" Plugins setting " {{
+" Plugins setting " {{{
 " vundle {
-set nocompatible
 filetype off
 set rtp+=~/rc/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -24,6 +24,7 @@ Plugin 'altercation/vim-colors-solarized'
 Plugin 'kshenoy/vim-signature'
 Plugin 'sirver/ultisnips'
 Plugin 'honza/vim-snippets'
+Plugin 'scrooloose/nerdcommenter'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -39,7 +40,7 @@ let mapleader = ","
 let maplocalleader = "<space>"
 
 set clipboard=unnamed
-set backspace=start
+"set backspace=indent,eol,start
 set tabstop=4 shiftwidth=4
 set expandtab
 set autoindent cindent
@@ -65,7 +66,14 @@ set grepprg=grep\ -n
 set foldmethod=indent
 set foldlevel=99
 
-syntax enable
+set splitbelow
+set splitright
+set hidden
+set guioptions-=T
+
+filetype on
+filetype plugin on
+filetype indent on
 
 " set colorscheme
 "colorscheme slate
@@ -76,12 +84,11 @@ else
     colorscheme slate
 endif
 
-filetype on
-filetype plugin on
-filetype indent on
+syntax enable
+
 
 " UltiSnips {
-let g:UltiSnipsUsePythonVersion = 3
+let g:UltiSnipsUsePythonVersion = 2
 let g:UltiSnipsSnippetsDir = '~/rc/.vim/UltiSnips'
 let g:UltiSnipsExpandTrigger='<tab>'
 let g:UltiSnipsJumpForwardTrigger='<tab>'
@@ -117,20 +124,10 @@ syntax on
 "
 
 " YouCompleteMe {
-let g:ycm_global_ycm_extra_conf='~/rc/.vim/.ycm_extra_conf.py'
-let g:ycm_autoclose_preview_window_after_completion=0
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-if has('win32')
-    let g:ycm_python_binary_path='c:\usr\bin\python3.exe'
-elseif has('mac')
-    let g:ycm_python_binary_path='/usr/bin/python3'
-endif
-nnoremap <Leader>g :YcmCompleter GoTo<CR>
-nnoremap <Leader>d :YcmCompleter GoToDeclaration<CR>
-nnoremap <Leader>t :YcmCompleter GetType<CR>
-nnoremap <Leader>p :YcmCompleter GetParent<CR>
-nnoremap <Leader>k :YcmCompleter GetDoc<CR>
+let g:ycm_complete_in_comments = 1
+let g:ycm_complete_in_strings = 1
+let g:ycm_key_list_select_completion = ['<c-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<c-p>', '<Up>']
 " YouCompleteMe }
 
 " SimpyLFold {
@@ -142,67 +139,40 @@ let g:SimpylFold_docstring_preview=1
 let g:syntastic_quiet_messages = {"type": "style"}
 "  syntastic }
 
-" omnisharp {
-filetype plugin on
-" Selection server type. 
-" v1, roslyn
+" omnisharp {{{
 let g:OmniSharp_server_type = 'v1'
-" This is the default value, setting it isn't actually necessary
+"let g:OmniSharp_server_type = 'roslyn'
 let g:Omnisharp_host="http://localhost:2000"
-" Timeout in seconds to wait for a response from the server
 let g:OmniSharp_timeout=1
 let g:OmniSharp_selector_ui='ctrlp'
-" Showmatch significantly slows down omnicomplete
-" when the first match contains parentheses.
-"set noshowmatch
-" Dont't autoselect first item in omnicaomplete, show if only one item (for
-" preview).
-" Remove preview if you don't want to see any documentation whatsoever.
-"set completeopt=longest,menuone,preview
-" Move the preview window (code documentation) to the bottom of the screen, so
-" it doesn't move the code!
-" You might also want to look at the echodoc plugin.
-"set splitbelow
-" Get code issues and syntax errors.
 let g:syntastic_cs_checkers=['syntax', 'semantic', 'issues']
-" If you are using the omnisharp-roslyn backend, use the following.
-"let g:syntastic_cs_checkers=['code_checker']
 
 augroup omnisharp_commands
-  autocmd!
+    autocmd!
 
-  autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-  autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
-  autocmd BufEnter,InsertLeave *.cs SyntasticCheck
-  " Automatically add new cs files to the nearest project on save
-  autocmd BufWritePost *.cs call OmniSharp#AddToProject()
-  " Show type information automatically when the cursor stops moving
-  autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-  
-  " The following commands are contextual, based on the current cursor
-  " position.
-  autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
-  autocmd FileType cs nnoremap <leader>if :OmniSharpFindImplementations<cr>
-  autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
-  autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
-  autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
-  " Finds members in the current buffer
-  autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
-  " Cursor can be anywhere on the line containing an issue.
-  autocmd FileType cs nnoremap <leader>x :OmniSharpFixIssue<cr>
-  autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
-  autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
-  autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
-  " Navigate up by method/property/field
-  autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
-  " Navigate down by method/property/field
-  autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
+    " Automatically add new cs files to the nearest project on save
+    autocmd BufWritePost *.cs call OmniSharp#AddToProject()
+
+    "show type information automatically when the cursor stops moving
+    autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+
+    "The following commands are contextual, based on the current cursor position.
+
+    autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+    autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
+    autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
+    autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
+    autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
+    autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
+    autocmd FileType cs nnoremap <leader>x  :OmniSharpFixIssue<cr>
+    autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
+    autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
+    autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
+    autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
+    autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
 augroup END
 
-"Don't ask to save when changing buffers (i.e. when jumping to a type
-"definition)
-set hidden
-" omnisharp }
+" omnisharp }}}
 
 " python-mode {
 let g:pymode_rope = 0
@@ -224,7 +194,7 @@ let g:pymode_run_bind = '<leader>r'
 "
 
 " 
-" Plugins setting }}
+" Plugins setting }}}
 
 
 " abbreviation " {
@@ -234,34 +204,32 @@ abbreviate mail: kino811@gmail.com
 iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 " abbreviation " }
 "
-" auto command " {
-"setlocal - apply current file only.
-autocmd BufRead,BufReadPost,BufNewFile Makefile  set noexpandtab 
-autocmd BufRead,BufReadPost,BufNewFile Makefile  set nocindent
-"au BufNewFile,BufRead *.py,*.pyw,*.c,*.h,*.cpp match BadWhitespace /\s\+$/
+
+" auto command " {{{
 "
+autocmd FileType vim set number
+autocmd FileType text set nonumber
 
 augroup csharp
     autocmd!
+
     if has("mac")
         autocmd BufEnter *.cs map <F5> :!mcs %:p && mono %:p:r.exe<CR>
+    elseif has("win32")
+        autocmd BufEnter *.cs map <f5> :!mcs %:p && %:p:r.exe<cr>
     endif
 augroup END
 
 augroup python
     autocmd!
-    autocmd FIleType python setlocal number
-    au BufNewFile,BufRead *.py set tabstop=4 softtabstop=4 shiftwidth=4 textwidth=79 expandtab autoindent fileformat=unix
+
+    au BufNewFile,BufRead *.py set tabstop=4 softtabstop=4 shiftwidth=4 textwidth=79 expandtab fileformat=unix
 
     if has("mac")
         autocmd BufEnter *.py map <F5> :!python %<CR>
     elseif has("win32")
         autocmd BufEnter *.py map <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
     endif
-augroup END
-
-augroup filetypedetect
-    autocmd BufNewFile,BufRead *.nsh setf nsis 
 augroup END
 
 augroup lua
@@ -281,8 +249,8 @@ augroup dosbatch
         autocmd BufEnter *.bat map <F5> :!start cmd /c "pushd %:p:h && %:t"<CR>
     endif
 augroup END
+" auto command " }}}
 
-" auto command " }
 "
 " set var " {
 "todo: set gnu grep path
@@ -398,7 +366,6 @@ endif
 
 " maps " {
 "about buffer
-nmap <leader>bb :b #<cr>
 nmap <leader>bn :bnext<cr>
 nmap <leader>bp :bprev<cr>
 nmap <leader>bf :bfirst<cr>
@@ -416,7 +383,7 @@ nnoremap <leader>ntf :NERDTreeFind<cr>
 nmap <Leader>tb :TagbarToggle<CR>
 
 nmap <leader>ts :TranslateWordFromEnToKr<cr>
-nmap <leader>tsw :TranslateWordFromEnToKrThat<cr>
+nmap <leader>tsw :TranslateWordFromEnToKrThat<space>
 
 " about OmniSharp
 " Contextual code actions (requires CtrlP or unite.vim).
@@ -437,4 +404,10 @@ nnoremap <leader>sp :OmniSharpStopServer<cr>
 " Add syntax highlighting for types and interfaces.
 nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 
+imap <C-c> <plug>NERDCommenterInsert
+
+nnoremap <Leader>yg :YcmCompleter GoTo<CR>
+nnoremap <Leader>ygd :YcmCompleter GoToDeclaration<CR>
+nnoremap <Leader>yt :YcmCompleter GetType<CR>
+nnoremap <Leader>yd :YcmCompleter GetDoc<CR>
 " maps " }
