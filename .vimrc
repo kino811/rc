@@ -30,6 +30,7 @@ filetype plugin indent on
 " vundle }
 "
 
+set showmatch
 set langmenu=en_US
 let $LANG = 'en_US'
 
@@ -37,7 +38,7 @@ so $VIMRUNTIME/delmenu.vim
 so $VIMRUNTIME/menu.vim
 
 let mapleader = ","
-let maplocalleader = "<space>"
+let maplocalleader = "\<space>"
 
 set clipboard=unnamed
 "set backspace=indent,eol,start
@@ -158,18 +159,27 @@ augroup omnisharp_commands
 
     "The following commands are contextual, based on the current cursor position.
 
-    autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
-    autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
-    autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
-    autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
-    autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
-    autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
-    autocmd FileType cs nnoremap <leader>x  :OmniSharpFixIssue<cr>
-    autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
-    autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
-    autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
-    autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
-    autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
+    autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>fi :OmniSharpFindImplementations<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>ft :OmniSharpFindType<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>fs :OmniSharpFindSymbol<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>fu :OmniSharpFindUsages<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>fm :OmniSharpFindMembers<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>x  :OmniSharpFixIssue<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>fx :OmniSharpFixUsings<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>tt :OmniSharpTypeLookup<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>dc :OmniSharpDocumentation<cr>
+    autocmd FileType cs nnoremap <buffer> <C-K> :OmniSharpNavigateUp<cr>
+    autocmd FileType cs nnoremap <buffer> <C-J> :OmniSharpNavigateDown<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader><space> :OmniSharpGetCodeActions<cr>
+    autocmd FileType cs vnoremap <buffer> <localleader><space> :call OmniSharp#GetCodeActions('visual')<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>nm :OmniSharpRename<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>rl :OmniSharpReloadSolution<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>cf :OmniSharpCodeFormat<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>tp :OmniSharpAddToProject<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>ss :OmniSharpStartServer<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>sp :OmniSharpStopServer<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>th :OmniSharpHighlightTypes<cr>
 augroup END
 
 " omnisharp }}}
@@ -197,26 +207,24 @@ let g:pymode_run_bind = '<leader>r'
 " Plugins setting }}}
 
 
-" abbreviation " {
-"abbreviate(ab)
-"iabbrev(ia)
-abbreviate mail: kino811@gmail.com
-iabbrev time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
-" abbreviation " }
+" abbreviation " {{{
+iabbrev :mail: kino811@gmail.com
+iabbrev :time: <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
+" abbreviation " }}}
 "
 
 " auto command " {{{
 "
-autocmd FileType vim set number
-autocmd FileType text set nonumber
+autocmd FileType vim setlocal number
+autocmd FileType text setlocal nonumber
 
 augroup csharp
     autocmd!
 
     if has("mac")
-        autocmd BufEnter *.cs map <F5> :!mcs %:p && mono %:p:r.exe<CR>
+        autocmd FileType cs map <buffer> <F5> :!mcs %:p && mono %:p:r.exe<CR>
     elseif has("win32")
-        autocmd BufEnter *.cs map <f5> :!mcs %:p && %:p:r.exe<cr>
+        autocmd FileType cs map <buffer> <f5> :!mcs %:p && %:p:r.exe<cr>
     endif
 augroup END
 
@@ -226,9 +234,9 @@ augroup python
     au BufNewFile,BufRead *.py set tabstop=4 softtabstop=4 shiftwidth=4 textwidth=79 expandtab fileformat=unix
 
     if has("mac")
-        autocmd BufEnter *.py map <F5> :!python %<CR>
+        autocmd FileType python map <buffer> <F5> :!python %<CR>
     elseif has("win32")
-        autocmd BufEnter *.py map <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
+        autocmd FileType python map <buffer> <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
     endif
 augroup END
 
@@ -236,9 +244,9 @@ augroup lua
     autocmd!
 
     if has("mac")
-        autocmd BufEnter *.lua map <F5> :!lua %<CR>
+        autocmd FileType lua map <buffer> <F5> :!lua %<CR>
     elseif has("win32")
-        autocmd BufEnter *.lua map <F5> :!start cmd /c "pushd %:p:h && lua %:t"<CR>
+        autocmd FileType lua map <buffer> <F5> :!start cmd /c "pushd %:p:h && lua %:t"<CR>
     endif
 augroup END
 
@@ -246,7 +254,21 @@ augroup dosbatch
     autocmd!
 
     if has("win32")
-        autocmd BufEnter *.bat map <F5> :!start cmd /c "pushd %:p:h && %:t"<CR>
+        autocmd FileType dosbatch map <buffer> <F5> :!start cmd /c "pushd %:p:h && %:t"<CR>
+    endif
+augroup END
+
+augroup cpp
+    autocmd!
+
+    if has('win32')
+        if isdirectory("d:/dev/local/MinGW")
+            autocmd FileType cpp setlocal path<
+            autocmd FileType cpp setlocal path+=d:/dev/local/MinGW/mingw32/**/include/**
+
+            autocmd FileType cpp setlocal tags<
+            autocmd FileType cpp setlocal tags+=d:/dev/local/MinGW/tags
+        endif
     endif
 augroup END
 " auto command " }}}
@@ -384,25 +406,6 @@ nmap <Leader>tb :TagbarToggle<CR>
 
 nmap <leader>ts :TranslateWordFromEnToKr<cr>
 nmap <leader>tsw :TranslateWordFromEnToKrThat<space>
-
-" about OmniSharp
-" Contextual code actions (requires CtrlP or unite.vim).
-nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
-" Run code actions with text selected in visual mode to extract method.
-vnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
-" Remane with dialog
-nnoremap <leader>nm :OmniSharpRename<cr>
-" Force OmniSharp to reload the solution. Useful when switching branches etc.
-nnoremap <leader>rl :OmniSharpReloadSolution<cr>
-nnoremap <leader>cf :OmniSharpCodeFormat<cr>
-" Load the current .cs file to the nearest project
-nnoremap <leader>tp :OmniSharpAddToProject<cr>
-" (Expreimental - uses vim-dispatch or vimproc plugin) - Start the omnisharp
-" server for the current solution.
-nnoremap <leader>ss :OmniSharpStartServer<cr>
-nnoremap <leader>sp :OmniSharpStopServer<cr>
-" Add syntax highlighting for types and interfaces.
-nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 
 imap <C-c> <plug>NERDCommenterInsert
 
