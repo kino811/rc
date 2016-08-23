@@ -141,24 +141,20 @@ let g:syntastic_quiet_messages = {"type": "style"}
 "  syntastic }
 
 " omnisharp {{{
+filetype plugin on
 let g:OmniSharp_server_type = 'v1'
-"let g:OmniSharp_server_type = 'roslyn'
-let g:Omnisharp_host="http://localhost:2000"
-let g:OmniSharp_timeout=1
-let g:OmniSharp_selector_ui='ctrlp'
-let g:syntastic_cs_checkers=['syntax', 'semantic', 'issues']
+let g:OmniSharp_port = 2000
+let g:OmniSharp_timeout = 1
+let g:syntastic_cs_checkers = ['syntax', 'semantic', 'issues']
+let g:OmniSharp_selector_ui = 'ctrlp'
+let g:OmniSharp_server_config_name = ""
 
-augroup omnisharp_commands
+augroup omnisharp
     autocmd!
 
-    " Automatically add new cs files to the nearest project on save
+    autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
     autocmd BufWritePost *.cs call OmniSharp#AddToProject()
-
-    "show type information automatically when the cursor stops moving
     autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-
-    "The following commands are contextual, based on the current cursor position.
-
     autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>fi :OmniSharpFindImplementations<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>ft :OmniSharpFindType<cr>
@@ -177,7 +173,10 @@ augroup omnisharp_commands
     autocmd FileType cs nnoremap <buffer> <localleader>rl :OmniSharpReloadSolution<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>cf :OmniSharpCodeFormat<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>tp :OmniSharpAddToProject<cr>
-    autocmd FileType cs nnoremap <buffer> <localleader>ss :OmniSharpStartServer<cr>
+    "
+    "autocmd FileType cs nnoremap <buffer> <localleader>ss :OmniSharpStartServer<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>ss :exe "!start " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]<cr>
+
     autocmd FileType cs nnoremap <buffer> <localleader>sp :OmniSharpStopServer<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>th :OmniSharpHighlightTypes<cr>
 augroup END
