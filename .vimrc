@@ -175,7 +175,11 @@ augroup omnisharp
     autocmd FileType cs nnoremap <buffer> <localleader>tp :OmniSharpAddToProject<cr>
     "
     "autocmd FileType cs nnoremap <buffer> <localleader>ss :OmniSharpStartServer<cr>
-    autocmd FileType cs nnoremap <buffer> <localleader>ss :exe "!start " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]<cr>
+    if has('mac')
+        autocmd FileType cs nnoremap <buffer> <localleader>ss :exe "!open mono " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]<cr>
+    elseif has('win32')
+        autocmd FileType cs nnoremap <buffer> <localleader>ss :exe "!start " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]<cr>
+    endif
 
     autocmd FileType cs nnoremap <buffer> <localleader>sp :OmniSharpStopServer<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>th :OmniSharpHighlightTypes<cr>
