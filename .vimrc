@@ -25,6 +25,8 @@ Plugin 'kshenoy/vim-signature'
 Plugin 'sirver/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-repeat'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -175,7 +177,8 @@ augroup omnisharp
     autocmd FileType cs nnoremap <buffer> <localleader>tp :OmniSharpAddToProject<cr>
     "
     "autocmd FileType cs nnoremap <buffer> <localleader>ss :OmniSharpStartServer<cr>
-    autocmd FileType cs nnoremap <buffer> <localleader>ss :exe "!start " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]<cr>
+    "autocmd FileType cs nnoremap <buffer> <localleader>ss :exe "!start " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]<cr>
+    autocmd FileType cs nnoremap <buffer> <localleader>ss :call OmniSharpStartServerBySync()<cr>
 
     autocmd FileType cs nnoremap <buffer> <localleader>sp :OmniSharpStopServer<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>th :OmniSharpHighlightTypes<cr>
@@ -362,6 +365,14 @@ function! OpenHTTPServerCurrentDir(empty, ...)
     exe '!' . fork_cmd . ' python -m SimpleHTTPServer ' . port . ''
 endfunction
 
+function! OmniSharpStartServerBySync()
+    let omnisharpServerIsRunning = OmniSharp#ServerIsRunning()
+    if !omnisharpServerIsRunning 
+        exe "!start " . g:OmniSharp_server_path . " -p " . g:OmniSharp_port . " -s " . g:OmniSharp_running_slns[0]
+    else
+        echo 'omnisharpServerIsRunning'
+    endif
+endfunc
 " my funcs " }
 
 "
