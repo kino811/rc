@@ -416,6 +416,7 @@ nnoremap <leader>nt :NERDTreeToggle<cr>
 nnoremap <leader>ntf :NERDTreeFind<cr>
 
 nmap <Leader>tb :TagbarToggle<CR>
+nmap <Leader>tbj :TagbarOpen j<CR>
 
 nmap <leader>ts :TranslateWordFromEnToKr<cr>
 nmap <leader>tsw :TranslateWordFromEnToKrThat<space>
