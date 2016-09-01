@@ -27,6 +27,7 @@ Plugin 'honza/vim-snippets'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
+Plugin 'tpope/vim-fugitive'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -42,7 +43,7 @@ so $VIMRUNTIME/menu.vim
 let mapleader = ","
 let maplocalleader = "\<space>"
 
-set clipboard=unnamed
+"set clipboard=unnamed
 "set backspace=indent,eol,start
 set tabstop=4 shiftwidth=4
 set expandtab
@@ -112,6 +113,7 @@ endif
 augroup PrevimSettings
     autocmd!
     autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+    autocmd BufWritePost *.md call MakeMarkdownAndPreviewFromPandoc()
 augroup END
 " previm }
 
@@ -129,8 +131,8 @@ syntax on
 " YouCompleteMe {
 let g:ycm_complete_in_comments = 1
 let g:ycm_complete_in_strings = 1
-let g:ycm_key_list_select_completion = ['<c-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<c-p>', '<Up>']
+let g:ycm_key_list_select_completion = ['<c-j>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<c-k>', '<Up>']
 " YouCompleteMe }
 
 " SimpyLFold {
