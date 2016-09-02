@@ -28,6 +28,7 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-fugitive'
+Plugin 'easymotion/vim-easymotion'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -43,7 +44,7 @@ so $VIMRUNTIME/menu.vim
 let mapleader = ","
 let maplocalleader = "\<space>"
 
-"set clipboard=unnamed
+set clipboard=unnamed
 "set backspace=indent,eol,start
 set tabstop=4 shiftwidth=4
 set expandtab
