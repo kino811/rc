@@ -424,8 +424,6 @@ nmap <Leader>tbj :TagbarOpen j<CR>
 nmap <leader>ts :TranslateWordFromEnToKr<cr>
 nmap <leader>tsw :TranslateWordFromEnToKrThat<space>
 
-imap <C-c> <plug>NERDCommenterInsert
-
 nnoremap <Leader>yg :YcmCompleter GoTo<CR>
 nnoremap <Leader>ygd :YcmCompleter GoToDeclaration<CR>
 nnoremap <Leader>yt :YcmCompleter GetType<CR>
