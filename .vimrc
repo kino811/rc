@@ -34,6 +34,7 @@ filetype plugin indent on
 " vundle }
 "
 
+set number
 set showmatch
 set langmenu=en_US
 let $LANG = 'en_US'
@@ -150,17 +151,22 @@ filetype plugin on
 let g:OmniSharp_server_type = 'v1'
 let g:OmniSharp_port = 2000
 let g:OmniSharp_timeout = 1
+set noshowmatch
+set completeopt=longest,menuone,preview
+set splitbelow
 let g:syntastic_cs_checkers = ['syntax', 'semantic', 'issues']
 let g:OmniSharp_selector_ui = 'ctrlp'
-let g:OmniSharp_server_config_name = ""
+"let g:OmniSharp_server_config_name = ""
 
 augroup omnisharp
     autocmd!
 
     autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+    "autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
     autocmd BufWritePost *.cs call OmniSharp#AddToProject()
     autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-    autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<cr>
+
+    autocmd FileType cs nnoremap <buffer> <localleader>gd :OmniSharpGotoDefinition<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>fi :OmniSharpFindImplementations<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>ft :OmniSharpFindType<cr>
     autocmd FileType cs nnoremap <buffer> <localleader>fs :OmniSharpFindSymbol<cr>
@@ -412,6 +418,7 @@ nmap <leader>bl :blast<cr>
 nmap <leader>cp :CtrlP<cr>
 nmap <leader>cpw :CtrlPCurWD<cr>
 nmap <leader>cpb :CtrlPBuffer<cr>
+nmap <leader>cpf :CtrlPCurFile<cr>
 " about python
 nnoremap <leader>16 viwy:python print(int(""", 16))<CR>
 "about NerdTree
@@ -425,7 +432,7 @@ nmap <leader>ts :TranslateWordFromEnToKr<cr>
 nmap <leader>tsw :TranslateWordFromEnToKrThat<space>
 
 nnoremap <Leader>yg :YcmCompleter GoTo<CR>
-nnoremap <Leader>ygd :YcmCompleter GoToDeclaration<CR>
+nnoremap <Leader>yd :YcmCompleter GoToDeclaration<CR>
 nnoremap <Leader>yt :YcmCompleter GetType<CR>
-nnoremap <Leader>yd :YcmCompleter GetDoc<CR>
+nnoremap <Leader>yk :YcmCompleter GetDoc<CR>
 " maps " }
