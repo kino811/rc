@@ -435,4 +435,8 @@ nnoremap <Leader>yg :YcmCompleter GoTo<CR>
 nnoremap <Leader>yd :YcmCompleter GoToDeclaration<CR>
 nnoremap <Leader>yt :YcmCompleter GetType<CR>
 nnoremap <Leader>yk :YcmCompleter GetDoc<CR>
+
+nnoremap <leader>gs :Gstatus<cr>
+nnoremap <leader>gc :Gcommit<cr>
+nnoremap <leader>gp :Gpush<cr>
 " maps " }
