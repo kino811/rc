@@ -15,3 +15,5 @@
 	st = status
 [credential]
 	helper = cache
+[color]
+	ui = true
