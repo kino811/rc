@@ -115,7 +115,9 @@ endif
 augroup PrevimSettings
     autocmd!
     autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-    autocmd BufWritePost *.md call MakeMarkdownAndPreviewFromPandoc()
+
+    "autocmd BufWritePost *.md call MakeMarkdownAndPreviewFromPandoc()
+    autocmd FileType markdown map <buffer> <F5> :call MakeMarkdownAndPreviewFromPandoc()<cr>
 augroup END
 " previm }
 
@@ -440,4 +442,5 @@ nnoremap <leader>gs :Gstatus<cr>
 nnoremap <leader>gc :Gcommit<cr>
 "nnoremap <leader>gp :Gpush<cr>
 nnoremap <leader>gp :Git push<cr>
+nnoremap <leader>gpu :Git pull<cr>
 " maps " }
