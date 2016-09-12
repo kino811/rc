@@ -45,7 +45,7 @@ so $VIMRUNTIME/menu.vim
 let mapleader = ","
 let maplocalleader = "\<space>"
 
-set clipboard=unnamed
+"set clipboard=unnamed
 "set backspace=indent,eol,start
 set tabstop=4 shiftwidth=4
 set expandtab
@@ -69,7 +69,7 @@ set sessionoptions+=unix,slash
 set hlsearch
 set grepprg=grep\ -n
 
-set foldmethod=indent
+set foldmethod=manual
 set foldlevel=99
 
 set splitbelow
@@ -92,6 +92,9 @@ endif
 
 syntax enable
 
+" solarized {{{
+let g:solarized_italic = 0
+" solarized }}}
 
 " UltiSnips {
 let g:UltiSnipsUsePythonVersion = 2
@@ -115,7 +118,9 @@ endif
 augroup PrevimSettings
     autocmd!
     autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-    autocmd BufWritePost *.md call MakeMarkdownAndPreviewFromPandoc()
+
+    "autocmd BufWritePost *.md call MakeMarkdownAndPreviewFromPandoc()
+    autocmd FileType markdown map <buffer> <F5> :call MakeMarkdownAndPreviewFromPandoc()<cr>
 augroup END
 " previm }
 
@@ -439,5 +444,11 @@ nnoremap <Leader>yk :YcmCompleter GetDoc<CR>
 nnoremap <leader>gs :Gstatus<cr>
 nnoremap <leader>gc :Gcommit<cr>
 "nnoremap <leader>gp :Gpush<cr>
-nnoremap <leader>gp :Git push<cr>
+nnoremap <leader>gph :Git push<cr>
+nnoremap <leader>gpu :Git pull<cr>
+
+" easymotion
+nmap <leader><leader>s <plug>(easymotion-overwin-f)
+map <leader><leader>j <plug>(easymotion-j)
+map <leader><leader>k <plug>(easymotion-k)
 " maps " }

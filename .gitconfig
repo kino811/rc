@@ -11,8 +11,9 @@
 [diff]
 	tool = vimdiff
 [alias]
-	logall = log --oneline --decorate --all --graph
-	logfull = log --oneline --decorate --graph
+	loggraph = log --oneline --decorate --graph
 	st = status
 [credential]
 	helper = cache
+[color]
+	ui = true

@@ -1,1 +1,0 @@
-;; kino emacs setting file.
