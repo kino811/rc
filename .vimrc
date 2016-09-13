@@ -29,6 +29,7 @@ Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-fugitive'
 Plugin 'easymotion/vim-easymotion'
+Plugin 'kino811/KinoDic'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -308,46 +309,6 @@ function! MakeMarkdownAndPreviewFromPandoc()
     endif
 endfunction
 
-function! FindReferenceAPIFromUnity3D()
-    let ref_site = "http://docs.unity3d.com/ScriptReference/30_search.html?q="
-
-    if has("mac")
-        exe '!open "' . ref_site . '<cword>"'
-    elseif has("win32")
-        exe '!start explorer "' . ref_site . '<cword>"'
-    endif
-endfunction
-
-function! FindReferenceAPIFromMSDN()
-    let ref_site = 'http://www.google.com/search?hl=en&btnI=I\%27m+Feeling+Lucky&q=site\%3Amsdn.microsoft.com\%20'
-
-    if has("mac")
-        exe '!open "' . ref_site . '<cword>"'
-    elseif has("win32")
-        exe '!start explorer "' . ref_site . '<cword>"'
-    endif
-endfunction
-
-function! TranslateWordFromEnToKr()
-    let ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
-
-    if has('mac')
-        exe '!open "' . ref_site . '<cword>"'
-    elseif has('win32')
-        exe '!start explorer "' . ref_site . '<cword>"'
-    endif
-endfunction
-
-function! TranslateWordFromEnToKrThat(word)
-    let ref_site = 'https://translate.google.co.kr/?hl=ko\#en/ko/'
-
-    if has('mac')
-        exe '!open "' . ref_site . a:word . '"'
-    elseif has('win32')
-        exe '!start explorer "' . ref_site . a:word . '"'
-    endif
-endfunction
-
 function! OpenFTPServerCurrentDir(empty, ...)
     let port = 2121
     if a:0 > 0
@@ -395,10 +356,6 @@ endfunc
 "
 " commands {
 command! MakeMarkdownAndPreviewFromPandoc :call MakeMarkdownAndPreviewFromPandoc()
-command! FindReferenceAPIFromUnity3D :call FindReferenceAPIFromUnity3D()
-command! FindReferenceAPIFromMSDN :call FindReferenceAPIFromMSDN()
-command! TranslateWordFromEnToKr :call TranslateWordFromEnToKr()
-command! -nargs=1 TranslateWordFromEnToKrThat :call TranslateWordFromEnToKrThat(<f-args>)
 command! SetLocalDirToThisFileDir :lcd %:p:h
 command! MakeSessionToDefault :mks! ~\session.vim
 command! OpenExplorerFromThisFile :!start explorer %:p:h
