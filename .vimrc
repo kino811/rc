@@ -400,8 +400,7 @@ nnoremap <Leader>yk :YcmCompleter GetDoc<CR>
 
 nnoremap <leader>gs :Gstatus<cr>
 nnoremap <leader>gc :Gcommit<cr>
-"nnoremap <leader>gp :Gpush<cr>
-nnoremap <leader>gph :Git push<cr>
+nnoremap <leader>gps :Git push<cr>
 nnoremap <leader>gpu :Git pull<cr>
 
 " easymotion
