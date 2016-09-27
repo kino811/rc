@@ -30,6 +30,9 @@ Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-fugitive'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'kino811/KinoDic'
+Plugin 'pangloss/vim-javascript'
+Plugin 'mattn/emmet-vim'
+Plugin 'moll/vim-node'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -407,4 +410,6 @@ nnoremap <leader>gpu :Git pull<cr>
 nmap <leader><leader>s <plug>(easymotion-overwin-f)
 map <leader><leader>j <plug>(easymotion-j)
 map <leader><leader>k <plug>(easymotion-k)
+
+cmap <c-x><c-o> <c-r>=expand("%")<cr>
 " maps " }
