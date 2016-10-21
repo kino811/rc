@@ -144,6 +144,7 @@ let g:ycm_complete_in_comments = 1
 let g:ycm_complete_in_strings = 1
 let g:ycm_key_list_select_completion = ['<c-j>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<c-k>', '<Up>']
+let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 " YouCompleteMe }
 
 " SimpyLFold {
