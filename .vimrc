@@ -413,4 +413,6 @@ map <leader><leader>j <plug>(easymotion-j)
 map <leader><leader>k <plug>(easymotion-k)
 
 cmap <c-x><c-o> <c-r>=expand("%")<cr>
+
+nmap <leader>lcd :SetLocalDirToThisFileDir<cr>
 " maps " }
