@@ -33,6 +33,7 @@ Plugin 'kino811/KinoDic'
 Plugin 'pangloss/vim-javascript'
 Plugin 'mattn/emmet-vim'
 Plugin 'moll/vim-node'
+Plugin 'Mark--Karkat'
 call vundle#end()
 filetype plugin indent on
 " vundle }
