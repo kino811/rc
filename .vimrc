@@ -34,6 +34,7 @@ Plugin 'pangloss/vim-javascript'
 Plugin 'mattn/emmet-vim'
 Plugin 'moll/vim-node'
 Plugin 'Mark--Karkat'
+Plugin 'davidhalter/jedi-vim'
 call vundle#end()
 filetype plugin indent on
 " vundle }
@@ -258,6 +259,7 @@ augroup python
         autocmd FileType python map <buffer> <F5> :!python %<CR>
     elseif has("win32")
         autocmd FileType python map <buffer> <F5> :!start cmd /c "pushd %:p:h && python %:t"<CR>
+        autocmd FileType python map <buffer> <C-F5> :pyfile %:p<cr>
     endif
 augroup END
 
