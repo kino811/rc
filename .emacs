@@ -3,20 +3,21 @@
 ;; adding a package source
 (require 'package)
 (add-to-list 'package-archives
-	     '("melpa-stable" . "https://stable.melpa.org/packages/")
+	     '("melpa" . "https://melpa.org/packages/")
 	     t)
 
-;; Added by Package.el.  This must come before configurations of
+n;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(defconst kino/packages '(helm 
-			  icicles 
+(defconst kino/packages '(helm
+			  icicles
 			  jedi
 			  markdown-mode
-			  markdown-mode+))
+			  markdown-mode+
+			  solarized-theme))
 (dolist (pkg kino/packages)
   (when (not (package-installed-p pkg)))
   (package-install pkg))
@@ -29,13 +30,13 @@
 
 ;; 
 ;; themes
-(add-to-list 'custom-theme-load-path 
-	     "~/.emacs.d/themes/emacs-color-theme-solarized")
+;; 
+;; (add-to-list 'custom-theme-load-path 
+;; 	     "~/.emacs.d/themes/emacs-color-theme-solarized")
 
 ;; set solarized theme color
-(set-frame-parameter nil 'background-mode 'dark)
-(set-terminal-parameter nil 'background-mode 'dark)
-(setq solarized-termcolors 256)
+;; (set-frame-parameter nil 'background-mode 'dark)
+;; (set-terminal-parameter nil 'background-mode 'dark)
 
 (load-theme 'solarized t)
 
