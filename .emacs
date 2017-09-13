@@ -6,7 +6,7 @@
 	     '("melpa" . "https://melpa.org/packages/")
 	     t)
 
-n;; Added by Package.el.  This must come before configurations of
+;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
@@ -31,21 +31,19 @@ n;; Added by Package.el.  This must come before configurations of
 ;; 
 ;; themes
 ;; 
-;; (add-to-list 'custom-theme-load-path 
-;; 	     "~/.emacs.d/themes/emacs-color-theme-solarized")
+(add-to-list 'custom-theme-load-path 
+	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
+(load-theme 'solarized-dark t)
 
-;; set solarized theme color
-;; (set-frame-parameter nil 'background-mode 'dark)
-;; (set-terminal-parameter nil 'background-mode 'dark)
 
-(load-theme 'solarized t)
-
-;; 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(package-selected-packages (quote (jedi helm icicles markdown-mode markdown-mode+))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
