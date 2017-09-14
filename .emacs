@@ -55,3 +55,6 @@
 ;; set icicles
 (require 'icicles)
 (icy-mode 1)
+
+;; custom key-map
+(global-set-key [C-kanji] 'set-mark-command)
