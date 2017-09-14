@@ -41,10 +41,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(current-language-environment "UTF-8")
  '(custom-safe-themes
    (quote
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
- '(package-selected-packages (quote (jedi helm icicles markdown-mode markdown-mode+))))
+ '(package-selected-packages
+   (quote
+    (company-jedi jedi helm icicles markdown-mode markdown-mode+))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -55,6 +58,8 @@
 ;; set icicles
 (require 'icicles)
 (icy-mode 1)
+
+
 
 ;; custom key-map
 (global-set-key [C-kanji] 'set-mark-command)
