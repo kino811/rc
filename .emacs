@@ -47,7 +47,7 @@
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(package-selected-packages
    (quote
-    (company-jedi jedi helm icicles markdown-mode markdown-mode+))))
+    (solarized-theme markdown-mode jedi pkg-info markdown-mode+ jedi-direx icicles helm elpy dash))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -59,7 +59,34 @@
 (require 'icicles)
 (icy-mode 1)
 
+;; elpy
+(elpy-enable)
 
 
+;; 
 ;; custom key-map
 (global-set-key [C-kanji] 'set-mark-command)
+
+(defun kino/call-process-shell-async-current-buffername ()
+  "for bat-mode shell-command by current-buffername"
+  (interactive)
+  (call-process-shell-command 
+   (format "start cmd /c %s" (buffer-name))
+   )
+  )
+(defun kino/set-bat-mode-hook ()
+  "set bat-mode hook"
+  (interactive)
+  (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername)
+  )
+(require 'bat-mode)
+(add-hook 'bat-mode-hook 'kino/set-bat-mode-hook)
+
+;; window move
+(global-set-key (kbd "C-c C-h") 'windmove-left)
+(global-set-key (kbd "C-c C-k") 'windmove-up)
+(global-set-key (kbd "C-c C-l") 'windmove-right)
+(global-set-key (kbd "C-c C-j") 'windmove-down)
+
+;; end custom key-map
+;; 
