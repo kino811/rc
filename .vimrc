@@ -406,4 +406,11 @@ map <leader><leader>k <plug>(easymotion-k)
 cmap <c-x><c-o> <c-r>=expand("%")<cr>
 
 nmap <leader>lcd :SetLocalDirToThisFileDir<cr>
+
+if has("nvim")
+    :tnoremap <C-w><C-h> <C-\><C-n><C-w><C-h>
+    :tnoremap <C-w><C-j> <C-\><C-n><C-w><C-j>
+    :tnoremap <C-w><C-k> <C-\><C-n><C-w><C-k>
+    :tnoremap <C-w><C-l> <C-\><C-n><C-w><C-l>
+endif
 " maps " }
