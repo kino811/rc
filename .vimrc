@@ -4,7 +4,7 @@ set rtp+=./
 " Plugins setting " {{{
 " vim-plug {
 call plug#begin("~/.vim/bundle/plugins")
-Plug 'gmarik/Vundle.vim'
+Plug 'iCyMind/NeoSolarized'
 Plug 'scrooloose/nerdtree'
 Plug 'OmniSharp/omnisharp-vim'
 Plug 'tpope/vim-dispatch'
@@ -14,7 +14,6 @@ Plug 'shougo/unite.vim'
 Plug 'tyru/open-browser.vim'
 Plug 'majutsushi/tagbar'
 Plug 'bling/vim-airline'
-Plug 'altercation/vim-colors-solarized'
 Plug 'kshenoy/vim-signature'
 Plug 'sirver/ultisnips'
 Plug 'honza/vim-snippets'
@@ -81,13 +80,9 @@ filetype plugin on
 filetype indent on
 
 " set colorscheme
-"colorscheme slate
-if has('gui_running')
-    set background=dark
-    colorscheme solarized
-else 
-    colorscheme slate
-endif
+set termguicolors
+colorscheme NeoSolarized
+set background=dark
 
 syntax enable
 
