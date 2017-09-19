@@ -2,42 +2,36 @@ set nocompatible
 set rtp+=./
 
 " Plugins setting " {{{
-" vundle {
-filetype off
-set rtp+=~/rc/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'gmarik/Vundle.vim'
-Plugin 'pathogen.vim'
-Plugin 'scrooloose/nerdtree'
-Plugin 'OmniSharp/omnisharp-vim'
-Plugin 'csharp.vim'
-Plugin 'taglist.vim'
-Plugin 'ctrlp.vim'
-Plugin 'tpope/vim-dispatch'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'scrooloose/syntastic'
-Plugin 'shougo/unite.vim'
-Plugin 'tyru/open-browser.vim'
-Plugin 'majutsushi/tagbar'
-Plugin 'bling/vim-airline'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'kshenoy/vim-signature'
-Plugin 'sirver/ultisnips'
-Plugin 'honza/vim-snippets'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-repeat'
-Plugin 'tpope/vim-fugitive'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'kino811/KinoDic'
-Plugin 'pangloss/vim-javascript'
-Plugin 'mattn/emmet-vim'
-Plugin 'moll/vim-node'
-Plugin 'Mark--Karkat'
-call vundle#end()
-filetype plugin indent on
-" vundle }
+" vim-plug {
+call plug#begin("~/.vim/bundle/plugins")
+Plug 'gmarik/Vundle.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'OmniSharp/omnisharp-vim'
+Plug 'tpope/vim-dispatch'
+Plug 'Valloric/YouCompleteMe'
+Plug 'scrooloose/syntastic'
+Plug 'shougo/unite.vim'
+Plug 'tyru/open-browser.vim'
+Plug 'majutsushi/tagbar'
+Plug 'bling/vim-airline'
+Plug 'altercation/vim-colors-solarized'
+Plug 'kshenoy/vim-signature'
+Plug 'sirver/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'scrooloose/nerdcommenter'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-fugitive'
+Plug 'easymotion/vim-easymotion'
+Plug 'kino811/KinoDic'
+Plug 'pangloss/vim-javascript'
+Plug 'mattn/emmet-vim'
+Plug 'moll/vim-node'
+call plug#end()
+" vim-plug }
 "
+
+filetype plugin indent on
 
 set number
 set showmatch
@@ -50,7 +44,7 @@ so $VIMRUNTIME/menu.vim
 let mapleader = ","
 let maplocalleader = "\<space>"
 
-"set clipboard=unnamed
+set clipboard=unnamed
 "set backspace=indent,eol,start
 set tabstop=4 shiftwidth=4
 set expandtab
@@ -109,10 +103,6 @@ let g:UltiSnipsJumpForwardTrigger='<tab>'
 let g:UltiSnipsJumpBackwardTrigger='<s-tab>'
 let g:UltiSnipsEditSplit='vertical'
 " UltiSnips }
-
-" pathogen {
-execute pathogen#infect()
-" pathogen }
 
 " previm {
 if has('mac')
