@@ -46,12 +46,9 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; 
-;; custom key-map
-(global-set-key [C-kanji] 'set-mark-command)
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
+;; 
+;; bat-mode
 (defun kino/call-process-shell-async-current-buffername ()
   "for bat-mode shell-command by current-buffername"
   (interactive)
@@ -66,12 +63,18 @@
   )
 (require 'bat-mode)
 (add-hook 'bat-mode-hook 'kino/set-bat-mode-hook)
+;; 
 
-;; window move
+
+;; 
+;; custom key-map
+(global-set-key [C-kanji] 'set-mark-command)
+
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+
 (global-set-key (kbd "C-c C-h") 'windmove-left)
 (global-set-key (kbd "C-c C-k") 'windmove-up)
 (global-set-key (kbd "C-c C-l") 'windmove-right)
 (global-set-key (kbd "C-c C-j") 'windmove-down)
-
-;; end custom key-map
 ;; 
