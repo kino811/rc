@@ -13,28 +13,24 @@
 (package-initialize)
 
 (defconst kino/packages '(helm
-			  icicles
 			  jedi
-			  markdown-mode
-			  markdown-mode+
-			  solarized-theme))
+			  solarized-theme
+			  pkg-info))
 (dolist (pkg kino/packages)
   (when (not (package-installed-p pkg)))
   (package-install pkg))
 
 ;; 
 ;; hide toolbar and menu
-(menu-bar-mode -1)
 (tool-bar-mode -1)
 ;; 
 
 ;; 
 ;; themes
-;; 
 (add-to-list 'custom-theme-load-path 
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
-
+;; 
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -42,12 +38,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(current-language-environment "UTF-8")
- '(custom-safe-themes
-   (quote
-    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
- '(package-selected-packages
-   (quote
-    (solarized-theme markdown-mode jedi pkg-info markdown-mode+ jedi-direx icicles helm elpy dash))))
+ '(package-selected-packages (quote (solarized-theme jedi pkg-info helm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -55,17 +46,11 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; set icicles
-(require 'icicles)
-(icy-mode 1)
-
-;; elpy
-(elpy-enable)
-
-
 ;; 
 ;; custom key-map
 (global-set-key [C-kanji] 'set-mark-command)
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 (defun kino/call-process-shell-async-current-buffername ()
   "for bat-mode shell-command by current-buffername"
