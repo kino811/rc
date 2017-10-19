@@ -12,10 +12,11 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(defconst kino/packages '(helm
+(defconst kino/packages '(pkg-info
+			  helm
 			  jedi
 			  solarized-theme
-			  pkg-info))
+			  evil))
 (dolist (pkg kino/packages)
   (when (not (package-installed-p pkg)))
   (package-install pkg))
@@ -38,13 +39,17 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(current-language-environment "UTF-8")
- '(package-selected-packages (quote (solarized-theme jedi pkg-info helm))))
+ '(package-selected-packages (quote (evil solarized-theme jedi pkg-info helm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;; evil
+(require 'evil)
+(evil-mode 1)
 
 
 ;; 
