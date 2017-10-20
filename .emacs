@@ -47,10 +47,9 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; evil
-(require 'evil)
-(evil-mode 1)
-
+;; ;; evil
+;; (require 'evil)
+;; (evil-mode 1)
 
 ;; 
 ;; bat-mode
