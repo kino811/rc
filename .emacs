@@ -6,20 +6,23 @@
 	     '("melpa" . "https://melpa.org/packages/")
 	     t)
 
+(or (file-exists-p package-user-dir)
+    (package-refresh-contents))
+
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(defconst kino/packages '(pkg-info
-			  helm
+(defconst kino/packages '(helm
 			  jedi
 			  solarized-theme
-			  evil))
+			  evil
+			  magit))
 (dolist (pkg kino/packages)
-  (when (not (package-installed-p pkg)))
-  (package-install pkg))
+  (when (not (package-installed-p pkg))
+    (package-install pkg)))
 
 ;; 
 ;; hide toolbar and menu
@@ -39,18 +42,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(current-language-environment "UTF-8")
- '(package-selected-packages (quote (evil solarized-theme jedi pkg-info helm))))
+ '(package-selected-packages (quote (magit evil solarized-theme jedi helm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
-;; evil
-(require 'evil)
-(evil-mode 1)
-
 
 ;; 
 ;; bat-mode
@@ -78,9 +76,5 @@
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-t") 'helm-for-files)
-
-(global-set-key (kbd "C-c C-h") 'windmove-left)
-(global-set-key (kbd "C-c C-k") 'windmove-up)
-(global-set-key (kbd "C-c C-l") 'windmove-right)
-(global-set-key (kbd "C-c C-j") 'windmove-down)
 ;; 
+
