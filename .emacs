@@ -19,7 +19,8 @@
 			  jedi
 			  solarized-theme
 			  evil
-			  magit))
+			  magit
+			  neotree))
 (dolist (pkg kino/packages)
   (when (not (package-installed-p pkg))
     (package-install pkg)))
@@ -34,7 +35,9 @@
 (add-to-list 'custom-theme-load-path 
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
-;; 
+;;
+
+(show-paren-mode t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -42,7 +45,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(current-language-environment "UTF-8")
- '(package-selected-packages (quote (magit evil solarized-theme jedi helm))))
+ '(package-selected-packages (quote (neotree magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -77,5 +80,7 @@
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-t") 'helm-for-files)
+
+(global-set-key (kbd "C-c n t") 'neotree-toggle)
 ;; 
 
