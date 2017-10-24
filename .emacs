@@ -32,17 +32,15 @@
   (when (not (package-installed-p pkg))
     (package-install pkg)))
 
-;; 
 ;; hide toolbar and menu
 (tool-bar-mode -1)
-;; 
 
-;; 
+
 ;; themes
 (add-to-list 'custom-theme-load-path 
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
-;;
+
 
 (set-input-method 'korean-hangul)
 
@@ -63,20 +61,20 @@
  ;; If there is more than one, they won't work right.
  )
 
+
 ;; 
 ;; bat-mode
 (defun kino/call-process-shell-async-current-buffername ()
   "for bat-mode shell-command by current-buffername"
   (interactive)
   (call-process-shell-command 
-   (format "start cmd /c %s" (buffer-name))
-   )
-  )
+   (format "start cmd /c %s" (buffer-name))))
+
 (defun kino/set-bat-mode-hook ()
   "set bat-mode hook"
   (interactive)
-  (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername)
-  )
+  (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername))
+
 (require 'bat-mode)
 (add-hook 'bat-mode-hook 'kino/set-bat-mode-hook)
 ;; 
