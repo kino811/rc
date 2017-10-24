@@ -6,9 +6,6 @@
 	     '("melpa" . "https://melpa.org/packages/")
 	     t)
 
-(or (file-exists-p package-user-dir)
-    (package-refresh-contents))
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -21,6 +18,16 @@
 			  evil
 			  magit
 			  neotree))
+
+(setq kino/need-package-refresh nil)
+
+(dolist (pkg kino/packages)
+  (when (not (package-installed-p pkg))
+    (setq kino/need-package-refresh t)))
+
+(if kino/need-package-refresh
+    (package-refresh-contents))
+
 (dolist (pkg kino/packages)
   (when (not (package-installed-p pkg))
     (package-install pkg)))
@@ -36,6 +43,8 @@
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
 ;;
+
+(set-input-method 'korean-hangul)
 
 (show-paren-mode t)
 
@@ -75,11 +84,9 @@
 
 ;; 
 ;; custom key-map
-(global-set-key [C-kanji] 'set-mark-command)
-
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "M-t") 'helm-for-files)
+(global-set-key (kbd "C-c h f") 'helm-for-files)
 
 (global-set-key (kbd "C-c n t") 'neotree-toggle)
 ;; 
