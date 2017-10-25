@@ -17,7 +17,8 @@
 			  solarized-theme
 			  evil
 			  magit
-			  neotree))
+			  neotree
+			  powerline))
 
 (setq kino/need-package-refresh nil)
 
@@ -40,7 +41,11 @@
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
 
-(require 'evil-mode)
+(require 'powerline)
+(powerline-default-theme)
+
+(require 'evil)
+(evil-mode t)
 
 (show-paren-mode t)
 
@@ -50,7 +55,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(current-language-environment "Korean")
- '(package-selected-packages (quote (neotree magit evil solarized-theme jedi helm))))
+ '(custom-safe-themes
+   (quote
+    ("a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" default)))
+ '(package-selected-packages
+   (quote
+    (powerline neotree magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
