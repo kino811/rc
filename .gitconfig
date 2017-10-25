@@ -2,7 +2,7 @@
 	email = kino811@gmail.com
 	name = Myonghwa, Jung
 [core]
-	editor = vim
+	editor = emacs
 	crlf = input
 [merge]
 	tool = vimdiff
