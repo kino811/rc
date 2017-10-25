@@ -81,8 +81,15 @@
 ;; custom key-map
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "C-c h f") 'helm-for-files)
+(global-set-key (kbd "C-c C-x h f") 'helm-for-files)
 
-(global-set-key (kbd "C-c n t") 'neotree-toggle)
+(global-set-key (kbd "C-c C-x n t") 'neotree-toggle)
+
+(global-set-key (kbd "C-c C-<right>") 'windmove-right)
+(global-set-key (kbd "C-c C-<left>") 'windmove-left)
+(global-set-key (kbd "C-c C-<up>") 'windmove-up)
+(global-set-key (kbd "C-c C-<down>") 'windmove-down)
+
+(global-set-key (kbd "C-c C-x m s") 'magit-status)
 ;; 
 
