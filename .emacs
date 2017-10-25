@@ -35,11 +35,12 @@
 ;; hide toolbar and menu
 (tool-bar-mode -1)
 
-
 ;; themes
 (add-to-list 'custom-theme-load-path 
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
+
+(require 'evil-mode)
 
 (show-paren-mode t)
 
@@ -79,6 +80,8 @@
 
 ;; 
 ;; custom key-map
+(global-set-key (kbd "C-<kanji>") 'set-mark-command)
+
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "C-c C-x h f") 'helm-for-files)
@@ -87,4 +90,3 @@
 
 (global-set-key (kbd "C-c C-x m s") 'magit-status)
 ;; 
-
