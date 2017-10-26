@@ -54,7 +54,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(current-language-environment "Korean")
+ '(current-language-environment "utf-8")
  '(package-selected-packages
    (quote
     (airline-themes powerline neotree magit evil solarized-theme jedi helm))))
