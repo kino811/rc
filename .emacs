@@ -12,44 +12,6 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(defconst kino/packages '(helm
-			  jedi
-			  solarized-theme
-			  evil
-			  magit
-			  neotree
-			  powerline))
-
-(setq kino/need-package-refresh nil)
-
-(dolist (pkg kino/packages)
-  (when (not (package-installed-p pkg))
-    (setq kino/need-package-refresh t)))
-
-(if kino/need-package-refresh
-    (package-refresh-contents))
-
-(dolist (pkg kino/packages)
-  (when (not (package-installed-p pkg))
-    (package-install pkg)))
-
-;; hide toolbar and menu
-(tool-bar-mode -1)
-
-;; themes
-(add-to-list 'custom-theme-load-path 
-	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
-(load-theme 'solarized-dark t)
-
-(require 'powerline)
-(powerline-default-theme)
-
-
-;; (require 'evil)
-;; (evil-mode t)
-
-
-(show-paren-mode t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -60,7 +22,7 @@
  '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
+    (csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -68,6 +30,54 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+
+;; 
+;; Install Packages that not exist package.
+
+;; (defconst kino/packages '(helm
+;; 			  jedi
+;; 			  solarized-theme
+;; 			  evil
+;; 			  magit
+;; 			  neotree
+;; 			  powerline))
+
+(setq kino/need-package-refresh nil)
+
+(dolist (pkg package-selected-packages) ;; (pkg kino/packages)
+  (when (not (package-installed-p pkg))
+    (setq kino/need-package-refresh t)))
+
+(if kino/need-package-refresh
+    (package-refresh-contents))
+
+(dolist (pkg package-selected-packages) ;; (pkg kino/packages)
+  (when (not (package-installed-p pkg))
+    (package-install pkg)))
+;; 
+
+
+;; hide toolbar and menu
+(tool-bar-mode -1)
+
+
+;; themes
+(add-to-list 'custom-theme-load-path 
+	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
+(load-theme 'solarized-dark t)
+
+
+(require 'powerline)
+(powerline-default-theme)
+
+
+(require 'evil)
+(evil-mode t)
+(global-evil-surround-mode 1)
+
+
+(show-paren-mode t)
 
 
 ;; 
@@ -85,15 +95,21 @@
 
 (require 'bat-mode)
 (add-hook 'bat-mode-hook 'kino/set-bat-mode-hook)
-;; 
+;;
+
+
+;; helm
+(require 'helm-config)
+(helm-mode 1)
 
 
 ;; 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-c C-x h t") 'helm-for-files)
+(global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
 
 (global-set-key (kbd "C-c C-x n t") 'neotree-toggle)
 
