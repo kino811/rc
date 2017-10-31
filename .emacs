@@ -18,8 +18,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
+ '(buffer-file-coding-system (quote utf-8) t)
  '(package-selected-packages
    (quote
     (csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
@@ -75,6 +75,11 @@
 (require 'evil)
 (evil-mode t)
 (global-evil-surround-mode 1)
+(define-key evil-normal-state-map (kbd "C-w C-h") 'evil-window-left)
+(define-key evil-normal-state-map (kbd "C-w C-j") 'evil-window-down)
+(define-key evil-normal-state-map (kbd "C-w C-k") 'evil-window-up)
+(define-key evil-normal-state-map (kbd "C-w C-l") 'evil-window-right)
+(define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
 
 
 (show-paren-mode t)
