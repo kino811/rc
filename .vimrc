@@ -21,6 +21,10 @@ filetype plugin indent on "required
 " set leader
 let mapleader = ","
 
+" file encoding
+set fileencodings=utf8,euc-kr
+set fileformats=dos,unix
+
 " colorscheme
 syntax enable
 set background=dark
