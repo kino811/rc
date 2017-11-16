@@ -33,9 +33,10 @@ colorscheme solarized
 " hide toolbar
 set guioptions-=T
 
-" show row number
 set number
-
+set autoindent cindent
+set tabstop=4 shiftwidth=4
+set hlsearch
 
 " syntastic setting
 set statusline+=%#warningmsg#
