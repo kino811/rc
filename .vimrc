@@ -33,7 +33,10 @@ colorscheme solarized
 " hide toolbar
 set guioptions-=T
 
-set number
+" set number
+autocmd FileType vim setlocal  number
+autocmd FileType text setlocal nonumber
+
 set autoindent cindent
 set tabstop=4 shiftwidth=4
 set hlsearch
@@ -62,3 +65,27 @@ map <Leader> <Plug>(easymotion-prefix)
 
 " nerd-tree
 map <C-n> :NERDTreeToggle<CR>
+
+
+" previm
+if has('mac')
+	let g:previm_open_cmd = 'open -a Safari'
+elseif has('win32')
+	let g:previm_open_cmd = 'start explorer'
+endif
+
+augroup Previm
+	autocmd!
+
+	" Types
+	autocmd BufNewFile,BufRead *.{md,mkd} set filetype=markdown
+augroup END
+
+
+" FileType Setting
+augroup dosbatch
+	autocmd!
+	if has('win32')
+		autocmd FileType dobatch map <buffer> <f5> :!start cmd /c "pushd %:p:h && %:t"<cr>
+	endif
+augroup END
