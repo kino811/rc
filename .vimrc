@@ -82,10 +82,10 @@ augroup Previm
 augroup END
 
 
-" FileType Setting
 augroup dosbatch
 	autocmd!
+
 	if has('win32')
-		autocmd FileType dobatch map <buffer> <f5> :!start cmd /c "pushd %:p:h && %:t"<cr>
+		autocmd FileType dosbatch nnoremap <buffer> <f5> :!start cmd /c "pushd %:p:h && %:t"<cr>
 	endif
 augroup END
