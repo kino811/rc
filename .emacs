@@ -18,11 +18,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(current-language-environment "Korean")
  '(buffer-file-coding-system (quote utf-8) t)
+ '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
+    (which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -73,7 +73,7 @@
 
 
 (require 'evil)
-(evil-mode t)
+;(evil-mode t)
 (global-evil-surround-mode 1)
 (define-key evil-normal-state-map (kbd "C-w C-h") 'evil-window-left)
 (define-key evil-normal-state-map (kbd "C-w C-j") 'evil-window-down)
@@ -115,9 +115,6 @@
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
-
-(global-set-key (kbd "C-c C-x n t") 'neotree-toggle)
-
-(global-set-key (kbd "C-c C-x m s") 'magit-status)
+(global-set-key (kbd "C-x g") 'magit-status)
 ;;
 
