@@ -5,11 +5,11 @@
 	editor = emacs
 	crlf = input
 [merge]
-	tool = vimdiff
+	tool = ediff
 [push]
 	default = matching
 [diff]
-	tool = vimdiff
+	tool = ediff
 [alias]
 	loggraph = log --oneline --decorate --graph
 	st = status
