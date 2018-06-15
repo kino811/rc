@@ -20,9 +20,12 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
+ '(org-agenda-files
+   (quote
+    ("~/work/kaiser/todo.org" "~/work/kaiser/tutorial_4_3.org")))
  '(package-selected-packages
    (quote
-    (which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
+    (edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -102,14 +105,20 @@
 (require 'helm-config)
 (helm-mode 1)
 
+(require 'edit-server)
+(edit-server-start)
 
 ;; 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
-
+(global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x g") 'magit-status)
+
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
 ;;
 
+(defalias 'list-buffers 'ibuffer)
