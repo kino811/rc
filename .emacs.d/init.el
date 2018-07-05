@@ -20,19 +20,9 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
-<<<<<<< HEAD
- '(org-agenda-files
-   (quote
-    ("~/work/kaiser/todo.org" "~/work/kaiser/tutorial_4_3.org")))
-=======
- '(custom-safe-themes
-   (quote
-    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "158013ec40a6e2844dbda340dbabda6e179a53e0aea04a4d383d69c329fba6e6" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "d21135150e22e58f8c656ec04530872831baebf5a1c3688030d119c114233c24" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)))
- '(org-agenda-files (quote ("~/work/emacs_practice.org")))
->>>>>>> 74f9208dec2ba50dd3eedf597ca3de72fa9ee339
  '(package-selected-packages
    (quote
-    (edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
+    (evil-easymotion ace-jump-helm-line ace-jump-buffer autopair evil-leader edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -98,12 +88,32 @@
 ;; 
 
 (require 'powerline)
-(powerline-default-theme)
+(powerline-center-evil-theme)
+(display-time-mode t)
 
 
 (require 'evil)
-;(evil-mode t)
-(global-evil-surround-mode 1)
+(evil-mode t)
+
+(setq evil-emacs-state-cursor '("red" box))
+(setq evil-normal-state-cursor '("green" box))
+(setq evil-visual-state-cursor '("orange" box))
+(setq evil-insert-state-cursor '("red" bar))
+(setq evil-replace-state-cursor '("red" bar))
+(setq evil-operator-state-cursor '("red" hollow))
+
+(setq evil-leader/in-all-states 1)
+(global-evil-leader-mode)
+(evil-leader/set-leader "<SPC>")
+
+(define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
+(define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+(define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+(define-key global-map (kbd "RET") 'newline-and-indent)
+
+
+(require 'autopair)
+(autopair-global-mode)
 
 
 (show-paren-mode t)
