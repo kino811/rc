@@ -92,33 +92,7 @@
 (display-time-mode t)
 
 
-(require 'evil)
-(evil-mode t)
-
-(setq evil-emacs-state-cursor '("red" box))
-(setq evil-normal-state-cursor '("green" box))
-(setq evil-visual-state-cursor '("orange" box))
-(setq evil-insert-state-cursor '("red" bar))
-(setq evil-replace-state-cursor '("red" bar))
-(setq evil-operator-state-cursor '("red" hollow))
-
-(setq evil-leader/in-all-states 1)
-(global-evil-leader-mode)
-(evil-leader/set-leader "<SPC>")
-
-(define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
-(define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-
-(define-key evil-normal-state-map (kbd "C-v") 'evil-scroll-page-down)
-(define-key evil-normal-state-map (kbd "C-u C-v") 'evil-visual-block)
-(define-key evil-insert-state-map (kbd "C-v") 'evil-scroll-page-down)
-(define-key evil-insert-state-map (kbd "C-u C-v") 'evil-visual-block)
-
 (define-key global-map (kbd "RET") 'newline-and-indent)
-
-
-(require 'autopair)
-(autopair-global-mode)
 
 
 (show-paren-mode t)
