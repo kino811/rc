@@ -108,7 +108,12 @@
 
 (define-key evil-motion-state-map (kbd "C-e") 'evil-end-of-line)
 (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-(define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+
+(define-key evil-normal-state-map (kbd "C-v") 'evil-scroll-page-down)
+(define-key evil-normal-state-map (kbd "C-u C-v") 'evil-visual-block)
+(define-key evil-insert-state-map (kbd "C-v") 'evil-scroll-page-down)
+(define-key evil-insert-state-map (kbd "C-u C-v") 'evil-visual-block)
+
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 
