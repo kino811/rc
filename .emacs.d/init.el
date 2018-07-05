@@ -22,7 +22,7 @@
  '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (evil-easymotion ace-jump-helm-line ace-jump-buffer autopair evil-leader edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode evil-surround evil-magit org-evil airline-themes powerline neotree magit evil solarized-theme jedi helm))))
+    (autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -87,6 +87,7 @@
 (defalias 'list-buffers 'ibuffer)
 ;; 
 
+
 (require 'powerline)
 (powerline-center-evil-theme)
 (display-time-mode t)
@@ -120,8 +121,10 @@
 (require 'helm-config)
 (helm-mode 1)
 
+
 (require 'edit-server)
 (edit-server-start)
+
 
 ;; windmove
 (windmove-default-keybindings 'meta)
@@ -153,5 +156,3 @@
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 ;;
-
-(defalias 'list-buffers 'ibuffer)
