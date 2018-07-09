@@ -167,6 +167,9 @@
 (yas-global-mode 1)
 
 
+(which-key-mode)
+
+
 ;; 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
