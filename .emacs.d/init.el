@@ -1,5 +1,10 @@
 ;; This is Kino's .emacs
 
+
+;; add load-path
+(add-to-list 'load-path "~/.emacs.d/site-lisp")
+
+
 ;; adding a package source
 (require 'package)
 (add-to-list 'package-archives
@@ -22,7 +27,7 @@
  '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
+    (yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -142,6 +147,24 @@
    (C . t)))
 
 (setq org-src-fontify-natively t)
+
+
+;; ace-jump-mode
+(require 'ace-jump-mode)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+
+;; mark-multiple
+(require 'mark-more-like-this)
+(global-set-key (kbd "C-<") 'mark-previous-like-this)
+(global-set-key (kbd "C->") 'mark-next-like-this)
+(global-set-key (kbd "C-M-m") 'mark-more-like-this)
+(global-set-key (kbd "C-*") 'mark-all-like-this)
+
+
+;; yasnippet
+(require 'yasnippet)
+(yas-global-mode 1)
 
 
 ;; 
