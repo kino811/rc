@@ -27,7 +27,7 @@
  '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
+    (flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -94,7 +94,7 @@
 
 
 (require 'powerline)
-(powerline-center-evil-theme)
+;; (powerline-center-evil-theme)
 (display-time-mode t)
 
 
@@ -149,25 +149,35 @@
 (setq org-src-fontify-natively t)
 
 
-;; ace-jump-mode
-(require 'ace-jump-mode)
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-
-
-;; mark-multiple
-(require 'mark-more-like-this)
-(global-set-key (kbd "C-<") 'mark-previous-like-this)
-(global-set-key (kbd "C->") 'mark-next-like-this)
-(global-set-key (kbd "C-M-m") 'mark-more-like-this)
-(global-set-key (kbd "C-*") 'mark-all-like-this)
-
-
 ;; yasnippet
 (require 'yasnippet)
 (yas-global-mode 1)
 
 
 (which-key-mode)
+
+
+;; swiper
+(global-set-key (kbd "C-s") 'swiper)
+
+
+;; avy
+(global-set-key (kbd "C-:") 'avy-goto-char)
+
+
+;; iedit-mode :: multi line edit
+(require 'iedit)
+
+
+;; wgrep
+(require 'wgrep)
+
+
+;; multi term
+(require 'multi-term)
+;; (if (eq system-type 'windows-nt)
+;;     (setq multi-term-program "c:/cygwin64/bin/bash.exe")
+;;   )
 
 
 ;; 
