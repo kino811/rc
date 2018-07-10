@@ -175,9 +175,11 @@
 
 ;; multi term
 (require 'multi-term)
+;; todo :: not work now.
 ;; (if (eq system-type 'windows-nt)
 ;;     (setq multi-term-program "c:/cygwin64/bin/bash.exe")
 ;;   )
+;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
 
 ;; 
