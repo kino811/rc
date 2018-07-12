@@ -27,7 +27,7 @@
  '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
+    (company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -158,7 +158,7 @@
 
 
 ;; swiper
-(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-c s") 'swiper)
 
 
 ;; avy
@@ -182,6 +182,22 @@
 ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
 
+;; undo-tree-mode
+(global-undo-tree-mode)
+
+
+;; shader-mode
+(add-to-list 'auto-mode-alist '("\\.shader\\'" . shader-mode))
+
+
+;; line number mode
+(global-linum-mode)
+
+
+;; magit
+(setenv "GIT_ASKPASS" "git-gui--askpass")
+
+
 ;; 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
@@ -194,3 +210,4 @@
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 ;;
+(put 'upcase-region 'disabled nil)
