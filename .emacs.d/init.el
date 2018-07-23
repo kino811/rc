@@ -27,7 +27,7 @@
  '(current-language-environment "Korean")
  '(package-selected-packages
    (quote
-    (company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme jedi helm))))
+    (company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -196,6 +196,14 @@
 
 ;; magit
 (setenv "GIT_ASKPASS" "git-gui--askpass")
+
+
+;; jedi
+(defun my/python-mode-hook ()
+  (with-eval-after-load 'company (add-to-list 'company-backends 'company-jedi))
+  )
+
+(add-hook 'python-mode-hook 'my/python-mode-hook)
 
 
 ;; 
