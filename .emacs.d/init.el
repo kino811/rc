@@ -77,7 +77,7 @@
 ;; recentf
 ;; keep a list of recently opened files
 (recentf-mode 1)
-;; (global-set-key (kbd "<f7>") 'recentf-open-files)
+(global-set-key (kbd "C-c r f") 'recentf-open-files)
 ;;
 
 ;; save/restore opend files and windows config
@@ -158,7 +158,7 @@
 
 
 ;; swiper
-(global-set-key (kbd "C-c s") 'swiper)
+(global-set-key (kbd "C-s") 'swiper)
 
 
 ;; avy
@@ -205,6 +205,10 @@
   )
 
 (add-hook 'python-mode-hook 'my/python-mode-hook)
+
+
+;; rg
+(rg-enable-default-bindings)
 
 
 ;; 
