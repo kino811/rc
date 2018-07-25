@@ -25,6 +25,7 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
+ '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
     (python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm))))
@@ -209,6 +210,20 @@
 
 ;; rg
 (rg-enable-default-bindings)
+
+
+;; python simple server
+(defun kino/open-server-working-dir-http ()
+  (interactive)
+  (setq kino/shell-cmd "python3 -m http.server")
+  (if (eq system-type 'windows-nt)
+      (setq kino/shell-cmd (concat "start " kino/shell-cmd))
+    (if (eq system-type 'darwin)
+	(setq kino/shell-cmd (concat "open " kino/shell-cmd))
+      )
+    )
+  (async-shell-command "start python3 -m http.server")
+  )
 
 
 ;; 
