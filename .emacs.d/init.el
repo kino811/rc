@@ -284,7 +284,13 @@
     (global-evil-surround-mode))
 
   (use-package evil-indent-textobject
-    :ensure t))
+    :ensure t)
+
+  (dolist (mode '(ag-mode
+		  flycheck-error-list-mode
+		  git-rebase-mode))
+    (add-to-list 'evil-emacs-state-modes mode))
+  )
 
 
 ;; 
