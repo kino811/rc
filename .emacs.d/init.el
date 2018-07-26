@@ -77,6 +77,7 @@
 ;; 
 ;; recentf
 ;; keep a list of recently opened files
+(require 'recentf)
 (recentf-mode 1)
 (global-set-key (kbd "C-c r f") 'recentf-open-files)
 ;;
@@ -91,6 +92,7 @@
 ;; 
 ;; alias
 (defalias 'list-buffers 'ibuffer)
+(defalias 'yes-or-no-p 'y-or-n-p)
 ;; 
 
 
@@ -240,6 +242,22 @@
     (async-shell-command shell-cmd)
     )
   )
+
+
+;; cursor line always highlighted
+(global-hl-line-mode 1)
+
+
+;; automatically insert right bracket when left one is typed
+(electric-pair-mode 1)
+
+
+;; make typing delete/overwrites selected text
+(delete-selection-mode 1)
+
+
+;; when a file is updated outside emacse, make it update if it's already opend in emacs
+(global-auto-revert-mode 1)
 
 
 ;; 
