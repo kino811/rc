@@ -107,7 +107,10 @@
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 
+;; highlight brackets
 (show-paren-mode t)
+;; ;; highlight entire expression style
+;; (setq show-paren-style 'expression)
 
 
 ;; 
@@ -193,7 +196,8 @@
 
 
 ;; shader-mode
-(add-to-list 'auto-mode-alist '("\\.shader\\'" . shader-mode))
+(add-to-list 'auto-mode-alist
+	     '("\\.shader\\'" . shader-mode))
 
 
 ;; line number mode
