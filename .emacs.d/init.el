@@ -31,7 +31,7 @@
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm))))
+    (use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -170,12 +170,13 @@
 (global-set-key (kbd "C-s") 'swiper)
 
 
-;; avy
-(global-set-key (kbd "C-:") 'avy-goto-char)
-
-
 ;; iedit-mode :: multi line edit
 (require 'iedit)
+(global-set-key (kbd "C-:") 'iedit-mode)
+
+
+;; avy
+(global-set-key (kbd "C-;") 'avy-goto-char)
 
 
 ;; wgrep
@@ -267,6 +268,13 @@
 (global-auto-revert-mode 1)
 
 
+(use-package use-package-chords
+  :ensure t
+  :config
+  (key-chord-mode 1)
+  (setq key-chord-two-keys-delay 0.1)	;default 0.1
+  )
+
 ;; evil-mode
 (use-package evil
   :ensure t
@@ -290,6 +298,16 @@
 		  flycheck-error-list-mode
 		  git-rebase-mode))
     (add-to-list 'evil-emacs-state-modes mode))
+
+  (define-key evil-normal-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'evil-end-of-line)
+  (define-key evil-visual-state-map (kbd "C-e") 'evil-end-of-line)
+  
+  (define-key evil-normal-state-map (kbd "C-a") 'evil-first-non-blank)
+  (define-key evil-insert-state-map (kbd "C-a") 'evil-first-non-blank)
+  (define-key evil-visual-state-map (kbd "C-a") 'evil-first-non-blank)
+
+  (define-key evil-visual-state-map (kbd  "<tab>") 'indent-for-tab-command)
   )
 
 
