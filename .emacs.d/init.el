@@ -33,7 +33,7 @@
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(send-mail-function (quote mailclient-send-it)))
 
 (custom-set-faces
@@ -156,11 +156,15 @@
  'org-babel-load-languages
  '((emacs-lisp . t)
    (python . t)
-   (C . t)))
+   (C . t)
+   (plantuml . t)))
 
 (setq org-src-fontify-natively t)
 (setq org-todo-keywords
       '((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
+
+(setq org-plantuml-jar-path
+      (expand-file-name "~/.emacs.d/plantuml.jar"))
 
 
 ;; yasnippet
