@@ -174,6 +174,8 @@
 skinparam monochrome true\n
 #+END_SRC"))
 
+(setq org-startup-with-inline-images t)
+
 
 ;; yasnippet
 (require 'yasnippet)
