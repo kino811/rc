@@ -1,7 +1,7 @@
-;; This is Kino's .emacs
+;;; This is Kino's .emacs
 
 
-;; add load-path
+;;; add load-path
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 
@@ -33,7 +33,7 @@
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(send-mail-function (quote mailclient-send-it)))
 
 (custom-set-faces
@@ -119,13 +119,13 @@
 ;; 
 ;; bat-mode
 (defun kino/call-process-shell-async-current-buffername ()
-  "for bat-mode shell-command by current-buffername"
+  "For bat-mode shell-command by current-buffername"
   (interactive)
   (call-process-shell-command 
    (format "start cmd /c %s" (buffer-name))))
 
 (defun kino/set-bat-mode-hook ()
-  "set bat-mode hook"
+  "Set bat-mode hook"
   (interactive)
   (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername))
 
@@ -165,6 +165,14 @@
 
 (setq org-plantuml-jar-path
       (expand-file-name "~/.emacs.d/plantuml.jar"))
+(add-hook 'org-babel-after-execute-hook
+	  (lambda ()
+	    (when org-inline-image-overlays
+	      (org-redisplay-inline-images))))
+(add-to-list 'org-structure-template-alist
+	     '("u" "#+BEGIN_SRC plantuml :file ?.png\n
+skinparam monochrome true\n
+#+END_SRC"))
 
 
 ;; yasnippet
@@ -317,6 +325,31 @@
   (define-key evil-visual-state-map (kbd "C-a") 'evil-first-non-blank)
 
   (define-key evil-visual-state-map (kbd  "<tab>") 'indent-for-tab-command)
+  )
+
+
+;; insert buffer-name at minibuffer
+(define-key minibuffer-local-map (kbd "C-c C-i")
+  (lambda ()
+    (interactive)
+    (insert (buffer-name (window-buffer (minibuffer-selected-window))))))
+
+
+;; company
+(use-package company
+  :ensure t
+  :config
+  ;; (add-hook 'after-init-hook 'global-company-mode)
+  (global-set-key (kbd "M-/") 'company-complete-common-or-cycle)
+  (setq company-idle-delay 0)
+  )
+
+
+;; flycheck
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode)
   )
 
 
