@@ -28,12 +28,15 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
+ '(irony-extra-cmake-args
+   (quote
+    ("-G \"MinGW Makefiles\"" "-DCMAKE_C_COMPILER=\"gcc\"" "-DCMAKE_CXX_COMPILER=\"g++\"")))
  '(org-agenda-files
    (quote
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (cmake-ide rtags flycheck-irony company-irony cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(send-mail-function (quote mailclient-send-it)))
 
 (custom-set-faces
@@ -340,10 +343,13 @@ skinparam monochrome true\n
 ;; company
 (use-package company
   :ensure t
+  :init
+  (add-hook 'after-init-hook 'global-company-mode)
   :config
-  ;; (add-hook 'after-init-hook 'global-company-mode)
   (global-set-key (kbd "M-/") 'company-complete-common-or-cycle)
   (setq company-idle-delay 0)
+  (setq company-show-numbers "on")
+  (setq company-global-modes '(not eshell-mode))
   )
 
 
