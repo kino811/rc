@@ -28,12 +28,14 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
+ '(irony-extra-cmake-args (quote ("-G Visual Studio 15 2017 Win64")))
  '(org-agenda-files
    (quote
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+ '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(send-mail-function (quote mailclient-send-it)))
 
 (custom-set-faces
@@ -226,6 +228,10 @@ skinparam monochrome true\n
 
 ;; magit
 (setenv "GIT_ASKPASS" "git-gui--askpass")
+(use-package magit
+  :bind
+  ("C-x g" . magit-status)
+  )
 
 
 ;; jedi
@@ -344,6 +350,11 @@ skinparam monochrome true\n
   :ensure t
   :init
   (add-hook 'after-init-hook 'global-company-mode)
+  :bind
+  (:map company-active-map ("M-n" . nil))
+  (:map company-active-map ("M-p" . nil))
+  (:map company-active-map ("C-n" . company-select-next))
+  (:map company-active-map ("C-p" . company-select-previous))
   :config
   (global-set-key (kbd "M-/") 'company-complete-common-or-cycle)
   (setq company-idle-delay 0)
@@ -372,6 +383,18 @@ skinparam monochrome true\n
   )
 
 
+(use-package irony
+  :init
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  (when (boundp 'w32-pipe-read-delay)
+    (setq w32-pipe-read-delay 0))
+  (when (boundp 'w32-pipe-buffer-size)
+    (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
+  )
+
+
 ;; 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
@@ -379,7 +402,6 @@ skinparam monochrome true\n
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
-(global-set-key (kbd "C-x g") 'magit-status)
 
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
