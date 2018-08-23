@@ -137,8 +137,32 @@
 
 
 ;; helm
-(require 'helm-config)
-(helm-mode 1)
+(use-package helm
+  :config
+  (require 'helm-config)
+
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (global-set-key (kbd "C-x b") 'helm-mini)
+  (global-set-key (kbd "C-c h o") 'helm-occur)
+  (global-set-key (kbd "C-c h SPC") 'helm-all-mark-rings)
+
+  (setq helm-split-window-inside-p t)
+  (setq helm-autoresize-max-height 50)
+  (setq helm-autoresize-min-height 30)
+  (helm-autoresize-mode 1)
+
+  (helm-mode 1)
+  )
+
+(use-package helm-projectile
+  :config
+  (setq projectile-completion-system 'helm)
+  (helm-projectile-on)
+  )
 
 
 (require 'edit-server)
@@ -399,10 +423,7 @@ skinparam monochrome true\n
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
-
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 ;;
