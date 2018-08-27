@@ -28,7 +28,6 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
- '(irony-extra-cmake-args (quote ("-G Visual Studio 15 2017 Win64")))
  '(org-agenda-files
    (quote
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
