@@ -307,7 +307,10 @@ skinparam monochrome true\n
 
 
 ;; automatically insert right bracket when left one is typed
-(electric-pair-mode 1)
+(electric-pair-mode 0)
+
+
+(autopair-global-mode 1)
 
 
 ;; make typing delete/overwrites selected text
@@ -382,7 +385,8 @@ skinparam monochrome true\n
   (global-set-key (kbd "M-/") 'company-complete-common-or-cycle)
   (setq company-idle-delay 0)
   (setq company-show-numbers "on")
-  (setq company-global-modes '(not eshell-mode))
+  (setq company-global-modes '(and (not eshell-mode)
+				   (not gud-mode)))
   )
 
 
@@ -416,6 +420,10 @@ skinparam monochrome true\n
   (when (boundp 'w32-pipe-buffer-size)
     (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
   )
+
+
+(setq c-default-style "linux"
+      c-basic-offset 4)
 
 
 ;; 
