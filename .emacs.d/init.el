@@ -33,7 +33,7 @@
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(send-mail-function (quote mailclient-send-it)))
 
@@ -218,16 +218,29 @@ skinparam monochrome true\n
 
 
 ;; swiper
-(global-set-key (kbd "C-s") 'swiper)
+(use-package swiper
+  :bind
+  (:map global-map ("C-s" . 'swiper))
+  )
 
 
 ;; iedit-mode :: multi line edit
 (require 'iedit)
-(global-set-key (kbd "C-:") 'iedit-mode)
+;; (global-set-key (kbd "C-;") 'iedit-mode)
 
 
 ;; avy
-(global-set-key (kbd "C-;") 'avy-goto-char)
+(use-package avy
+  :bind
+  (:map global-map ("C-:" . 'avy-goto-char))
+  (:map global-map ("C-'" . 'avy-goto-char-2))
+  (:map global-map ("M-g f" . 'avy-goto-line))
+  (:map global-map ("M-g w" . 'avy-goto-word-1))
+  (:map global-map ("M-g e" . 'avy-goto-word-0))
+  (:map global-map ("C-c C-j" . 'avy-resume))
+  :config
+  (avy-setup-default)
+  )
 
 
 ;; wgrep
@@ -383,17 +396,25 @@ skinparam monochrome true\n
   :ensure t
   :init
   (add-hook 'after-init-hook 'global-company-mode)
+  
   :bind
   (:map company-active-map ("M-n" . nil))
   (:map company-active-map ("M-p" . nil))
   (:map company-active-map ("C-n" . company-select-next))
   (:map company-active-map ("C-p" . company-select-previous))
+  (:map global-map ("C-c \\" . 'company-complete-common-or-cycle))
+  
   :config
-  (global-set-key (kbd "M-/") 'company-complete-common-or-cycle)
   (setq company-idle-delay 0)
   (setq company-show-numbers "on")
   (setq company-global-modes '(and (not eshell-mode)
 				   (not gud-mode)))
+
+  (use-package company-irony
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-irony)
+    )
   )
 
 
@@ -402,6 +423,8 @@ skinparam monochrome true\n
   :ensure t
   :init
   (global-flycheck-mode)
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
   )
 
 
@@ -421,11 +444,17 @@ skinparam monochrome true\n
   :init
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  
   (when (boundp 'w32-pipe-read-delay)
     (setq w32-pipe-read-delay 0))
   (when (boundp 'w32-pipe-buffer-size)
     (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
+  
+  :config
+  (add-hook 'irony-mode-hook #'irony-eldoc)
   )
 
 
