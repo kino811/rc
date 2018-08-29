@@ -26,6 +26,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(helm-gtags-prefix-key "C-c g")
+ '(helm-gtags-suggested-key-mapping t)
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "Korean")
  '(org-agenda-files
@@ -33,7 +35,7 @@
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (helm-gtags el-get req-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(send-mail-function (quote mailclient-send-it)))
 
@@ -142,6 +144,12 @@
 ;;
 
 
+(require 'req-package)
+(req-package el-get
+  :force t ;; load package immediately, no dependency resolution
+  :config
+  )
+
 ;; helm
 (use-package helm
   :config
@@ -164,7 +172,8 @@
   (helm-mode 1)
   )
 
-(use-package helm-projectile
+(req-package helm-projectile
+  :require helm projectile
   :config
   (setq projectile-completion-system 'helm)
   (helm-projectile-on)
@@ -406,20 +415,19 @@ skinparam monochrome true\n
   (:map company-active-map ("M-p" . nil))
   (:map company-active-map ("C-n" . company-select-next))
   (:map company-active-map ("C-p" . company-select-previous))
-  (:map global-map ("C-c \\" . 'company-complete-common-or-cycle))
+  (:map global-map ("C-c /" . 'company-complete-common-or-cycle))
   
   :config
   (setq company-idle-delay 0)
   (setq company-show-numbers "on")
   (setq company-global-modes '(not eshell-mode gud-mode))
-
-  (use-package company-irony
-    :ensure t
-    :config
-    (add-to-list 'company-backends 'company-irony)
-    )
   )
 
+(req-package company-irony
+  :require company irony
+  :config
+  (add-to-list 'company-backends 'company-irony)
+  )
 
 ;; flycheck
 (use-package flycheck
@@ -449,6 +457,9 @@ skinparam monochrome true\n
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'objc-mode-hook 'irony-mode)
   
+  (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
+						  irony-cdb-clang-complete))
+
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   
   (when (boundp 'w32-pipe-read-delay)
@@ -456,6 +467,12 @@ skinparam monochrome true\n
   (when (boundp 'w32-pipe-buffer-size)
     (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
   
+  :config
+  (add-hook 'irony-mode-hook #'irony-eldoc)
+  )
+
+(req-package irony-eldoc
+  :require eldoc irony
   :config
   (add-hook 'irony-mode-hook #'irony-eldoc)
   )
@@ -469,6 +486,12 @@ skinparam monochrome true\n
   :config
   (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+  )
+
+(req-package helm-gtags
+  :init
+  :config
+  (add-hook 'c-mode-common-hook 'helm-gtags-mode)
   )
 
 
