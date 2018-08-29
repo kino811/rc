@@ -37,7 +37,7 @@
    (quote
     (helm-gtags el-get req-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
- '(send-mail-function (quote mailclient-send-it)))
+ )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -46,32 +46,17 @@
  ;; If there is more than one, they won't work right.
  )
 
-
-;; 
-;; Install Packages that not exist package.
-
-;; (defconst kino/packages '(helm
-;; 			  jedi
-;; 			  solarized-theme
-;; 			  evil
-;; 			  magit
-;; 			  neotree
-;; 			  powerline))
-
-(setq kino/need-package-refresh nil)
-
-(dolist (pkg package-selected-packages) ;; (pkg kino/packages)
-  (when (not (package-installed-p pkg))
-    (setq kino/need-package-refresh t)))
-
-(if kino/need-package-refresh
-    (package-refresh-contents))
-
-(dolist (pkg package-selected-packages) ;; (pkg kino/packages)
-  (when (not (package-installed-p pkg))
-    (package-install pkg)))
-;; 
-
+(let ((packageRefreshed nil))
+  (dolist (packageSymbol package-selected-packages)
+    (when (not (package-installed-p packageSymbol))
+      (if (not packageRefreshed)
+	  (setq-local packageRefreshed t)
+	(package-refresh-contents)
+	)
+      (package-install packageSymbol)
+      )
+    )
+  )
 
 ;; hide toolbar and menu
 (tool-bar-mode -1)
@@ -83,20 +68,10 @@
 	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
 
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
-;; exec path
-(if (eq system-type 'darwin)
-    (exec-path-from-shell-initialize)
-  )
-
-
-;; 
-;; recentf
-;; keep a list of recently opened files
-(require 'recentf)
-(recentf-mode 1)
-(global-set-key (kbd "C-c r f") 'recentf-open-files)
-;;
+;; highlight brackets
+(show-paren-mode t)
 
 ;; save/restore opend files and windows config
 (desktop-save-mode t)
@@ -105,44 +80,15 @@
 ;; starting emacs without opening last session's files
 ;; $ emacs --no-desktop
 
-;; 
-;; alias
-(defalias 'list-buffers 'ibuffer)
-(defalias 'yes-or-no-p 'y-or-n-p)
-;; 
+;; windmove
+(windmove-default-keybindings 'meta)
 
+(which-key-mode)
 
-(require 'powerline)
-;; (powerline-center-evil-theme)
-(display-time-mode t)
-
-
-(define-key global-map (kbd "RET") 'newline-and-indent)
-
-
-;; highlight brackets
-(show-paren-mode t)
-;; ;; highlight entire expression style
-;; (setq show-paren-style 'expression)
-
-
-;; 
-;; bat-mode
-(defun kino/call-process-shell-async-current-buffername ()
-  "For bat-mode shell-command by current-buffername"
-  (interactive)
-  (call-process-shell-command 
-   (format "start cmd /c %s" (buffer-name))))
-
-(defun kino/set-bat-mode-hook ()
-  "Set bat-mode hook"
-  (interactive)
-  (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername))
-
-(require 'bat-mode)
-(add-hook 'bat-mode-hook 'kino/set-bat-mode-hook)
-;;
-
+;; exec path
+(if (eq system-type 'darwin)
+    (exec-path-from-shell-initialize)
+  )
 
 (require 'req-package)
 (req-package el-get
@@ -150,25 +96,63 @@
   :config
   )
 
-;; helm
-(use-package helm
+;; keep a list of recently opened files
+(req-package recentf
+  :bind
+  (:map global-map ("C-c r f" . 'recentf-open-files))
   :config
-  (require 'helm-config)
+  (recentf-mode 1)
+  )
 
-  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+;; 
+;; alias
+(defalias 'list-buffers 'ibuffer)
+(defalias 'yes-or-no-p 'y-or-n-p)
+;; 
+
+(req-package powerline
+  :config
+  (display-time-mode t)  
+  )
+
+;; 
+;; bat-mode
+(defun kino-call-process-shell-async-current-buffername ()
+  "For bat-mode shell-command by current-buffername"
+  (interactive)
+  (call-process-shell-command 
+   (format "start cmd /c %s" (buffer-name)))
+  )
+
+(defun kino-set-bat-mode-hook ()
+  "Set bat-mode hook"
+  (interactive)
+  (local-set-key (kbd "<f5>") 'kino-call-process-shell-async-current-buffername)
+  )
+
+(require 'bat-mode)
+(add-hook 'bat-mode-hook 'kino-set-bat-mode-hook)
+;;
+
+;; helm
+(req-package helm
+  :require helm-config
+  
+  :bind
+  (:map global-map ("C-c h" . 'helm-command-prefix))
+  (:map global-map ("C-x C-f" . 'helm-find-files))
+  (:map global-map ("C-x r b" . 'helm-filtered-bookmarks))
+  (:map global-map ("M-y" . 'helm-show-kill-ring))
+  (:map global-map ("C-x b" . 'helm-mini))
+  (:map global-map ("C-c h o" . 'helm-occur))
+  (:map global-map ("C-c h SPC" . 'helm-all-mark-rings))
+  
+  :config
   (global-unset-key (kbd "C-x c"))
-  (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-  (global-set-key (kbd "C-x b") 'helm-mini)
-  (global-set-key (kbd "C-c h o") 'helm-occur)
-  (global-set-key (kbd "C-c h SPC") 'helm-all-mark-rings)
-
   (setq helm-split-window-inside-p t)
   (setq helm-autoresize-max-height 50)
   (setq helm-autoresize-min-height 30)
   (helm-autoresize-mode 1)
-
   (helm-mode 1)
   )
 
@@ -179,70 +163,56 @@
   (helm-projectile-on)
   )
 
+(req-package edit-server
+  (edit-server-start)
+  )
 
-(require 'edit-server)
-(edit-server-start)
+(req-package org
+  :require ob
+  :config
+  ;; make org mode allow eval of some langs
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (C . t)
+     (plantuml . t)))
 
+  (setq org-src-fontify-natively t)
+  (setq org-todo-keywords
+	'((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
 
-;; windmove
-(windmove-default-keybindings 'meta)
-
-
-;; org-mode
-(require 'org)
-(require 'ob)
-
-;; make org mode allow eval of some langs
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)
-   (C . t)
-   (plantuml . t)))
-
-(setq org-src-fontify-natively t)
-(setq org-todo-keywords
-      '((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
-
-(setq org-plantuml-jar-path
-      (expand-file-name "~/.emacs.d/plantuml.jar"))
-(add-hook 'org-babel-after-execute-hook
-	  (lambda ()
-	    (when org-inline-image-overlays
-	      (org-redisplay-inline-images))))
-(add-to-list 'org-structure-template-alist
-	     '("u" "#+BEGIN_SRC plantuml :file ?.png\n
+  (setq org-plantuml-jar-path
+	(expand-file-name "~/.emacs.d/plantuml.jar"))
+  (add-hook 'org-babel-after-execute-hook
+	    (lambda ()
+	      (when org-inline-image-overlays
+		(org-redisplay-inline-images))
+	      )
+	    )
+  (add-to-list 'org-structure-template-alist
+	       '("u" "#+BEGIN_SRC plantuml :file ?.png\n
 skinparam monochrome true\n
 #+END_SRC"))
 
-(setq org-startup-with-inline-images t)
+  (setq org-startup-with-inline-images t)
+  )
 
+(req-package yasnippet
+  :config
+  (yas-global-mode 1)
+  )
 
-;; yasnippet
-(require 'yasnippet)
-(yas-global-mode 1)
-
-
-(which-key-mode)
-
-
-;; swiper
 (use-package swiper
   :bind
   (:map global-map ("C-s" . 'swiper))
   )
 
-
-;; iedit-mode :: multi line edit
-(require 'iedit)
 (use-package iedit
-  :ensure t
   :bind
   (:map global-map ("C-c ;" . 'iedit-mode))
   )
 
-
-;; avy
 (use-package avy
   :bind
   (:map global-map ("C-;" . 'avy-goto-char))
@@ -255,12 +225,8 @@ skinparam monochrome true\n
   (avy-setup-default)
   )
 
+(req-package wgrep)
 
-;; wgrep
-(require 'wgrep)
-
-
-;; multi term
 (require 'multi-term)
 ;; todo :: not work now.
 ;; (if (eq system-type 'windows-nt)
@@ -268,40 +234,34 @@ skinparam monochrome true\n
 ;;   )
 ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
-
 ;; undo-tree-mode
 (global-undo-tree-mode)
-
 
 ;; shader-mode
 (add-to-list 'auto-mode-alist
 	     '("\\.shader\\'" . shader-mode))
 
-
-;; line number mode
 (global-linum-mode)
 
-
-;; magit
-(setenv "GIT_ASKPASS" "git-gui--askpass")
 (use-package magit
+  :init
+  (setenv "GIT_ASKPASS" "git-gui--askpass")
   :bind
   ("C-x g" . magit-status)
   )
 
-
-;; jedi
-(require 'company)
-(defun my/python-mode-hook ()
-  (with-eval-after-load 'company (add-to-list 'company-backends 'company-jedi))
+(req-package jedi
+  :require company
+  (defun my/python-mode-hook ()
+    (with-eval-after-load 'company (add-to-list 'company-backends 'company-jedi))
+    )
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
   )
 
-(add-hook 'python-mode-hook 'my/python-mode-hook)
-
-
-;; rg
-(rg-enable-default-bindings)
-
+(req-package rg
+  :config
+  (rg-enable-default-bindings)
+  )
 
 ;; python simple server
 (defun kino/open-server-working-dir-http ()
