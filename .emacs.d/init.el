@@ -33,7 +33,7 @@
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
+    (google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord evil-indent-textobject use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit evil solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(send-mail-function (quote mailclient-send-it)))
 
@@ -226,13 +226,17 @@ skinparam monochrome true\n
 
 ;; iedit-mode :: multi line edit
 (require 'iedit)
-;; (global-set-key (kbd "C-;") 'iedit-mode)
+(use-package iedit
+  :ensure t
+  :bind
+  (:map global-map ("C-c ;" . 'iedit-mode))
+  )
 
 
 ;; avy
 (use-package avy
   :bind
-  (:map global-map ("C-:" . 'avy-goto-char))
+  (:map global-map ("C-;" . 'avy-goto-char))
   (:map global-map ("C-'" . 'avy-goto-char-2))
   (:map global-map ("M-g f" . 'avy-goto-line))
   (:map global-map ("M-g w" . 'avy-goto-word-1))
@@ -407,8 +411,7 @@ skinparam monochrome true\n
   :config
   (setq company-idle-delay 0)
   (setq company-show-numbers "on")
-  (setq company-global-modes '(and (not eshell-mode)
-				   (not gud-mode)))
+  (setq company-global-modes '(not eshell-mode gud-mode))
 
   (use-package company-irony
     :ensure t
@@ -460,6 +463,13 @@ skinparam monochrome true\n
 
 (setq c-default-style "linux"
       c-basic-offset 4)
+
+
+(use-package google-c-style
+  :config
+  (add-hook 'c-mode-common-hook 'google-set-c-style)
+  (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+  )
 
 
 ;; 
