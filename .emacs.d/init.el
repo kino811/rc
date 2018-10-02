@@ -31,7 +31,7 @@
     ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+    (dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4)))))
 
 (custom-set-faces
@@ -85,8 +85,6 @@
 ;; keep a list of recently opened files
 (use-package recentf
   :ensure t
-  :bind
-  (:map global-map ("C-c r f" . 'recentf-open-files))
   :config
   (recentf-mode 1)
   )
@@ -105,21 +103,21 @@
 
 ;; 
 ;; bat-mode
-(defun kino-call-process-shell-async-current-buffername ()
+(defun my:call-process-shell-async-current-buffername ()
   "For bat-mode shell-command by current-buffername"
   (interactive)
   (call-process-shell-command 
    (format "start cmd /c %s" (buffer-name)))
   )
 
-(defun kino-set-bat-mode-hook ()
+(defun my:set-bat-mode-hook ()
   "Set bat-mode hook"
   (interactive)
-  (local-set-key (kbd "<f5>") 'kino-call-process-shell-async-current-buffername)
+  (local-set-key (kbd "<f5>") 'my:call-process-shell-async-current-buffername)
   )
 
 (require 'bat-mode)
-(add-hook 'bat-mode-hook 'kino-set-bat-mode-hook)
+(add-hook 'bat-mode-hook 'my:set-bat-mode-hook)
 ;;
 
 (require 'helm-config)
@@ -214,12 +212,9 @@ skinparam monochrome true\n
 (use-package avy
   :ensure t
   :bind
-  (:map global-map ("C-;" . 'avy-goto-char))
-  (:map global-map ("C-'" . 'avy-goto-char-2))
-  (:map global-map ("M-g f" . 'avy-goto-line))
-  (:map global-map ("M-g w" . 'avy-goto-word-1))
-  (:map global-map ("M-g e" . 'avy-goto-word-0))
-  (:map global-map ("C-c C-j" . 'avy-resume))
+  (:map global-map ("C-c C-f " . 'avy-goto-char))
+  (:map global-map ("M-g M-f" . 'avy-goto-line))
+  (:map global-map ("C-c C-n" . 'avy-resume))
   :config
   (avy-setup-default)
   )
@@ -263,11 +258,11 @@ skinparam monochrome true\n
 (use-package rg
   :ensure t
   :config
-  (rg-enable-default-bindings)
+  (rg-enable-default-bindings (kbd "C-c r"))
   )
 
 ;; python simple server
-(defun kino/open-server-working-dir-http ()
+(defun my:open-server-working-dir-http ()
   (interactive)
   (let (shell-cmd)
     (setq shell-cmd "python3 -m http.server")
@@ -281,7 +276,7 @@ skinparam monochrome true\n
     )
   )
 
-(defun kino/open-server-working-dir-ftp ()
+(defun my:open-server-working-dir-ftp ()
   (interactive)
   (let (shell-cmd)
     (setq shell-cmd "python3 -m pyftpdlib")
@@ -404,9 +399,6 @@ skinparam monochrome true\n
   (add-hook 'irony-mode-hook #'irony-eldoc)
   )
 
-(setq c-default-style "linux"
-      c-basic-offset 4)
-
 (use-package google-c-style
   :ensure t
   :config
@@ -421,6 +413,25 @@ skinparam monochrome true\n
   :config
   (add-hook 'c-mode-common-hook 'helm-gtags-mode)
   )
+
+(defun my:set-c-common-style ()
+  (c-set-style "google")
+  (setq tab-width 4)
+  (setq c-basic-offset 4)
+  )
+(add-hook 'c-mode-common-hook 'my:set-c-common-style)
+
+(defun my:kill-other-buffers ()
+  "kill all other buffers"
+  (interactive)
+  (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
+
+;; cs mode
+(add-hook 'csharp-mode-hook 'omnisharp-mode)
+(eval-after-load
+    'company
+  '(add-to-list 'company-backends 'company-omnisharp))
+(add-hook 'csharp-mode-hook #'company-mode)
 
 ;; 
 ;; custom key-map
