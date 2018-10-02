@@ -131,6 +131,7 @@
    ("C-x r b" . helm-filtered-bookmarks)
    ("M-y" . helm-show-kill-ring)
    ("M-x" . helm-M-x)
+   ("C-x b" . 'helm-mini)
    )
   (:map helm-command-map
 	("o" . helm-occur)
