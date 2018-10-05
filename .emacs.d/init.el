@@ -26,9 +26,7 @@
  '(current-language-environment "Korean")
  '(helm-gtags-prefix-key "C-c g")
  '(helm-gtags-suggested-key-mapping t)
- '(org-agenda-files
-   (quote
-    ("~/work/practice_org-mode.org" "~/work/kaiser/todo.org")))
+ '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
     (dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
@@ -74,10 +72,10 @@
 (use-package windmove
   :ensure t
   :bind
-  ("C-c o h" . windmove-left)
-  ("C-c o j" . windmove-down) 
-  ("C-c o k" . windmove-up)   
-  ("C-c o l" . windmove-right)
+  ("C-c w h" . windmove-left)
+  ("C-c w j" . windmove-down) 
+  ("C-c w k" . windmove-up)   
+  ("C-c w l" . windmove-right)
   :config
   (windmove-default-keybindings 'meta)
   )
@@ -163,6 +161,12 @@
 (use-package org
   :ensure t
   :after ob
+  :bind
+  (:map org-mode-map
+	("C-c C-c" . (lambda ()
+			(interactive) 
+			(org-ctrl-c-ctrl-c)
+			(org-display-inline-images))))
   :config
   ;; make org mode allow eval of some langs
   (org-babel-do-load-languages
@@ -213,9 +217,8 @@ skinparam monochrome true\n
 (use-package avy
   :ensure t
   :bind
-  (:map global-map ("C-c C-f " . 'avy-goto-char))
-  (:map global-map ("M-g M-f" . 'avy-goto-line))
-  (:map global-map ("C-c C-n" . 'avy-resume))
+  (:map global-map ("C-c j c" . 'avy-goto-char))
+  (:map global-map ("C-c j l" . 'avy-goto-line))
   :config
   (avy-setup-default)
   )
@@ -298,20 +301,8 @@ skinparam monochrome true\n
   )
 
 
-;; automatically insert right bracket when left one is typed
-(electric-pair-mode 0)
-
-
-(autopair-global-mode 1)
-
-
-;; make typing delete/overwrites selected text
-(delete-selection-mode 1)
-
-
 ;; when a file is updated outside emacse, make it update if it's already opend in emacs
 (global-auto-revert-mode 1)
-
 
 (use-package use-package-chords
   :ensure t
@@ -321,7 +312,7 @@ skinparam monochrome true\n
   )
 
 ;; insert buffer-name at minibuffer
-(define-key minibuffer-local-map (kbd "C-c C-i")
+(define-key minibuffer-local-map (kbd "C-c t i b n")
   (lambda ()
     (interactive)
     (insert (buffer-name (window-buffer (minibuffer-selected-window))))))
@@ -438,7 +429,19 @@ skinparam monochrome true\n
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c o a") 'org-agenda)
+(global-set-key (kbd "C-c o c") 'org-capture)
 ;;
 (put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+
+(which-key-add-key-based-replacements
+  "C-c t" "text"
+  "C-c t i" "insert"
+  "C-c t i b" "buffer"
+  "C-c j" "jump"
+  "C-c w" "window"
+  "C-c r" "rg"
+  "C-c o" "org"
+  )
