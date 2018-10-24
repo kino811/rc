@@ -83,6 +83,8 @@
 ;; keep a list of recently opened files
 (use-package recentf
   :ensure t
+  :bind
+  (("C-c f r" . 'recentf-open-files))
   :config
   (recentf-mode 1)
   )
@@ -205,7 +207,7 @@ skinparam monochrome true\n
 (use-package swiper
   :ensure t
   :bind
-  (:map global-map ("C-s" . 'swiper))
+  (:map global-map ("C-c s s" . 'swiper))
   )
 
 (use-package iedit
@@ -444,4 +446,8 @@ skinparam monochrome true\n
   "C-c w" "window"
   "C-c r" "rg"
   "C-c o" "org"
+  "C-x RET" "file encoding"
+  "C-c s" "search"
+  "C-c f" "file"
+  "C-x r" "register or rect"
   )
