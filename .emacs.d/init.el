@@ -30,6 +30,7 @@
  '(package-selected-packages
    (quote
     (dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+ '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4)))))
 
 (custom-set-faces
@@ -150,6 +151,7 @@
   :ensure t
   :after (helm projectile)
   :config
+  (setq projectile-keymap-prefix (kbd "C-p p"))
   (setq projectile-completion-system 'helm)
   (helm-projectile-on)
   )
@@ -437,6 +439,12 @@ skinparam monochrome true\n
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
+(define-abbrev-table 'global-abbrev-table
+  '(
+    ("kinog" "kino811@gmail.com")
+    ("kinon" "kino811@naver.com")
+    ("kino8" "kino811")
+    ))
 
 (which-key-add-key-based-replacements
   "C-c t" "text"
