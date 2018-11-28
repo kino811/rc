@@ -48,6 +48,8 @@
 ;; hide toolbar and menu
 (tool-bar-mode -1)
 
+;; (electric-pair-mode t)
+
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
 
@@ -316,10 +318,11 @@ skinparam monochrome true\n
   )
 
 ;; insert buffer-name at minibuffer
-(define-key minibuffer-local-map (kbd "C-c t i b n")
-  (lambda ()
-    (interactive)
-    (insert (buffer-name (window-buffer (minibuffer-selected-window))))))
+(defun insert-buffer-name ()
+  (interactive)
+  (insert (buffer-name (window-buffer (minibuffer-selected-window)))))
+(define-key minibuffer-local-map (kbd "C-c i b n")
+  'insert-buffer-name)
 
 ;; company
 (use-package company
@@ -447,9 +450,8 @@ skinparam monochrome true\n
     ))
 
 (which-key-add-key-based-replacements
-  "C-c t" "text"
-  "C-c t i" "insert"
-  "C-c t i b" "buffer"
+  "C-c i" "insert"
+  "C-c i b" "buffer"
   "C-c j" "jump"
   "C-c w" "window"
   "C-c r" "rg"
@@ -459,3 +461,4 @@ skinparam monochrome true\n
   "C-c f" "file"
   "C-x r" "register or rect"
   )
+(put 'set-goal-column 'disabled nil)
