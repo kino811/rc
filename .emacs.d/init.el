@@ -23,13 +23,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
- '(current-language-environment "Korean")
+ '(current-language-environment "English")
  '(helm-gtags-prefix-key "C-c g")
  '(helm-gtags-suggested-key-mapping t)
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+    (evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4)))))
 
