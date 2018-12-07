@@ -29,7 +29,7 @@
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+    (company-anaconda company-box evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4)))))
 
@@ -326,22 +326,20 @@ skinparam monochrome true\n
 
 ;; company
 (use-package company
-  :ensure t
-  :init
-  (add-hook 'after-init-hook 'global-company-mode)
-  
   :bind
-  (:map company-active-map ("M-n" . nil))
-  (:map company-active-map ("M-p" . nil))
-  (:map company-active-map ("C-n" . company-select-next))
-  (:map company-active-map ("C-p" . company-select-previous))
-  (:map global-map ("C-c /" . 'company-complete-common-or-cycle))
-  
+  (:map global-map ("C-c c c" . 'company-complete))
   :config
-  (setq company-idle-delay 0)
-  (setq company-show-numbers "on")
-  (setq company-global-modes '(not eshell-mode gud-mode))
+  (add-hook 'after-init-hook 'global-company-mode)
   )
+
+(use-package company-box
+  :after company
+  :diminish
+  :hook (company-mode . company-box-mode))
+
+(use-package company-anaconda
+  :after (anaconda-mode company)
+  :config (add-to-list 'company-backend 'company-anaconda))
 
 (use-package company-irony
   :ensure t
@@ -460,5 +458,6 @@ skinparam monochrome true\n
   "C-c s" "search"
   "C-c f" "file"
   "C-x r" "register or rect"
+  "C-c c" "completion"
   )
 (put 'set-goal-column 'disabled nil)
