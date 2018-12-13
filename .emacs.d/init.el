@@ -106,21 +106,20 @@
 
 ;; 
 ;; bat-mode
-(defun my:call-process-shell-async-current-buffername ()
+(defun kino-call-process-shell-async-current-buffername ()
   "For bat-mode shell-command by current-buffername"
   (interactive)
   (call-process-shell-command 
    (format "start cmd /c %s" (buffer-name)))
   )
 
-(defun my:set-bat-mode-hook ()
+(defun kino-set-bat-mode-hook ()
   "Set bat-mode hook"
   (interactive)
-  (local-set-key (kbd "<f5>") 'my:call-process-shell-async-current-buffername)
-  )
+  (local-set-key (kbd "<f5>") 'kino-call-process-shell-async-current-buffername))
 
 (require 'bat-mode)
-(add-hook 'bat-mode-hook 'my:set-bat-mode-hook)
+(add-hook 'bat-mode-hook 'kino-set-bat-mode-hook)
 ;;
 
 (require 'helm-config)
@@ -268,7 +267,7 @@ skinparam monochrome true\n
 (use-package rg
   :ensure t
   :config
-  (rg-enable-default-bindings (kbd "C-c r"))
+  (rg-enable-default-bindings (kbd "C-c R"))
   )
 
 ;; python simple server
@@ -430,13 +429,18 @@ skinparam monochrome true\n
   '(add-to-list 'company-backends 'company-omnisharp))
 (add-hook 'csharp-mode-hook #'company-mode)
 
-;; 
-;; custom key-map
-(global-set-key (kbd "C-<kanji>") 'set-mark-command)
-(global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
-(global-set-key (kbd "C-c o a") 'org-agenda)
-(global-set-key (kbd "C-c o c") 'org-capture)
-;;
+(defun open-google-translate ()
+  "Translate current word using Google Translator"
+  (interactive)
+  (let (sel-word-target-url)
+    (setq sel-word
+	  (if (and transient-mark-mode mark-active)
+	      (buffer-substring-no-properties (region-beginning) (region-end))
+	    (thing-at-point 'symbol)))
+    (setq sel-word (replace-regexp-in-string " " "%20" sel-word))
+    (setq target-url (concat "http://translate.google.com/#auto|ko|" sel-word))
+    (browse-url target-url)))
+
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
@@ -462,15 +466,11 @@ skinparam monochrome true\n
   )
 (put 'set-goal-column 'disabled nil)
 
-(defun open-google-translate ()
-  "Translate current word using Google Translator"
-  (interactive)
-  (let (sel-word-target-url)
-    (setq sel-word
-	  (if (and transient-mark-mode mark-active)
-	      (buffer-substring-no-properties (region-beginning) (region-end))
-	    (thing-at-point 'symbol)))
-    (setq sel-word (replace-regexp-in-string " " "%20" sel-word))
-    (setq target-url (concat "http://translate.google.com/#auto|ko|" sel-word))
-    (browse-url target-url)))
-(global-set-key (kbd "C-S-t") 'open-google-translate)
+;; 
+;; custom key-map
+(global-set-key (kbd "C-<kanji>") 'set-mark-command)
+(global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
+(global-set-key (kbd "C-c o a") 'org-agenda)
+(global-set-key (kbd "C-c o c") 'org-capture)
+(global-set-key (kbd "C-c t") 'open-google-translate)
+;;
