@@ -24,12 +24,14 @@
  ;; If there is more than one, they won't work right.
  '(buffer-file-coding-system (quote utf-8) t)
  '(current-language-environment "English")
+ '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
+ '(electric-pair-mode t)
  '(helm-gtags-prefix-key "C-c g")
  '(helm-gtags-suggested-key-mapping t)
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-    (company-anaconda company-box evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode autopair edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+    (w3 company-anaconda company-box evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4)))))
 
@@ -47,8 +49,6 @@
 
 ;; hide toolbar and menu
 (tool-bar-mode -1)
-
-;; (electric-pair-mode t)
 
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
@@ -461,3 +461,16 @@ skinparam monochrome true\n
   "C-c c" "completion"
   )
 (put 'set-goal-column 'disabled nil)
+
+(defun open-google-translate ()
+  "Translate current word using Google Translator"
+  (interactive)
+  (let (sel-word-target-url)
+    (setq sel-word
+	  (if (and transient-mark-mode mark-active)
+	      (buffer-substring-no-properties (region-beginning) (region-end))
+	    (thing-at-point 'symbol)))
+    (setq sel-word (replace-regexp-in-string " " "%20" sel-word))
+    (setq target-url (concat "http://translate.google.com/#auto|ko|" sel-word))
+    (browse-url target-url)))
+(global-set-key (kbd "C-S-t") 'open-google-translate)
