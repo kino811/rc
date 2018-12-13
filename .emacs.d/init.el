@@ -451,19 +451,6 @@ skinparam monochrome true\n
     ("kino8" "kino811")
     ))
 
-(which-key-add-key-based-replacements
-  "C-c i" "insert"
-  "C-c i b" "buffer"
-  "C-c j" "jump"
-  "C-c w" "window"
-  "C-c r" "rg"
-  "C-c o" "org"
-  "C-x RET" "file encoding"
-  "C-c s" "search"
-  "C-c f" "file"
-  "C-x r" "register or rect"
-  "C-c c" "completion"
-  )
 (put 'set-goal-column 'disabled nil)
 
 ;; 
@@ -472,5 +459,5 @@ skinparam monochrome true\n
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
 (global-set-key (kbd "C-c o a") 'org-agenda)
 (global-set-key (kbd "C-c o c") 'org-capture)
-(global-set-key (kbd "C-c t") 'open-google-translate)
+(global-set-key (2kbd "C-c t") 'open-google-translate)
 ;;
