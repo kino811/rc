@@ -73,21 +73,18 @@
 
 ;; windmove
 (use-package windmove
-  :ensure t
-  :bind
-  ("C-c w h" . windmove-left)
-  ("C-c w j" . windmove-down) 
-  ("C-c w k" . windmove-up)   
-  ("C-c w l" . windmove-right)
+  :bind (("C-c w h" . windmove-left)
+	 ("C-c w j" . windmove-down) 
+	 ("C-c w k" . windmove-up)   
+	 ("C-c w l" . windmove-right))
   :config
-  (windmove-default-keybindings 'meta)
+  (windmove-default-keybindings nil)
   )
 
 ;; keep a list of recently opened files
 (use-package recentf
   :ensure t
-  :bind
-  (("C-c f r" . 'recentf-open-files))
+  :bind (("C-c f r" . 'recentf-open-files))
   :config
   (recentf-mode 1)
   )
@@ -127,26 +124,22 @@
 (use-package helm
   :ensure t
   :bind-keymap
-  ("C-c h" . helm-command-map)
-  :bind
-  (("C-x C-f" . helm-find-files)
-   ("C-x r b" . helm-filtered-bookmarks)
-   ("M-y" . helm-show-kill-ring)
-   ("M-x" . helm-M-x)
-   ("C-x b" . 'helm-mini)
-   )
-  (:map helm-command-map
-	("o" . helm-occur)
-	("SPC" . helm-all-mark-rings)
-	)
+  ("C-c H" . helm-command-map)
+  :bind (("C-x C-f" . helm-find-files)
+	 ("C-x r b" . helm-filtered-bookmarks)
+	 ("M-y" . helm-show-kill-ring)
+	 ("M-x" . helm-M-x)
+	 ("C-x b" . 'helm-mini)
+	 :map helm-command-map
+	 ("o" . helm-occur)
+	 ("SPC" . helm-all-mark-rings))
   :config
-  (global-unset-key (kbd "C-x c"))
+  ;; (global-unset-key (kbd "C-x c"))
   (setq helm-split-window-inside-p t)
   (setq helm-autoresize-max-height 50)
   (setq helm-autoresize-min-height 30)
   (helm-autoresize-mode 1)
-  (helm-mode 1)
-  )
+  (helm-mode 1))
 
 (use-package helm-projectile
   :ensure t
@@ -154,14 +147,12 @@
   :config
   (setq projectile-keymap-prefix (kbd "C-p p"))
   (setq projectile-completion-system 'helm)
-  (helm-projectile-on)
-  )
+  (helm-projectile-on))
 
 (use-package edit-server
-  :ensure t
+  :if window-system
   :config
-  (edit-server-start)
-  )
+  (edit-server-start))
 
 (use-package org
   :ensure t
@@ -216,7 +207,7 @@ skinparam monochrome true\n
 (use-package iedit
   :ensure t
   :bind
-  (:map global-map ("C-c ;" . 'iedit-mode))
+  (:map global-map ("C-c e i" . 'iedit-mode))
   )
 
 (use-package avy
@@ -271,7 +262,7 @@ skinparam monochrome true\n
   )
 
 ;; python simple server
-(defun my:open-server-working-dir-http ()
+(defun kino-open-server-working-dir-http ()
   (interactive)
   (let (shell-cmd)
     (setq shell-cmd "python3 -m http.server")
@@ -285,7 +276,7 @@ skinparam monochrome true\n
     )
   )
 
-(defun my:open-server-working-dir-ftp ()
+(defun kino-open-server-working-dir-ftp ()
   (interactive)
   (let (shell-cmd)
     (setq shell-cmd "python3 -m pyftpdlib")
@@ -410,14 +401,14 @@ skinparam monochrome true\n
   (add-hook 'c-mode-common-hook 'helm-gtags-mode)
   )
 
-(defun my:set-c-common-style ()
+(defun kino-set-c-common-style ()
   (c-set-style "google")
   (setq tab-width 4)
   (setq c-basic-offset 4)
   )
-(add-hook 'c-mode-common-hook 'my:set-c-common-style)
+(add-hook 'c-mode-common-hook 'kino-set-c-common-style)
 
-(defun my:kill-other-buffers ()
+(defun kino-kill-other-buffers ()
   "kill all other buffers"
   (interactive)
   (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
@@ -453,11 +444,10 @@ skinparam monochrome true\n
 
 (put 'set-goal-column 'disabled nil)
 
-;; 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
-(global-set-key (kbd "C-c o a") 'org-agenda)
-(global-set-key (kbd "C-c o c") 'org-capture)
+(global-set-key (kbd "C-c O a") 'org-agenda)
+(global-set-key (kbd "C-c O c") 'org-capture)
 (global-set-key (2kbd "C-c t") 'open-google-translate)
-;;
+
