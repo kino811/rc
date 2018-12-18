@@ -449,5 +449,5 @@ skinparam monochrome true\n
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
 (global-set-key (kbd "C-c O a") 'org-agenda)
 (global-set-key (kbd "C-c O c") 'org-capture)
-(global-set-key (2kbd "C-c t") 'open-google-translate)
+(global-set-key (kbd "C-c t") 'open-google-translate)
 
