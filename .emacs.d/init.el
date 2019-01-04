@@ -445,10 +445,16 @@ skinparam monochrome true\n
 
 (put 'set-goal-column 'disabled nil)
 
+(defun kino-insert-pair-char (arg char)
+  "insert pair character"
+  (interactive "P\ncCharacter: ")
+  (insert-pair arg char char))
+
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
 (global-set-key (kbd "C-c O a") 'org-agenda)
 (global-set-key (kbd "C-c O c") 'org-capture)
 (global-set-key (kbd "C-c t") 'open-google-translate)
+(global-set-key (kbd "C-c i p c") 'kino-insert-pair-char)
 
