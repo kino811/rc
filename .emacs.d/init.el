@@ -130,7 +130,6 @@
 	 ("C-x r b" . helm-filtered-bookmarks)
 	 ("M-y" . helm-show-kill-ring)
 	 ("M-x" . helm-M-x)
-	 ("C-x b" . 'helm-mini)
 	 :map helm-command-map
 	 ("o" . helm-occur)
 	 ("SPC" . helm-all-mark-rings))
@@ -207,8 +206,6 @@ skinparam monochrome true\n
 
 (use-package iedit
   :ensure t
-  :bind
-  (:map global-map ("C-c e i" . 'iedit-mode))
   )
 
 (use-package avy
@@ -421,7 +418,7 @@ skinparam monochrome true\n
   '(add-to-list 'company-backends 'company-omnisharp))
 (add-hook 'csharp-mode-hook #'company-mode)
 
-(defun open-google-translate ()
+(defun kino-open-google-translate ()
   "Translate current word using Google Translator"
   (interactive)
   (let (sel-word-target-url)
@@ -453,8 +450,9 @@ skinparam monochrome true\n
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
+(global-set-key (kbd "M-<junja>") 'count-words-region)
 (global-set-key (kbd "C-c O a") 'org-agenda)
 (global-set-key (kbd "C-c O c") 'org-capture)
-(global-set-key (kbd "C-c t") 'open-google-translate)
+(global-set-key (kbd "C-c t") 'kino-open-google-translate)
 (global-set-key (kbd "C-c i p c") 'kino-insert-pair-char)
 
