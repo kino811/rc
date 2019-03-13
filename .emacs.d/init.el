@@ -31,7 +31,7 @@
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-	(w3 company-anaconda company-box evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(pyenv-mode w3 company-anaconda company-box evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -249,9 +249,9 @@ skinparam monochrome true\n
   :config
   (defun my/python-mode-hook ()
     (with-eval-after-load 'company (add-to-list 'company-backends 'company-jedi))
-    )
+	(jedi:setup))
   (add-hook 'python-mode-hook 'my/python-mode-hook)
-  )
+  (setq jedi:complete-on-dot t))
 
 (use-package rg
   :ensure t
@@ -319,11 +319,6 @@ skinparam monochrome true\n
   :config
   (add-hook 'after-init-hook 'global-company-mode)
   )
-
-(use-package company-box
-  :after company
-  :diminish
-  :hook (company-mode . company-box-mode))
 
 (use-package company-anaconda
   :after (anaconda-mode company)
@@ -446,6 +441,9 @@ skinparam monochrome true\n
   "insert pair character"
   (interactive "P\ncCharacter: ")
   (insert-pair arg char char))
+
+;; python
+(setq python-shell-interpreter "python3")
 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
