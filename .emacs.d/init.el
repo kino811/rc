@@ -22,8 +22,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(buffer-file-coding-system (quote utf-8) t)
- '(current-language-environment "English")
  '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
  '(electric-pair-mode t)
  '(helm-gtags-prefix-key "C-c g")
@@ -31,7 +29,7 @@
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-	(pyenv-mode w3 company-anaconda company-box evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -42,6 +40,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(set-language-environment "Korean")
+(prefer-coding-system 'utf-8)
+(setq default-process-coding-system '(utf-8 . euc-kr-unix))
 
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
@@ -232,8 +234,6 @@ skinparam monochrome true\n
 ;; shader-mode
 (add-to-list 'auto-mode-alist
 	     '("\\.shader\\'" . shader-mode))
-
-(global-linum-mode)
 
 (use-package magit
   :ensure t
