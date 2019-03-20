@@ -136,7 +136,7 @@
 	 ("o" . helm-occur)
 	 ("SPC" . helm-all-mark-rings))
   :config
-  ;; (global-unset-key (kbd "C-x c"))
+  (global-unset-key (kbd "C-x c"))
   (setq helm-split-window-inside-p t)
   (setq helm-autoresize-max-height 50)
   (setq helm-autoresize-min-height 30)
@@ -413,17 +413,25 @@ skinparam monochrome true\n
   '(add-to-list 'company-backends 'company-omnisharp))
 (add-hook 'csharp-mode-hook #'company-mode)
 
-(defun kino-open-google-translate ()
+(defun kino-translate-at()
   "Translate current word using Google Translator"
   (interactive)
   (let (sel-word-target-url)
-    (setq sel-word
-	  (if (and transient-mark-mode mark-active)
-	      (buffer-substring-no-properties (region-beginning) (region-end))
-	    (thing-at-point 'symbol)))
-    (setq sel-word (replace-regexp-in-string " " "%20" sel-word))
-    (setq target-url (concat "http://translate.google.com/#auto|ko|" sel-word))
-    (browse-url target-url)))
+    (setq word
+		  (if (and transient-mark-mode mark-active)
+			  (buffer-substring-no-properties (region-beginning) (region-end))
+			(thing-at-point 'symbol)))
+    (setq word (replace-regexp-in-string " " "%20" word))
+	(kino-translate-string word)))
+
+(defun kino-translate-string(string)
+  "translate input string"
+  (interactive "sstring:")
+  (kino-translate-string-google string))
+
+(defun kino-translate-string-google(string)
+  (setq target-url (concat "http://translate.google.com/#auto|ko|" string))
+  (browse-url target-url))
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -451,6 +459,7 @@ skinparam monochrome true\n
 (global-set-key (kbd "M-<junja>") 'count-words-region)
 (global-set-key (kbd "C-c O a") 'org-agenda)
 (global-set-key (kbd "C-c O c") 'org-capture)
-(global-set-key (kbd "C-c t") 'kino-open-google-translate)
+(global-set-key (kbd "C-c t a") 'kino-translate-at)
+(global-set-key (kbd "C-c t s") 'kino-translate-string)
 (global-set-key (kbd "C-c i p c") 'kino-insert-pair-char)
 
