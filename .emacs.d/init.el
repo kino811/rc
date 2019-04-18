@@ -7,8 +7,8 @@
 (when (>= emacs-major-version 24)
   (require 'package)
   (add-to-list 'package-archives
-	       '("melpa" . "https://melpa.org/packages/")
-	       t)
+			   '("melpa" . "https://melpa.org/packages/")
+			   t)
   )
 
 ;; Added by Package.el.  This must come before configurations of
@@ -29,7 +29,7 @@
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-	(pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -58,7 +58,7 @@
 
 ;; set theme
 (add-to-list 'custom-theme-load-path 
-	     "~/.emacs.d/elpa/solarized-theme-20170831.1159")
+			 "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
 
 ;; highlight brackets
@@ -77,9 +77,9 @@
 ;; windmove
 (use-package windmove
   :bind (("C-c w h" . windmove-left)
-	 ("C-c w j" . windmove-down) 
-	 ("C-c w k" . windmove-up)   
-	 ("C-c w l" . windmove-right))
+		 ("C-c w j" . windmove-down) 
+		 ("C-c w k" . windmove-up)   
+		 ("C-c w l" . windmove-right))
   :config
   (windmove-default-keybindings nil)
   )
@@ -129,12 +129,12 @@
   :bind-keymap
   ("C-c H" . helm-command-map)
   :bind (("C-x C-f" . helm-find-files)
-	 ("C-x r b" . helm-filtered-bookmarks)
-	 ("M-y" . helm-show-kill-ring)
-	 ("M-x" . helm-M-x)
-	 :map helm-command-map
-	 ("o" . helm-occur)
-	 ("SPC" . helm-all-mark-rings))
+		 ("C-x r b" . helm-filtered-bookmarks)
+		 ("M-y" . helm-show-kill-ring)
+		 ("M-x" . helm-M-x)
+		 :map helm-command-map
+		 ("o" . helm-occur)
+		 ("SPC" . helm-all-mark-rings))
   :config
   (global-unset-key (kbd "C-x c"))
   (setq helm-split-window-inside-p t)
@@ -161,10 +161,10 @@
   :after ob
   :bind
   (:map org-mode-map
-	("C-c C-c" . (lambda ()
-			(interactive) 
-			(org-ctrl-c-ctrl-c)
-			(org-display-inline-images))))
+		("C-c C-c" . (lambda ()
+					   (interactive) 
+					   (org-ctrl-c-ctrl-c)
+					   (org-display-inline-images))))
   :config
   ;; make org mode allow eval of some langs
   (org-babel-do-load-languages
@@ -176,18 +176,18 @@
 
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords
-	'((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
+		'((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
 
   (setq org-plantuml-jar-path
-	(expand-file-name "~/.emacs.d/plantuml.jar"))
+		(expand-file-name "~/.emacs.d/plantuml.jar"))
   (add-hook 'org-babel-after-execute-hook
-	    (lambda ()
-	      (when org-inline-image-overlays
-		(org-redisplay-inline-images))
-	      )
-	    )
+			(lambda ()
+			  (when org-inline-image-overlays
+				(org-redisplay-inline-images))
+			  )
+			)
   (add-to-list 'org-structure-template-alist
-	       '("u" "#+BEGIN_SRC plantuml :file ?.png\n
+			   '("u" "#+BEGIN_SRC plantuml :file ?.png\n
 skinparam monochrome true\n
 #+END_SRC"))
 
@@ -233,7 +233,7 @@ skinparam monochrome true\n
 
 ;; shader-mode
 (add-to-list 'auto-mode-alist
-	     '("\\.shader\\'" . shader-mode))
+			 '("\\.shader\\'" . shader-mode))
 
 (use-package magit
   :ensure t
@@ -265,10 +265,10 @@ skinparam monochrome true\n
   (let (shell-cmd)
     (setq shell-cmd "python3 -m http.server")
     (if (eq system-type 'windows-nt)
-	(setq shell-cmd (concat "start " shell-cmd))
+		(setq shell-cmd (concat "start " shell-cmd))
       (if (eq system-type 'darwin)
-	  (setq shell-cmd (concat "open " shell-cmd))
-	)
+		  (setq shell-cmd (concat "open " shell-cmd))
+		)
       )
     (async-shell-command shell-cmd)
     )
@@ -279,10 +279,10 @@ skinparam monochrome true\n
   (let (shell-cmd)
     (setq shell-cmd "python3 -m pyftpdlib")
     (if (eq system-type 'windows-nt)
-	(setq shell-cmd (concat "start " shell-cmd))
+		(setq shell-cmd (concat "start " shell-cmd))
       (if (eq system-type 'darwin)
-	  (setq shell-cmd (concat "open " shell-cmd))
-	)
+		  (setq shell-cmd (concat "open " shell-cmd))
+		)
       )
     (async-shell-command shell-cmd)
     )
@@ -346,9 +346,9 @@ skinparam monochrome true\n
   (if (eq system-type 'windows-nt)
       (async-shell-command "explorer .")
     (if (eq system-type 'darwin)
-	(async-shell-command "open .")
-	)
-      )
+		(async-shell-command "open .")
+	  )
+    )
   )
 
 (use-package irony
@@ -359,7 +359,7 @@ skinparam monochrome true\n
   (add-hook 'objc-mode-hook 'irony-mode)
   
   (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
-						  irony-cdb-clang-complete))
+												  irony-cdb-clang-complete))
 
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   
@@ -452,6 +452,14 @@ skinparam monochrome true\n
 
 ;; python
 (setq python-shell-interpreter "python3")
+
+;; jupyter
+(defun kino-jupyter-notebook ()
+  (interactive)
+  (if (eq system-type 'windows-nt)
+	  (async-shell-command "start cmd /k jupyter notebook")
+    (if (eq system-type 'darwin)
+		(async-shell-command "open jupyter notebook"))))
 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
