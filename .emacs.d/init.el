@@ -457,7 +457,8 @@ skinparam monochrome true\n
 (defun kino-jupyter-notebook ()
   (interactive)
   (if (eq system-type 'windows-nt)
-	  (async-shell-command "start cmd /k jupyter notebook")
+	  (async-shell-command
+	   (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
     (if (eq system-type 'darwin)
 		(async-shell-command "open jupyter notebook"))))
 
