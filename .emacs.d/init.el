@@ -1,5 +1,8 @@
 ;;; This is Kino's .emacs
 
+;; (setq custom-file "~/.emacs.d/custom.el")
+;; (load custom-file)
+
 ;;; add load-path
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
@@ -8,6 +11,9 @@
   (require 'package)
   (add-to-list 'package-archives
 			   '("melpa" . "https://melpa.org/packages/")
+			   t)
+  (add-to-list 'package-archives
+			   '("marmalade" . "http://marmalade-repo.org/")
 			   t)
   )
 
@@ -29,7 +35,7 @@
  '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-	(ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -51,7 +57,7 @@
   )
 
 ;; hide toolbar and menu
-(tool-bar-mode -1)
+(tool-bar-mode nil)
 
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
@@ -203,7 +209,8 @@ skinparam monochrome true\n
 (use-package swiper
   :ensure t
   :bind
-  (:map global-map ("C-c s s" . 'swiper))
+  (:map global-map ("C-c S s" . 'swiper))
+  (:map global-map ("C-c S a" . 'swiper-all))
   )
 
 (use-package iedit
@@ -257,6 +264,17 @@ skinparam monochrome true\n
   :ensure t
   :config
   (rg-enable-default-bindings (kbd "C-c R"))
+  )
+
+(use-package elpy
+  :ensure t
+  :config
+  (elpy-enable)
+  (setq elpy-rpc-python-command "python")
+  )
+
+(use-package pyenv-mode
+  :if (executable-find "pyenv")
   )
 
 ;; python simple server
@@ -451,7 +469,7 @@ skinparam monochrome true\n
   (insert-pair arg char char))
 
 ;; python
-(setq python-shell-interpreter "python3")
+(setq python-shell-interpreter "python")
 
 ;; jupyter
 (defun kino-jupyter-notebook ()
@@ -462,12 +480,20 @@ skinparam monochrome true\n
     (if (eq system-type 'darwin)
 		(async-shell-command "open jupyter notebook"))))
 
+;; python
+(add-hook 'python-mode-hook
+		  #'(lambda () (display-line-numbers-mode t)))
+
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
 (global-set-key (kbd "M-<junja>") 'count-words-region)
+
+(global-set-key (kbd "C-c O l") 'org-store-link)
 (global-set-key (kbd "C-c O a") 'org-agenda)
 (global-set-key (kbd "C-c O c") 'org-capture)
+(global-set-key (kbd "C-c O s") 'org-switchb)
+
 (global-set-key (kbd "C-c t a") 'kino-translate-at)
 (global-set-key (kbd "C-c t s") 'kino-translate-string)
 (global-set-key (kbd "C-c i p c") 'kino-insert-pair-char)
