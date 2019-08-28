@@ -13,9 +13,8 @@
 			   '("melpa" . "https://melpa.org/packages/")
 			   t)
   (add-to-list 'package-archives
-			   '("marmalade" . "http://marmalade-repo.org/")
-			   t)
-  )
+			   '("marmalade" . "http://marmalade-repo.org/packages")
+			   t))
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
@@ -32,10 +31,12 @@
  '(electric-pair-mode t)
  '(helm-gtags-prefix-key "C-c g")
  '(helm-gtags-suggested-key-mapping t)
- '(org-agenda-files (quote ("~/work/kaiser/todo.org")))
+ '(org-agenda-files
+   (quote
+	("d:/work/Unity3d/todo.org" "~/work/kaiser/todo.org")))
  '(package-selected-packages
    (quote
-	(multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp jedi helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key multi-term wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -53,8 +54,16 @@
 
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
-  (package-install 'use-package)
+  (package-install 'use-package))
+
+(use-package use-package-chords
+  :ensure t
+  :config
+  (key-chord-mode t)
+  (setq key-chord-two-keys-delay 0.1)	;default 0.1
   )
+
+;; sample use-package
 
 ;; hide toolbar and menu
 (tool-bar-mode nil)
@@ -73,30 +82,28 @@
 ;; save/restore opend files and windows config
 (desktop-save-mode t)
 
-(which-key-mode)
+(which-key-mode t)
 
 ;; exec path
-(if (eq system-type 'darwin)
-    (exec-path-from-shell-initialize)
-  )
+(when (eq system-type 'darwin)
+  (exec-path-from-shell-initialize))
 
 ;; windmove
 (use-package windmove
+  :ensure t
   :bind (("C-c w h" . windmove-left)
 		 ("C-c w j" . windmove-down) 
 		 ("C-c w k" . windmove-up)   
 		 ("C-c w l" . windmove-right))
   :config
-  (windmove-default-keybindings nil)
-  )
+  (windmove-default-keybindings 'meta))
 
 ;; keep a list of recently opened files
 (use-package recentf
   :ensure t
   :bind (("C-c f r" . 'recentf-open-files))
   :config
-  (recentf-mode 1)
-  )
+  (recentf-mode 1))
 
 ;; 
 ;; alias
@@ -107,26 +114,18 @@
 (use-package powerline
   :ensure t
   :config
-  (display-time-mode t)  
-  )
+  (display-time-mode t))
 
-;; 
 ;; bat-mode
-(defun kino-call-process-shell-async-current-buffername ()
-  "For bat-mode shell-command by current-buffername"
-  (interactive)
-  (call-process-shell-command 
-   (format "start cmd /c %s" (buffer-name)))
-  )
-
-(defun kino-set-bat-mode-hook ()
-  "Set bat-mode hook"
-  (interactive)
-  (local-set-key (kbd "<f5>") 'kino-call-process-shell-async-current-buffername))
-
-(require 'bat-mode)
-(add-hook 'bat-mode-hook 'kino-set-bat-mode-hook)
-;;
+(when (eq system-type 'windows-nt)
+  (defun kino-call-process-shell-async-current-buffername ()
+	"For bat-mode shell-command by current-buffername"
+	(interactive)
+	(call-process-shell-command (format "start cmd /c %s" (buffer-name))))
+  (require 'bat-mode)
+  (add-hook 'bat-mode-hook
+			(lambda ()
+			  (local-set-key (kbd "<f5>") 'kino-call-process-shell-async-current-buffername))))
 
 (require 'helm-config)
 ;; helm
@@ -183,39 +182,34 @@
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords
 		'((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
-
   (setq org-plantuml-jar-path
-		(expand-file-name "~/.emacs.d/plantuml.jar"))
+		(if (file-directory-p "~/rc/.emacs.d")
+			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
+		  (expand-file-name "~/.emacs.d/plantuml.jar")))
   (add-hook 'org-babel-after-execute-hook
 			(lambda ()
 			  (when org-inline-image-overlays
-				(org-redisplay-inline-images))
-			  )
-			)
+				(org-redisplay-inline-images))))
   (add-to-list 'org-structure-template-alist
 			   '("u" "#+BEGIN_SRC plantuml :file ?.png\n
 skinparam monochrome true\n
 #+END_SRC"))
 
-  (setq org-startup-with-inline-images t)
-  )
+  (setq org-startup-with-inline-images t))
 
 (use-package yasnippet
   :ensure t
   :config
-  (yas-global-mode 1)
-  )
+  (yas-global-mode 1))
 
 (use-package swiper
   :ensure t
   :bind
   (:map global-map ("C-c S s" . 'swiper))
-  (:map global-map ("C-c S a" . 'swiper-all))
-  )
+  (:map global-map ("C-c S a" . 'swiper-all)))
 
 (use-package iedit
-  :ensure t
-  )
+  :ensure t)
 
 (use-package avy
   :ensure t
@@ -223,17 +217,9 @@ skinparam monochrome true\n
   (:map global-map ("C-c j c" . 'avy-goto-char))
   (:map global-map ("C-c j l" . 'avy-goto-line))
   :config
-  (avy-setup-default)
-  )
+  (avy-setup-default))
 
 (use-package wgrep)
-
-(require 'multi-term)
-;; todo :: not work now.
-;; (if (eq system-type 'windows-nt)
-;;     (setq multi-term-program "c:/cygwin64/bin/bash.exe")
-;;   )
-;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
 ;; undo-tree-mode
 (global-undo-tree-mode)
@@ -247,35 +233,21 @@ skinparam monochrome true\n
   :init
   (setenv "GIT_ASKPASS" "git-gui--askpass")
   :bind
-  ("C-x g" . magit-status)
-  )
-
-(use-package jedi
-  :ensure t
-  :after company
-  :config
-  (defun my/python-mode-hook ()
-    (with-eval-after-load 'company (add-to-list 'company-backends 'company-jedi))
-	(jedi:setup))
-  (add-hook 'python-mode-hook 'my/python-mode-hook)
-  (setq jedi:complete-on-dot t))
+  ("C-x g" . magit-status))
 
 (use-package rg
   :ensure t
   :config
-  (rg-enable-default-bindings (kbd "C-c R"))
-  )
+  (rg-enable-default-bindings (kbd "C-c R")))
 
 (use-package elpy
   :ensure t
   :config
   (elpy-enable)
-  (setq elpy-rpc-python-command "python")
-  )
+  (setq elpy-rpc-python-command "python"))
 
 (use-package pyenv-mode
-  :if (executable-find "pyenv")
-  )
+  :if (executable-find "pyenv"))
 
 ;; python simple server
 (defun kino-open-server-working-dir-http ()
@@ -285,12 +257,8 @@ skinparam monochrome true\n
     (if (eq system-type 'windows-nt)
 		(setq shell-cmd (concat "start " shell-cmd))
       (if (eq system-type 'darwin)
-		  (setq shell-cmd (concat "open " shell-cmd))
-		)
-      )
-    (async-shell-command shell-cmd)
-    )
-  )
+		  (setq shell-cmd (concat "open " shell-cmd))))
+    (async-shell-command shell-cmd)))
 
 (defun kino-open-server-working-dir-ftp ()
   (interactive)
@@ -299,29 +267,15 @@ skinparam monochrome true\n
     (if (eq system-type 'windows-nt)
 		(setq shell-cmd (concat "start " shell-cmd))
       (if (eq system-type 'darwin)
-		  (setq shell-cmd (concat "open " shell-cmd))
-		)
-      )
-    (async-shell-command shell-cmd)
-    )
-  )
-
+		  (setq shell-cmd (concat "open " shell-cmd))))
+    (async-shell-command shell-cmd)))
 
 ;; cursor line always highlighted
-(if (display-graphic-p)
-    (global-hl-line-mode 1)
-  )
-
+(when (display-graphic-p)
+  (global-hl-line-mode t))
 
 ;; when a file is updated outside emacse, make it update if it's already opend in emacs
-(global-auto-revert-mode 1)
-
-(use-package use-package-chords
-  :ensure t
-  :config
-  (key-chord-mode 1)
-  (setq key-chord-two-keys-delay 0.1)	;default 0.1
-  )
+(global-auto-revert-mode t)
 
 ;; insert buffer-name at minibuffer
 (defun insert-buffer-name ()
@@ -335,8 +289,7 @@ skinparam monochrome true\n
   :bind
   (:map global-map ("C-c c c" . 'company-complete))
   :config
-  (add-hook 'after-init-hook 'global-company-mode)
-  )
+  (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package company-anaconda
   :after (anaconda-mode company)
@@ -346,8 +299,7 @@ skinparam monochrome true\n
   :ensure t
   :after (company irony)
   :config
-  (add-to-list 'company-backends 'company-irony)
-  )
+  (add-to-list 'company-backends 'company-irony))
 
 ;; flycheck
 (use-package flycheck
@@ -355,8 +307,7 @@ skinparam monochrome true\n
   :init
   (global-flycheck-mode)
   :config
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
-  )
+  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
 ;; open gui file manager
 (defun open-file-manager-cwd ()
@@ -364,10 +315,7 @@ skinparam monochrome true\n
   (if (eq system-type 'windows-nt)
       (async-shell-command "explorer .")
     (if (eq system-type 'darwin)
-		(async-shell-command "open .")
-	  )
-    )
-  )
+		(async-shell-command "open ."))))
 
 (use-package irony
   :ensure t
@@ -387,36 +335,32 @@ skinparam monochrome true\n
     (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
   
   :config
-  (add-hook 'irony-mode-hook #'irony-eldoc)
-  )
+  (add-hook 'irony-mode-hook #'irony-eldoc))
 
 (use-package irony-eldoc
   :ensure t
   :after (eldoc irony)
   :config
-  (add-hook 'irony-mode-hook #'irony-eldoc)
-  )
+  (add-hook 'irony-mode-hook #'irony-eldoc))
 
 (use-package google-c-style
   :ensure t
   :config
   (add-hook 'c-mode-common-hook 'google-set-c-style)
-  (add-hook 'c-mode-common-hook 'google-make-newline-indent)
-  )
+  (add-hook 'c-mode-common-hook 'google-make-newline-indent))
 
 (use-package helm-gtags
   :ensure t
   :after (helm)
   :init
   :config
-  (add-hook 'c-mode-common-hook 'helm-gtags-mode)
-  )
+  (add-hook 'c-mode-common-hook 'helm-gtags-mode))
 
 (defun kino-set-c-common-style ()
   (c-set-style "google")
   (setq tab-width 4)
-  (setq c-basic-offset 4)
-  )
+  (setq c-basic-offset 4))
+
 (add-hook 'c-mode-common-hook 'kino-set-c-common-style)
 
 (defun kino-kill-other-buffers ()
@@ -455,17 +399,16 @@ skinparam monochrome true\n
 (put 'downcase-region 'disabled nil)
 
 (define-abbrev-table 'global-abbrev-table
-  '(
-    ("kinog" "kino811@gmail.com")
+  '(("kinog" "kino811@gmail.com")
     ("kinon" "kino811@naver.com")
-    ("kino8" "kino811")
-    ))
+    ("kino8" "kino811")))
 
 (put 'set-goal-column 'disabled nil)
 
 (defun kino-insert-pair-char (arg char)
   "insert pair character"
   (interactive "P\ncCharacter: ")
+  (message "%s" arg)
   (insert-pair arg char char))
 
 ;; python
