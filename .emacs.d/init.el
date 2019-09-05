@@ -28,15 +28,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
- '(electric-pair-mode t)
  '(helm-gtags-prefix-key "C-c g")
  '(helm-gtags-suggested-key-mapping t)
  '(org-agenda-files
    (quote
-	("d:/work/Unity3d/todo.org" "~/work/kaiser/todo.org")))
+	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
  '(package-selected-packages
    (quote
-	(multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(python-mode command-log-mode multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -63,7 +62,10 @@
   (setq key-chord-two-keys-delay 0.1)	;default 0.1
   )
 
-;; sample use-package
+(electric-pair-mode t)
+
+(require 'command-log-mode)
+(command-log-mode t)
 
 ;; hide toolbar and menu
 (tool-bar-mode nil)
@@ -370,8 +372,10 @@ skinparam monochrome true\n
 
 ;; cs mode
 (add-hook 'csharp-mode-hook 'omnisharp-mode)
+(add-hook 'csharp-mode-hook 'display-line-numbers-mode)
+(add-hook 'csharp-mode-hook #'flycheck-mode)
 (eval-after-load
-    'company
+	'company
   '(add-to-list 'company-backends 'company-omnisharp))
 (add-hook 'csharp-mode-hook #'company-mode)
 
