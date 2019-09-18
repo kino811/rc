@@ -35,7 +35,7 @@
 	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
  '(package-selected-packages
    (quote
-	(python-mode command-log-mode multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(projectile-keymap-prefix "p")
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
@@ -47,9 +47,13 @@
  ;; If there is more than one, they won't work right.
  )
 
-(set-language-environment "Korean")
+(when enable-multibyte-characters
+  (set-language-environment "Korean"))
+
 (prefer-coding-system 'utf-8)
 (setq default-process-coding-system '(utf-8 . euc-kr-unix))
+
+(subword-mode t)
 
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
@@ -251,6 +255,25 @@ skinparam monochrome true\n
 (use-package pyenv-mode
   :if (executable-find "pyenv"))
 
+;; python
+(setq python-shell-interpreter "jupyter"
+	  python-shell-interpreter-args "console --simple-prompt"
+	  python-shell-prompt-detect-failure-warning nil)
+(add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+
+;; jupyter
+(defun kino-jupyter-notebook ()
+  (interactive)
+  (if (eq system-type 'windows-nt)
+	  (async-shell-command
+	   (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
+    (if (eq system-type 'darwin)
+		(async-shell-command "open jupyter notebook"))))
+
+;; python
+(add-hook 'python-mode-hook
+		  #'(lambda () (display-line-numbers-mode t)))
+
 ;; python simple server
 (defun kino-open-server-working-dir-http ()
   (interactive)
@@ -371,13 +394,28 @@ skinparam monochrome true\n
   (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
 
 ;; cs mode
-(add-hook 'csharp-mode-hook 'omnisharp-mode)
-(add-hook 'csharp-mode-hook 'display-line-numbers-mode)
-(add-hook 'csharp-mode-hook #'flycheck-mode)
 (eval-after-load
 	'company
-  '(add-to-list 'company-backends 'company-omnisharp))
-(add-hook 'csharp-mode-hook #'company-mode)
+  '(add-to-list 'company-backends #'company-omnisharp))
+(defun kino-csharp-mode-setup ()
+  (omnisharp-mode)
+  (company-mode)
+  (flycheck-mode)
+  (display-line-numbers-mode)
+  )
+(add-hook 'csharp-mode-hook 'kino-csharp-mode-setup t)
+
+(use-package omnisharp
+  :bind
+  (:map omnisharp-mode-map ("C-c r r" . 'omnisharp-run-code-action-refactoring))
+  (:map omnisharp-mode-map ("C-c d d" . 'omnisharp-current-type-documentation))
+  (:map omnisharp-mode-map ("C-c f u" . 'omnisharp-find-usages))
+  (:map omnisharp-mode-map ("C-c m r" . 'omnisharp-rename))
+  :config
+  (define-key omnisharp-mode-map (kbd "C-c g d c") 'omnisharp-go-to-definition)
+  (define-key omnisharp-mode-map (kbd "C-c g d o") 'omnisharp-go-to-definition-other-window)
+  (define-key omnisharp-mode-map (kbd "C-c O N s e") 'omnisharp-solution-errors)
+  )
 
 (defun kino-translate-at()
   "Translate current word using Google Translator"
@@ -415,22 +453,6 @@ skinparam monochrome true\n
   (message "%s" arg)
   (insert-pair arg char char))
 
-;; python
-(setq python-shell-interpreter "python")
-
-;; jupyter
-(defun kino-jupyter-notebook ()
-  (interactive)
-  (if (eq system-type 'windows-nt)
-	  (async-shell-command
-	   (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
-    (if (eq system-type 'darwin)
-		(async-shell-command "open jupyter notebook"))))
-
-;; python
-(add-hook 'python-mode-hook
-		  #'(lambda () (display-line-numbers-mode t)))
-
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
 (global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
@@ -445,3 +467,5 @@ skinparam monochrome true\n
 (global-set-key (kbd "C-c t s") 'kino-translate-string)
 (global-set-key (kbd "C-c i p c") 'kino-insert-pair-char)
 
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
