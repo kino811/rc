@@ -35,8 +35,7 @@
 	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
  '(package-selected-packages
    (quote
-	(narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode elpy w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-jedi company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
- '(projectile-keymap-prefix "p")
+	(elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
 
@@ -210,9 +209,10 @@ skinparam monochrome true\n
 
 (use-package swiper
   :ensure t
-  :bind
-  (:map global-map ("C-c S s" . 'swiper))
-  (:map global-map ("C-c S a" . 'swiper-all)))
+  :config
+  (define-key global-map (kbd "C-c s s c") 'swiper)
+  (define-key global-map (kbd "C-c s s a") 'swiper-all)
+  )
 
 (use-package iedit
   :ensure t)
@@ -250,12 +250,18 @@ skinparam monochrome true\n
   :ensure t
   :config
   (elpy-enable)
-  (setq elpy-rpc-python-command "python"))
+  (setq elpy-rpc-python-command "python3")
+  (define-key elpy-mode-map (kbd "C-M-i") 'company-jedi)
+  )
+
+(use-package ein
+  :ensure t
+  )
 
 (use-package pyenv-mode
   :if (executable-find "pyenv"))
 
-;; python
+;; set python-shell-interpreter
 (setq python-shell-interpreter "jupyter"
 	  python-shell-interpreter-args "console --simple-prompt"
 	  python-shell-prompt-detect-failure-warning nil)
@@ -295,6 +301,7 @@ skinparam monochrome true\n
 		  (setq shell-cmd (concat "open " shell-cmd))))
     (async-shell-command shell-cmd)))
 
+
 ;; cursor line always highlighted
 (when (display-graphic-p)
   (global-hl-line-mode t))
@@ -314,7 +321,14 @@ skinparam monochrome true\n
   :bind
   (:map global-map ("C-c c c" . 'company-complete))
   :config
-  (add-hook 'after-init-hook 'global-company-mode))
+  (add-hook 'after-init-hook 'global-company-mode)
+  )
+
+(use-package company-jedi
+  :after (company)
+  :config
+  (add-to-list 'company-backends 'company-jedi)
+  )
 
 (use-package company-anaconda
   :after (anaconda-mode company)
