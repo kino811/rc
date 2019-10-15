@@ -35,7 +35,7 @@
 	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
  '(package-selected-packages
    (quote
-	(elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(jupyter elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
 
@@ -157,7 +157,7 @@
   :ensure t
   :after (helm projectile)
   :config
-  (setq projectile-keymap-prefix (kbd "C-p p"))
+  (define-key projectile-mode-map (kbd "C-c P") 'projectile-command-map)
   (setq projectile-completion-system 'helm)
   (helm-projectile-on))
 
@@ -262,10 +262,11 @@ skinparam monochrome true\n
   :if (executable-find "pyenv"))
 
 ;; set python-shell-interpreter
-(setq python-shell-interpreter "jupyter"
-	  python-shell-interpreter-args "console --simple-prompt"
-	  python-shell-prompt-detect-failure-warning nil)
-(add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+;; (setq python-shell-interpreter "jupyter"
+;; 	  python-shell-interpreter-args "console --simple-prompt"
+;; 	  python-shell-prompt-detect-failure-warning nil)
+;; (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+(setq python-shell-interpreter "python")
 
 ;; jupyter
 (defun kino-jupyter-notebook ()
