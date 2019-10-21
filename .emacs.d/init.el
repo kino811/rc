@@ -268,6 +268,8 @@ skinparam monochrome true\n
 ;; (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
 (setq python-shell-interpreter "python")
 
+(add-hook 'python-mode-hook 'anaconda-mode)
+
 ;; jupyter
 (defun kino-jupyter-notebook ()
   (interactive)
