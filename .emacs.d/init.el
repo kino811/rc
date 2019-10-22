@@ -35,7 +35,7 @@
 	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
  '(package-selected-packages
    (quote
-	(jupyter elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(blacken py-autopep8 jupyter elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
 
@@ -71,7 +71,7 @@
 (command-log-mode t)
 
 ;; hide toolbar and menu
-(tool-bar-mode nil)
+(tool-bar-mode -1)
 
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
@@ -210,8 +210,8 @@ skinparam monochrome true\n
 (use-package swiper
   :ensure t
   :config
-  (define-key global-map (kbd "C-c s s c") 'swiper)
-  (define-key global-map (kbd "C-c s s a") 'swiper-all)
+  (define-key global-map (kbd "C-c s c") 'swiper)
+  (define-key global-map (kbd "C-c s a") 'swiper-all)
   )
 
 (use-package iedit
@@ -246,12 +246,34 @@ skinparam monochrome true\n
   :config
   (rg-enable-default-bindings (kbd "C-c R")))
 
+;; flycheck
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode)
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+
 (use-package elpy
   :ensure t
   :config
   (elpy-enable)
   (setq elpy-rpc-python-command "python3")
   (define-key elpy-mode-map (kbd "C-M-i") 'company-jedi)
+  (when (require 'flycheck nil t)
+	(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+	(add-hook 'elpy-mode-hook 'flycheck-mode)
+	)
+  )
+
+(use-package py-autopep8
+  :ensure t
+  :config
+  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-sav)
+  )
+
+(use-package blacken
+  :ensure t
   )
 
 (use-package ein
@@ -261,14 +283,16 @@ skinparam monochrome true\n
 (use-package pyenv-mode
   :if (executable-find "pyenv"))
 
-;; set python-shell-interpreter
-;; (setq python-shell-interpreter "jupyter"
-;; 	  python-shell-interpreter-args "console --simple-prompt"
-;; 	  python-shell-prompt-detect-failure-warning nil)
-;; (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+;; (setq python-shell-interpreter "jupyter")
 (setq python-shell-interpreter "python")
-
-(add-hook 'python-mode-hook 'anaconda-mode)
+(if (equal python-shell-interpreter "jupyter")
+	(progn
+	  (setq python-shell-interpreter-args "console --simple-prompt"
+			python-shell-prompt-detect-failure-warning nil
+			)
+	  (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+	  )
+  )
 
 ;; jupyter
 (defun kino-jupyter-notebook ()
@@ -281,7 +305,9 @@ skinparam monochrome true\n
 
 ;; python
 (add-hook 'python-mode-hook
-		  #'(lambda () (display-line-numbers-mode t)))
+		  #'(lambda ()
+			  (display-line-numbers-mode t)
+			  (anaconda-mode t)))
 
 ;; python simple server
 (defun kino-open-server-working-dir-http ()
@@ -342,14 +368,6 @@ skinparam monochrome true\n
   :after (company irony)
   :config
   (add-to-list 'company-backends 'company-irony))
-
-;; flycheck
-(use-package flycheck
-  :ensure t
-  :init
-  (global-flycheck-mode)
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
 ;; open gui file manager
 (defun open-file-manager-cwd ()
