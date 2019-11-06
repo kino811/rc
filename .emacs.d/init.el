@@ -1,27 +1,13 @@
-;;; This is Kino's .emacs
+;;; package --- kino's init
 
-(setq kino-init-file-path "~/.emacs.d/kino-init.el")
-(if (file-exists-p kino-init-file-path)
-	(load kino-init-file-path)
-	)
-
-;;; add load-path
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-;; adding a package source
 (when (>= emacs-major-version 24)
   (require 'package)
-  (add-to-list 'package-archives
-			   '("melpa" . "https://melpa.org/packages/")
-			   t)
-  (add-to-list 'package-archives
-			   '("marmalade" . "http://marmalade-repo.org/packages")
-			   t))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages") t)
+  )
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
 (package-initialize)
 
 (custom-set-variables
@@ -29,18 +15,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(electric-pair-inhibit-predicate (quote electric-pair-conservative-inhibit))
- '(helm-gtags-prefix-key "C-c g")
- '(helm-gtags-suggested-key-mapping t)
- '(org-agenda-files
+ '(custom-safe-themes
    (quote
-	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
+    ("0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
  '(package-selected-packages
    (quote
-	(pytest-pdb-break blacken py-autopep8 jupyter elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
- '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
- '(tab-width 4))
-
+    (yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode py-autopep8 projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -48,29 +28,19 @@
  ;; If there is more than one, they won't work right.
  )
 
+(when (not (package-installed-p 'use-package))
+  (package-refresh-contents)
+  (package-install 'use-package)
+  )
+
 (when enable-multibyte-characters
   (set-language-environment "Korean"))
 
 (prefer-coding-system 'utf-8)
-(setq default-process-coding-system '(utf-8 . euc-kr-unix))
+
+;; (setq default-process-coding-system '(utf-8 . euc-kr-unix))
 
 (subword-mode t)
-
-(when (not (package-installed-p 'use-package))
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(use-package use-package-chords
-  :ensure t
-  :config
-  (key-chord-mode t)
-  (setq key-chord-two-keys-delay 0.1)	;default 0.1
-  )
-
-(electric-pair-mode t)
-
-(require 'command-log-mode)
-(command-log-mode t)
 
 ;; hide toolbar and menu
 (tool-bar-mode -1)
@@ -79,8 +49,8 @@
 (setq inhibit-splash-screen t)
 
 ;; set theme
-(add-to-list 'custom-theme-load-path 
-			 "~/.emacs.d/elpa/solarized-theme-20170831.1159")
+;; (add-to-list 'custom-theme-load-path 
+;; 			 "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
 
 ;; highlight brackets
@@ -89,83 +59,45 @@
 ;; save/restore opend files and windows config
 (desktop-save-mode t)
 
-(which-key-mode t)
+;; alias
+(defalias 'list-buffers 'ibuffer)
+(defalias 'yes-or-no-p 'y-or-n-p)
 
-;; exec path
-(when (eq system-type 'darwin)
-  (exec-path-from-shell-initialize))
+(which-key-mode t)
 
 ;; windmove
 (use-package windmove
   :ensure t
-  :bind (("C-c w h" . windmove-left)
-		 ("C-c w j" . windmove-down) 
-		 ("C-c w k" . windmove-up)   
-		 ("C-c w l" . windmove-right))
+  :bind
+  ("C-c w h" . windmove-left)
+  ("C-c w j" . windmove-down) 
+  ("C-c w k" . windmove-up)   
+  ("C-c w l" . windmove-right)
   :config
-  (windmove-default-keybindings 'meta))
+  (windmove-default-keybindings 'meta)
+  )
 
-;; keep a list of recently opened files
 (use-package recentf
   :ensure t
-  :bind (("C-c f f r" . 'recentf-open-files))
   :config
-  (recentf-mode 1))
-
-;; 
-;; alias
-(defalias 'list-buffers 'ibuffer)
-(defalias 'yes-or-no-p 'y-or-n-p)
-;; 
+  (recentf-mode t)
+  )
 
 (use-package powerline
   :ensure t
   :config
-  (display-time-mode t))
-
-(require 'helm-config)
-;; helm
-(use-package helm
-  :ensure t
-  :bind-keymap
-  ("C-c H" . helm-command-map)
-  :bind (("C-x C-f" . helm-find-files)
-		 ("C-x r b" . helm-filtered-bookmarks)
-		 ("M-y" . helm-show-kill-ring)
-		 ("M-x" . helm-M-x)
-		 :map helm-command-map
-		 ("o" . helm-occur)
-		 ("SPC" . helm-all-mark-rings))
-  :config
-  (global-unset-key (kbd "C-x c"))
-  (setq helm-split-window-inside-p t)
-  (setq helm-autoresize-max-height 50)
-  (setq helm-autoresize-min-height 30)
-  (helm-autoresize-mode 1)
-  (helm-mode 1))
-
-(use-package helm-projectile
-  :ensure t
-  :after (helm projectile)
-  :config
-  (define-key projectile-mode-map (kbd "C-c P") 'projectile-command-map)
-  (setq projectile-completion-system 'helm)
-  (helm-projectile-on))
-
-(use-package edit-server
-  :if window-system
-  :config
-  (edit-server-start))
+  (display-time-mode t)
+  )
 
 (use-package org
   :ensure t
   :after ob
   :bind
   (:map org-mode-map
-		("C-c C-c" . (lambda ()
-					   (interactive) 
-					   (org-ctrl-c-ctrl-c)
-					   (org-display-inline-images))))
+	("C-c C-c" . (lambda ()
+		       (interactive) 
+		       (org-ctrl-c-ctrl-c)
+		       (org-display-inline-images))))
   :config
   ;; make org mode allow eval of some langs
   (org-babel-do-load-languages
@@ -177,74 +109,69 @@
 
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords
-		'((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
+	'((sequence "TODO" "PROGRESS" "WAITING" "DONE")))
   (setq org-plantuml-jar-path
-		(if (file-directory-p "~/rc/.emacs.d")
-			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
-		  (expand-file-name "~/.emacs.d/plantuml.jar")))
+	(if (file-directory-p "~/rc/.emacs.d")
+	    (expand-file-name "~/rc/.emacs.d/plantuml.jar")
+	  (expand-file-name "~/.emacs.d/plantuml.jar")))
   (add-hook 'org-babel-after-execute-hook
-			(lambda ()
-			  (when org-inline-image-overlays
-				(org-redisplay-inline-images))))
+	    (lambda ()
+	      (when org-inline-image-overlays
+		(org-redisplay-inline-images))))
   (add-to-list 'org-structure-template-alist
-			   '("u" "#+BEGIN_SRC plantuml :file ?.png\n
+	       '("u" "#+BEGIN_SRC plantuml :file ?.png\n
 skinparam monochrome true\n
 #+END_SRC"))
 
-  (setq org-startup-with-inline-images t))
-
-(use-package yasnippet
-  :ensure t
-  :config
-  (yas-global-mode 1))
+  (setq org-startup-with-inline-images t)
+  )
 
 (use-package swiper
   :ensure t
   :config
-  (define-key global-map (kbd "C-c s s s") 'swiper)
-  (define-key global-map (kbd "C-c s s a") 'swiper-all)
+  (define-key global-map (kbd "C-c s s") 'swiper)
   )
 
 (use-package iedit
-  :ensure t)
+  :ensure t
+  )
 
 (use-package avy
   :ensure t
   :bind
-  (:map global-map ("C-c j c c" . 'avy-goto-char))
-  (:map global-map ("C-c j l" . 'avy-goto-line))
-  (:map global-map ("C-c j c l" . 'avy-goto-char-in-line))
+  ("C-c j c" . avy-goto-char)
+  ("C-c j l" . avy-goto-line)
   :config
-  (avy-setup-default))
-
-(use-package wgrep)
+  (avy-setup-default)
+  )
 
 ;; undo-tree-mode
 (global-undo-tree-mode)
 
 ;; shader-mode
-(add-to-list 'auto-mode-alist
-			 '("\\.shader\\'" . shader-mode))
+(add-to-list 'auto-mode-alist '("\\.shader\\'" . shader-mode))
 
 (use-package magit
   :ensure t
   :init
   (setenv "GIT_ASKPASS" "git-gui--askpass")
   :bind
-  ("C-x g" . magit-status))
+  ("C-x g" . magit-status)
+  )
 
 (use-package rg
   :ensure t
   :config
-  (rg-enable-default-bindings (kbd "C-c R")))
+  (rg-enable-default-bindings (kbd "C-c g r"))
+  )
 
-;; flycheck
 (use-package flycheck
   :ensure t
   :init
   (global-flycheck-mode)
   :config
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+  )
 
 (use-package elpy
   :ensure t
@@ -253,9 +180,9 @@ skinparam monochrome true\n
   (setq elpy-rpc-python-command "python3")
   (define-key elpy-mode-map (kbd "C-M-i") 'company-jedi)
   (when (require 'flycheck nil t)
-	(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-	(add-hook 'elpy-mode-hook 'flycheck-mode)
-	)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode)
+    )
   )
 
 (use-package py-autopep8
@@ -264,79 +191,69 @@ skinparam monochrome true\n
   (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-sav)
   )
 
-(use-package blacken
-  :ensure t
-  )
-
 (use-package ein
   :ensure t
   )
 
 (use-package pyenv-mode
-  :if (executable-find "pyenv"))
+  :if (executable-find "pyenv")
+  )
 
 ;; (setq python-shell-interpreter "jupyter")
 (setq python-shell-interpreter "python")
 (if (equal python-shell-interpreter "jupyter")
-	(progn
-	  (setq python-shell-interpreter-args "console --simple-prompt"
-			python-shell-prompt-detect-failure-warning nil
-			)
-	  (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
-	  )
+    (progn
+      (setq python-shell-interpreter-args "console --simple-prompt"
+	    python-shell-prompt-detect-failure-warning nil
+	    )
+      (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+      )
   )
 
 ;; python
 (add-hook 'python-mode-hook
-		  #'(lambda ()
-			  (display-line-numbers-mode t)
-			  (anaconda-mode t)))
+	  #'(lambda ()
+	      (display-line-numbers-mode t)
+	      (anaconda-mode t)
+	      )
+	  )
 
 ;; cursor line always highlighted
 (when (display-graphic-p)
-  (global-hl-line-mode t))
+  (global-hl-line-mode t)
+  )
 
 ;; when a file is updated outside emacse, make it update if it's already opend in emacs
 (global-auto-revert-mode t)
 
-;; insert buffer-name at minibuffer
-(defun insert-buffer-name ()
-  (interactive)
-  (insert (buffer-name (window-buffer (minibuffer-selected-window)))))
-(define-key minibuffer-local-map (kbd "C-c i b n")
-  'insert-buffer-name)
+(define-key minibuffer-local-map (kbd "C-c i b n") 'kino/insert-buffer-name)
 
 ;; company
 (use-package company
   :bind
-  (:map global-map ("C-c c c" . 'company-complete))
+  ("C-c c c" . 'company-complete)
   :config
   (add-hook 'after-init-hook 'global-company-mode)
   )
 
 (use-package company-jedi
-  :after (company)
+  :after company
   :config
   (add-to-list 'company-backends 'company-jedi)
   )
 
 (use-package company-anaconda
   :after (anaconda-mode company)
-  :config (add-to-list 'company-backend 'company-anaconda))
+  :config
+  (add-to-list 'company-backend 'company-anaconda)
+  )
 
 (use-package company-irony
   :ensure t
   :after (company irony)
   :config
-  (add-to-list 'company-backends 'company-irony))
-
-;; open gui file manager
-(defun open-file-manager-cwd ()
-  (interactive)
-  (if (eq system-type 'windows-nt)
-      (async-shell-command "explorer .")
-    (if (eq system-type 'darwin)
-		(async-shell-command "open ."))))
+  (add-to-list 'company-backends 'company-irony)
+  )
 
 (use-package irony
   :ensure t
@@ -344,43 +261,40 @@ skinparam monochrome true\n
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'objc-mode-hook 'irony-mode)
-  
-  (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
-												  irony-cdb-clang-complete))
-
+  (setq-default irony-cdb-compilation-databases
+		'(irony-cdb-libclang
+		  irony-cdb-clang-complete)
+		)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  
   (when (boundp 'w32-pipe-read-delay)
-    (setq w32-pipe-read-delay 0))
+    (setq w32-pipe-read-delay 0)
+    )
   (when (boundp 'w32-pipe-buffer-size)
-    (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
-  
+    (setq irony-server-w32-pipe-buffer-size (* 64 1024))
+    )
   :config
-  (add-hook 'irony-mode-hook #'irony-eldoc))
+  (add-hook 'irony-mode-hook #'irony-eldoc)
+  )
 
 (use-package irony-eldoc
   :ensure t
   :after (eldoc irony)
   :config
-  (add-hook 'irony-mode-hook #'irony-eldoc))
+  (add-hook 'irony-mode-hook #'irony-eldoc)
+  )
 
 (use-package google-c-style
   :ensure t
   :config
   (add-hook 'c-mode-common-hook 'google-set-c-style)
-  (add-hook 'c-mode-common-hook 'google-make-newline-indent))
-
-(use-package helm-gtags
-  :ensure t
-  :after (helm)
-  :init
-  :config
-  (add-hook 'c-mode-common-hook 'helm-gtags-mode))
+  (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+  )
 
 ;; cs mode
 (eval-after-load
-	'company
-  '(add-to-list 'company-backends #'company-omnisharp))
+    'company
+  '(add-to-list 'company-backends #'company-omnisharp)
+  )
 
 (use-package omnisharp
   :bind
@@ -394,19 +308,137 @@ skinparam monochrome true\n
   (define-key omnisharp-mode-map (kbd "C-c O N s e") 'omnisharp-solution-errors)
   )
 
+(use-package helm
+  :ensure t
+  :bind
+  ("M-x" . helm-M-x)
+  )
+
+;; bat-mode
+(when (eq system-type 'windows-nt)
+  (defun kino/call-process-shell-async-current-buffername ()
+	"For bat-mode shell-command by current-buffername"
+	(interactive)
+	(call-process-shell-command (format "start cmd /c %s" (buffer-name))))
+  (require 'bat-mode)
+  (add-hook 'bat-mode-hook
+			(lambda ()
+			  (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername))))
+
+;; jupyter
+(defun kino/jupyter-notebook ()
+  (interactive)
+  (if (eq system-type 'windows-nt)
+	  (async-shell-command
+	   (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
+    (if (eq system-type 'darwin)
+		(async-shell-command "open jupyter notebook"))))
+
+;; python simple server
+(defun kino/open-server-working-dir-http ()
+  (interactive)
+  (let (shell-cmd)
+    (setq shell-cmd "python3 -m http.server")
+    (if (eq system-type 'windows-nt)
+		(setq shell-cmd (concat "start " shell-cmd))
+      (if (eq system-type 'darwin)
+		  (setq shell-cmd (concat "open " shell-cmd))))
+    (async-shell-command shell-cmd)))
+
+(defun kino/open-server-working-dir-ftp ()
+  (interactive)
+  (let (shell-cmd)
+    (setq shell-cmd "python3 -m pyftpdlib")
+    (if (eq system-type 'windows-nt)
+		(setq shell-cmd (concat "start " shell-cmd))
+      (if (eq system-type 'darwin)
+		  (setq shell-cmd (concat "open " shell-cmd))))
+    (async-shell-command shell-cmd)))
+
+(defun kino/set-c-common-style ()
+  (c-set-style "google")
+  (setq tab-width 4)
+  (setq c-basic-offset 4))
+
+(add-hook 'c-mode-common-hook 'kino/set-c-common-style)
+
+(defun kino/kill-other-buffers ()
+  "kill all other buffers"
+  (interactive)
+  (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
+
+(defun kino/csharp-mode-setup ()
+  (omnisharp-mode)
+  (company-mode)
+  (flycheck-mode)
+  (display-line-numbers-mode)
+  )
+
+(add-hook 'csharp-mode-hook 'kino/csharp-mode-setup t)
+
+(defun kino/translate-at()
+  "Translate current word using Google Translator"
+  (interactive)
+  (let (sel-word-target-url)
+    (setq word
+		  (if (and transient-mark-mode mark-active)
+			  (buffer-substring-no-properties (region-beginning) (region-end))
+			(thing-at-point 'symbol)))
+    (setq word (replace-regexp-in-string " " "%20" word))
+	(kino/translate-string word)))
+
+(defun kino/translate-string(string)
+  "translate input string"
+  (interactive "sstring:")
+  (kino/translate-string-google string))
+
+(defun kino/translate-string-google(string)
+  (setq target-url (concat "http://translate.google.com/#auto|ko|" string))
+  (browse-url target-url))
+
+(defun kino/insert-pair-char (arg char)
+  "insert pair character"
+  (interactive "P\ncCharacter: ")
+  (message "%s" arg)
+  (insert-pair arg char char))
+
+(global-set-key (kbd "C-c t a") 'kino/translate-at)
+(global-set-key (kbd "C-c t s") 'kino/translate-string)
+(global-set-key (kbd "C-c i p c") 'kino/insert-pair-char)
+
+(define-abbrev-table 'global-abbrev-table
+  '(("kinog" "kino811@gmail.com")
+    ("kinon" "kino811@naver.com")
+    ("kino8" "kino811")))
+
+;; insert buffer-name at minibuffer
+(defun kino/insert-buffer-name ()
+  (interactive)
+  (insert (buffer-name (window-buffer (minibuffer-selected-window))))
+  )
+
+;; open gui file manager
+(defun kino/open-file-manager-cwd ()
+  (interactive)
+  (if (eq system-type 'windows-nt)
+      (async-shell-command "explorer .")
+    (if (eq system-type 'darwin)
+	(async-shell-command "open ."))
+    )
+  )
+
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\'" . markdown-mode)
+	 ("\\.markdown\\'" . markdown-mode))
+  :init
+  (setq markdown-command "multimarkdown")
+  )
+
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
-
-;; custom key-map
-(global-set-key (kbd "C-<kanji>") 'set-mark-command)
-(global-set-key (kbd "C-x C-<kanji>") 'pop-global-mark)
-(global-set-key (kbd "M-<junja>") 'count-words-region)
-
-(global-set-key (kbd "C-c O l") 'org-store-link)
-(global-set-key (kbd "C-c O a") 'org-agenda)
-(global-set-key (kbd "C-c O c") 'org-capture)
-(global-set-key (kbd "C-c O s") 'org-switchb)
-
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+
+(global-set-key (kbd "C-c o a") 'org-agenda)
