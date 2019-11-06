@@ -1,6 +1,6 @@
 ;;; This is Kino's .emacs
 
-(setq-local kino-init-file-path "./kino-init.el")
+(setq kino-init-file-path "~/.emacs.d/kino-init.el")
 (if (file-exists-p kino-init-file-path)
 	(load kino-init-file-path)
 	)
