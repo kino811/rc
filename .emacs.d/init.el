@@ -1,7 +1,9 @@
 ;;; This is Kino's .emacs
 
-;; (setq custom-file "~/.emacs.d/custom.el")
-;; (load custom-file)
+(setq-local kino-init-file-path "./kino-init.el")
+(if (file-exists-p kino-init-file-path)
+	(load kino-init-file-path)
+	)
 
 ;;; add load-path
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -35,7 +37,7 @@
 	("~/Dropbox/work/todo.org" "~/work/kaiser/todo.org" "d:/work/Unity3d/todo.org")))
  '(package-selected-packages
    (quote
-	(blacken py-autopep8 jupyter elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
+	(pytest-pdb-break blacken py-autopep8 jupyter elpy company-jedi narrowed-page-navigation narrow-reindent request python-mode command-log-mode multishell ein pyenv-mode w3 company-anaconda evil dotnet omnisharp helm-gtags el-get use-package google-c-style irony-eldoc exec-path-from-shell helm-company flycheck-irony company-irony-c-headers company-irony irony cmake-ide rtags cmake-mode plantuml-mode wsd-mode use-package-chords key-chord use-package python-docstring company-glsl flymake-yaml yaml-mode flycheck-pycheckers flymake-json flymake-lua flymake-shell flycheck company-lua company-shell company wgrep-ag wgrep-helm projectile-ripgrep swiper-helm ripgrep rg helm-rg ibuffer-projectile org-projectile helm-projectile yasnippet-snippets yasnippet mark-multiple ace-jump-mode edit-server which-key wgrep iedit avy swiper prodigy eyebrowse projectile csharp-mode airline-themes powerline magit solarized-theme helm)))
  '(safe-local-variable-values (quote ((cmake-tab-width . 4))))
  '(tab-width 4))
 
@@ -106,7 +108,7 @@
 ;; keep a list of recently opened files
 (use-package recentf
   :ensure t
-  :bind (("C-c f r" . 'recentf-open-files))
+  :bind (("C-c f f r" . 'recentf-open-files))
   :config
   (recentf-mode 1))
 
@@ -120,17 +122,6 @@
   :ensure t
   :config
   (display-time-mode t))
-
-;; bat-mode
-(when (eq system-type 'windows-nt)
-  (defun kino-call-process-shell-async-current-buffername ()
-	"For bat-mode shell-command by current-buffername"
-	(interactive)
-	(call-process-shell-command (format "start cmd /c %s" (buffer-name))))
-  (require 'bat-mode)
-  (add-hook 'bat-mode-hook
-			(lambda ()
-			  (local-set-key (kbd "<f5>") 'kino-call-process-shell-async-current-buffername))))
 
 (require 'helm-config)
 ;; helm
@@ -210,8 +201,8 @@ skinparam monochrome true\n
 (use-package swiper
   :ensure t
   :config
-  (define-key global-map (kbd "C-c s c") 'swiper)
-  (define-key global-map (kbd "C-c s a") 'swiper-all)
+  (define-key global-map (kbd "C-c s s s") 'swiper)
+  (define-key global-map (kbd "C-c s s a") 'swiper-all)
   )
 
 (use-package iedit
@@ -220,8 +211,9 @@ skinparam monochrome true\n
 (use-package avy
   :ensure t
   :bind
-  (:map global-map ("C-c j c" . 'avy-goto-char))
+  (:map global-map ("C-c j c c" . 'avy-goto-char))
   (:map global-map ("C-c j l" . 'avy-goto-line))
+  (:map global-map ("C-c j c l" . 'avy-goto-char-in-line))
   :config
   (avy-setup-default))
 
@@ -294,42 +286,11 @@ skinparam monochrome true\n
 	  )
   )
 
-;; jupyter
-(defun kino-jupyter-notebook ()
-  (interactive)
-  (if (eq system-type 'windows-nt)
-	  (async-shell-command
-	   (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
-    (if (eq system-type 'darwin)
-		(async-shell-command "open jupyter notebook"))))
-
 ;; python
 (add-hook 'python-mode-hook
 		  #'(lambda ()
 			  (display-line-numbers-mode t)
 			  (anaconda-mode t)))
-
-;; python simple server
-(defun kino-open-server-working-dir-http ()
-  (interactive)
-  (let (shell-cmd)
-    (setq shell-cmd "python3 -m http.server")
-    (if (eq system-type 'windows-nt)
-		(setq shell-cmd (concat "start " shell-cmd))
-      (if (eq system-type 'darwin)
-		  (setq shell-cmd (concat "open " shell-cmd))))
-    (async-shell-command shell-cmd)))
-
-(defun kino-open-server-working-dir-ftp ()
-  (interactive)
-  (let (shell-cmd)
-    (setq shell-cmd "python3 -m pyftpdlib")
-    (if (eq system-type 'windows-nt)
-		(setq shell-cmd (concat "start " shell-cmd))
-      (if (eq system-type 'darwin)
-		  (setq shell-cmd (concat "open " shell-cmd))))
-    (async-shell-command shell-cmd)))
-
 
 ;; cursor line always highlighted
 (when (display-graphic-p)
@@ -416,29 +377,10 @@ skinparam monochrome true\n
   :config
   (add-hook 'c-mode-common-hook 'helm-gtags-mode))
 
-(defun kino-set-c-common-style ()
-  (c-set-style "google")
-  (setq tab-width 4)
-  (setq c-basic-offset 4))
-
-(add-hook 'c-mode-common-hook 'kino-set-c-common-style)
-
-(defun kino-kill-other-buffers ()
-  "kill all other buffers"
-  (interactive)
-  (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
-
 ;; cs mode
 (eval-after-load
 	'company
   '(add-to-list 'company-backends #'company-omnisharp))
-(defun kino-csharp-mode-setup ()
-  (omnisharp-mode)
-  (company-mode)
-  (flycheck-mode)
-  (display-line-numbers-mode)
-  )
-(add-hook 'csharp-mode-hook 'kino-csharp-mode-setup t)
 
 (use-package omnisharp
   :bind
@@ -452,41 +394,9 @@ skinparam monochrome true\n
   (define-key omnisharp-mode-map (kbd "C-c O N s e") 'omnisharp-solution-errors)
   )
 
-(defun kino-translate-at()
-  "Translate current word using Google Translator"
-  (interactive)
-  (let (sel-word-target-url)
-    (setq word
-		  (if (and transient-mark-mode mark-active)
-			  (buffer-substring-no-properties (region-beginning) (region-end))
-			(thing-at-point 'symbol)))
-    (setq word (replace-regexp-in-string " " "%20" word))
-	(kino-translate-string word)))
-
-(defun kino-translate-string(string)
-  "translate input string"
-  (interactive "sstring:")
-  (kino-translate-string-google string))
-
-(defun kino-translate-string-google(string)
-  (setq target-url (concat "http://translate.google.com/#auto|ko|" string))
-  (browse-url target-url))
-
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
-
-(define-abbrev-table 'global-abbrev-table
-  '(("kinog" "kino811@gmail.com")
-    ("kinon" "kino811@naver.com")
-    ("kino8" "kino811")))
-
 (put 'set-goal-column 'disabled nil)
-
-(defun kino-insert-pair-char (arg char)
-  "insert pair character"
-  (interactive "P\ncCharacter: ")
-  (message "%s" arg)
-  (insert-pair arg char char))
 
 ;; custom key-map
 (global-set-key (kbd "C-<kanji>") 'set-mark-command)
@@ -497,10 +407,6 @@ skinparam monochrome true\n
 (global-set-key (kbd "C-c O a") 'org-agenda)
 (global-set-key (kbd "C-c O c") 'org-capture)
 (global-set-key (kbd "C-c O s") 'org-switchb)
-
-(global-set-key (kbd "C-c t a") 'kino-translate-at)
-(global-set-key (kbd "C-c t s") 'kino-translate-string)
-(global-set-key (kbd "C-c i p c") 'kino-insert-pair-char)
 
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
