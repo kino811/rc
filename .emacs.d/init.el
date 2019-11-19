@@ -442,3 +442,6 @@ skinparam monochrome true\n
 (put 'narrow-to-region 'disabled nil)
 
 (global-set-key (kbd "C-c o a") 'org-agenda)
+
+(edit-server-start)
+(server-start)
