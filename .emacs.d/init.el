@@ -38,7 +38,8 @@
 
 (prefer-coding-system 'utf-8)
 
-;; (setq default-process-coding-system '(utf-8 . euc-kr-unix))
+;; setting for rg search in korean text file right
+(setq default-process-coding-system '(utf-8 . euc-kr-unix))
 
 (subword-mode t)
 
@@ -308,11 +309,13 @@ skinparam monochrome true\n
   (define-key omnisharp-mode-map (kbd "C-c O N s e") 'omnisharp-solution-errors)
   )
 
-(use-package helm
-  :ensure t
-  :bind
-  ("M-x" . helm-M-x)
-  )
+(require 'helm)
+(require 'helm-config)
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-unset-key (kbd "C-x c"))
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(helm-mode t)
 
 ;; bat-mode
 (when (eq system-type 'windows-nt)
@@ -372,6 +375,8 @@ skinparam monochrome true\n
   (company-mode)
   (flycheck-mode)
   (display-line-numbers-mode)
+  (local-set-key (kbd "C-M-i") 'omnisharp-auto-complete)
+  (local-set-key (kbd "C-M-k C-M-i") 'omnisharp-current-type-information)
   )
 
 (add-hook 'csharp-mode-hook 'kino/csharp-mode-setup t)
@@ -445,3 +450,5 @@ skinparam monochrome true\n
 
 (edit-server-start)
 (server-start)
+
+(global-visual-line-mode t)
