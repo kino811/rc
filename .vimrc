@@ -18,12 +18,16 @@ call vundle#end() "required
 filetype plugin indent on "required
 
 
+set ignorecase smartcase
+
+runtime! ftplugin/man.vim
+
 " set leader
-let mapleader = ","
+let mapleader = " "
 
 " file encoding
-set fileencodings=utf8,korea
-set fileformats=dos,unix
+set fileencodings=ucs-bom,utf-8,korea
+set fileformats=dos,mac,unix
 
 " colorscheme
 syntax enable
