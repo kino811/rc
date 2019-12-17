@@ -18,9 +18,32 @@
  '(custom-safe-themes
    (quote
     ("0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
+ '(google-translate-default-source-language "auto")
+ '(google-translate-default-target-language "ko")
+ '(org-latex-default-packages-alist
+   (quote
+    (("AUTO" "inputenc" t
+      ("pdflatex"))
+     ("T1" "fontenc" t
+      ("pdflatex"))
+     ("" "graphicx" t nil)
+     ("" "grffile" t nil)
+     ("" "longtable" nil nil)
+     ("" "wrapfig" nil nil)
+     ("" "rotating" nil nil)
+     ("normalem" "ulem" t nil)
+     ("" "amsmath" t nil)
+     ("" "textcomp" t nil)
+     ("" "amssymb" t nil)
+     ("" "capt-of" nil nil)
+     ("" "hyperref" nil nil)
+     ("" "kotex" nil nil))))
+ '(org-latex-inline-image-rules
+   (quote
+    (("file" . "\\(?:eps\\|jp\\(?:e?g\\)\\|p\\(?:df\\|gf\\|ng\\|s\\)\\|svg\\|tikz\\|png\\|jpg\\)"))))
  '(package-selected-packages
    (quote
-    (powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode py-autopep8 projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (google-translate org-download powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode py-autopep8 projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -125,7 +148,12 @@ skinparam monochrome true\n
 #+END_SRC"))
 
   (setq org-startup-with-inline-images t)
+  (add-hook 'org-mode-hook (lambda ()
+			     (org-indent-mode)))
   )
+
+(require 'org-download)
+(add-hook 'dired-mode-hook 'org-download-enable)
 
 (use-package swiper
   :ensure t
@@ -231,10 +259,9 @@ skinparam monochrome true\n
 
 ;; company
 (use-package company
-  :bind
-  ("C-c c c" . 'company-complete)
   :config
   (add-hook 'after-init-hook 'global-company-mode)
+  (define-key company-mode-map (kbd "C-M-i") 'company-complete)
   )
 
 (use-package company-jedi
@@ -407,8 +434,8 @@ skinparam monochrome true\n
   (message "%s" arg)
   (insert-pair arg char char))
 
-(global-set-key (kbd "C-c t a") 'kino/translate-at)
-(global-set-key (kbd "C-c t s") 'kino/translate-string)
+(global-set-key (kbd "C-c t o a") 'kino/translate-at)
+(global-set-key (kbd "C-c t o s") 'kino/translate-string)
 (global-set-key (kbd "C-c i p c") 'kino/insert-pair-char)
 
 (define-abbrev-table 'global-abbrev-table
@@ -452,3 +479,8 @@ skinparam monochrome true\n
 (server-start)
 
 (global-visual-line-mode t)
+
+(require 'google-translate)
+(require 'google-translate-default-ui)
+(global-set-key "\C-ctia" 'google-translate-at-point)
+(global-set-key "\C-ctiq" 'google-translate-query-translate)
