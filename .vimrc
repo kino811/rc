@@ -22,7 +22,7 @@ filetype plugin indent on "required
 let mapleader = ","
 
 " file encoding
-set fileencodings=utf8,euc-kr
+set fileencodings=utf8,korea
 set fileformats=dos,unix
 
 " colorscheme
