@@ -11,8 +11,8 @@
 [diff]
 	tool = ediff
 [alias]
-	loggraph = log --oneline --decorate --graph
 	st = status
+	logt = log --oneline --decorate --graph --all
 [credential]
 	helper = cache
 [color]
