@@ -30,17 +30,32 @@
  ;; If there is more than one, they won't work right.
  )
 
-(when (not (package-installed-p 'use-package))
-  (package-refresh-contents)
-  (package-install 'use-package)
+(let ((package-refreshed nil))
+  (when (not (package-installed-p 'use-package))
+    (package-refresh-contents)
+    (setq-local package-refreshed t)
+    
+    (package-install 'use-package)
+    )
+  
+  (dolist (package-symbol package-selected-packages)
+    (when (not (package-installed-p package-symbol))
+      (if (not package-refreshed)
+	  (progn
+	    (package-refresh-contents)
+	    (setq-local package-refreshed t)
+	    )
+	)
+      
+      (package-install package-symbol)
+      )
+    )
   )
 
 (when enable-multibyte-characters
   (set-language-environment "Korean"))
 
 (prefer-coding-system 'utf-8)
-
-;; (setq default-process-coding-system '(utf-8 . euc-kr-unix))
 
 (subword-mode t)
 
@@ -51,8 +66,6 @@
 (setq inhibit-splash-screen t)
 
 ;; set theme
-;; (add-to-list 'custom-theme-load-path 
-;; 			 "~/.emacs.d/elpa/solarized-theme-20170831.1159")
 (load-theme 'solarized-dark t)
 
 ;; highlight brackets
@@ -320,7 +333,6 @@ skinparam monochrome true\n
 (require 'helm-config)
 (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 ;; bat-mode
 (when (eq system-type 'windows-nt)
