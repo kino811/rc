@@ -260,6 +260,7 @@ skinparam monochrome true\n
 (defun kino/c-style-mode ()
   (irony-mode t)
   (setq-local c-basic-offset 4)
+  (linum-mode t)
   )
 
 (use-package irony
@@ -319,17 +320,18 @@ skinparam monochrome true\n
 (require 'helm-config)
 (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 ;; bat-mode
 (when (eq system-type 'windows-nt)
   (defun kino/call-process-shell-async-current-buffername ()
-	"For bat-mode shell-command by current-buffername"
-	(interactive)
-	(call-process-shell-command (format "start cmd /c %s" (buffer-name))))
+    "For bat-mode shell-command by current-buffername"
+    (interactive)
+    (call-process-shell-command (format "start cmd /c %s" (buffer-name))))
   (require 'bat-mode)
   (add-hook 'bat-mode-hook
-			(lambda ()
-			  (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername))))
+	    (lambda ()
+	      (local-set-key (kbd "<f5>") 'kino/call-process-shell-async-current-buffername))))
 
 ;; jupyter
 (defun kino/jupyter-notebook ()
@@ -457,3 +459,4 @@ skinparam monochrome true\n
 (require 'google-translate-default-ui)
 (global-set-key "\C-cta" 'google-translate-at-point)
 (global-set-key "\C-ctq" 'google-translate-query-translate)
+
