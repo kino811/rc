@@ -22,7 +22,7 @@
  '(google-translate-default-target-language "ko")
  '(package-selected-packages
    (quote
-    (google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode py-autopep8 projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -190,20 +190,16 @@ skinparam monochrome true\n
 
 (use-package elpy
   :ensure t
-  :config
+  :init
   (elpy-enable)
+  :config
   (setq elpy-rpc-python-command "python3")
-  (define-key elpy-mode-map (kbd "C-M-i") 'company-jedi)
+  ;; (define-key elpy-mode-map (kbd "C-M-i") 'company-jedi)
   (when (require 'flycheck nil t)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (add-hook 'elpy-mode-hook 'flycheck-mode)
     )
-  )
-
-(use-package py-autopep8
-  :ensure t
-  :config
-  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-sav)
+  (setq elpy-rpc-virtualenv-path 'system)
   )
 
 (use-package ein
@@ -333,6 +329,7 @@ skinparam monochrome true\n
 (require 'helm-config)
 (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 ;; bat-mode
 (when (eq system-type 'windows-nt)
