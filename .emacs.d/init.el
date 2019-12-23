@@ -22,7 +22,7 @@
  '(google-translate-default-target-language "ko")
  '(package-selected-packages
    (quote
-    (python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (autopair company-quickhelp python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -240,11 +240,15 @@ skinparam monochrome true\n
 (define-key minibuffer-local-map (kbd "C-c i b n") 'kino/insert-buffer-name)
 
 ;; company
+(require 'cc-mode)
 (use-package company
   :bind
-  ("C-c c c" . 'company-complete)
   :config
   (add-hook 'after-init-hook 'global-company-mode)
+  (company-quickhelp-mode t)
+  (setq company-backends (delete 'company-semantic company-backends))
+  (define-key c-mode-map (kbd "<tab>") 'company-complete)
+  (define-key c++-mode-map (kbd "<tab>") 'company-complete)
   )
 
 (use-package company-jedi
@@ -469,3 +473,5 @@ skinparam monochrome true\n
 (global-set-key "\C-cta" 'google-translate-at-point)
 (global-set-key "\C-ctq" 'google-translate-query-translate)
 
+(require 'autopair)
+(autopair-global-mode t) ;; to enable in all buffers
