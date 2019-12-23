@@ -333,6 +333,7 @@ skinparam monochrome true\n
 (require 'helm-config)
 (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 ;; bat-mode
 (when (eq system-type 'windows-nt)
@@ -471,4 +472,4 @@ skinparam monochrome true\n
 (require 'google-translate-default-ui)
 (global-set-key "\C-cta" 'google-translate-at-point)
 (global-set-key "\C-ctq" 'google-translate-query-translate)
-
+(global-set-key (kbd "C-c t Q") 'google-translate-query-translate-reverse)
