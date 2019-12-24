@@ -15,14 +15,17 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(browse-url-generic-program "chrome")
  '(custom-safe-themes
    (quote
     ("0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
  '(google-translate-default-source-language "auto")
  '(google-translate-default-target-language "ko")
+ '(helm-gtags-prefix-key "tg")
+ '(helm-gtags-suggested-key-mapping t)
  '(package-selected-packages
    (quote
-    (autopair company-quickhelp python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (company-box ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -182,10 +185,43 @@ skinparam monochrome true\n
 
 (use-package flycheck
   :ensure t
-  :init
-  (global-flycheck-mode)
+  :hook (flycheck-mode . flycheck-irony-setup)
+  )
+
+(use-package lsp-mode
+  :ensure t
+  :hook (prog-mode . lsp-deferred)
+  :commands lsp-deferred
+  )
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  )
+
+(use-package company-lsp
+  :ensure t
+  :commands company-lsp
+  :config (push 'company-lsp company-backends)
+  )
+
+(use-package helm-lsp
+  :ensure t
+  :commands helm-lsp-workspace-symbol
+  )
+
+(use-package dap-mode
+  :ensure t
+  )
+
+(use-package ccls
+  :ensure t
   :config
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+  (setq ccls-executable "ccls")
+  (setq lsp-prefer-flymake nil)
+  (setq-default flycheck-disabled-checkers
+		'(c/c++-clang c/c++-cppcheck c/c++-gcc))
+  :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp)))
   )
 
 (use-package elpy
@@ -207,6 +243,7 @@ skinparam monochrome true\n
   )
 
 (use-package pyenv-mode
+  :ensure t
   :if (executable-find "pyenv")
   )
 
@@ -242,22 +279,28 @@ skinparam monochrome true\n
 ;; company
 (require 'cc-mode)
 (use-package company
-  :bind
+  :ensure t
+  :hook (after-init . global-company-mode)
   :config
-  (add-hook 'after-init-hook 'global-company-mode)
-  (company-quickhelp-mode t)
   (setq company-backends (delete 'company-semantic company-backends))
   (define-key c-mode-map (kbd "<tab>") 'company-complete)
   (define-key c++-mode-map (kbd "<tab>") 'company-complete)
   )
 
+(use-package company-box
+  :ensure t
+  :hook (company-mode . company-box-mode)
+  )
+
 (use-package company-jedi
+  :ensure t
   :after company
   :config
   (add-to-list 'company-backends 'company-jedi)
   )
 
 (use-package company-anaconda
+  :ensure t
   :after (anaconda-mode company)
   :config
   (add-to-list 'company-backend 'company-anaconda)
@@ -274,6 +317,11 @@ skinparam monochrome true\n
   (irony-mode t)
   (setq-local c-basic-offset 4)
   (linum-mode t)
+  (lambda ()
+    (when (derived-mode-p 'c-mode 'c++-mode)
+      (ggtags-mode t)
+      )
+    )
   )
 
 (use-package irony
@@ -318,6 +366,7 @@ skinparam monochrome true\n
   )
 
 (use-package omnisharp
+  :ensure t
   :bind
   (:map omnisharp-mode-map ("C-c r r" . 'omnisharp-run-code-action-refactoring))
   (:map omnisharp-mode-map ("C-c d d" . 'omnisharp-current-type-documentation))
@@ -334,6 +383,8 @@ skinparam monochrome true\n
 (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
+(helm-gtags-mode t)
+
 
 ;; bat-mode
 (when (eq system-type 'windows-nt)
@@ -423,8 +474,8 @@ skinparam monochrome true\n
   (message "%s" arg)
   (insert-pair arg char char))
 
-(global-set-key (kbd "C-c t g a") 'kino/translate-at)
-(global-set-key (kbd "C-c t g s") 'kino/translate-string)
+(global-set-key (kbd "C-c t s w a") 'kino/translate-at)
+(global-set-key (kbd "C-c t s w s") 'kino/translate-string)
 
 (global-set-key (kbd "C-c i p c") 'kino/insert-pair-char)
 
@@ -470,9 +521,9 @@ skinparam monochrome true\n
 
 (require 'google-translate)
 (require 'google-translate-default-ui)
-(global-set-key "\C-cta" 'google-translate-at-point)
-(global-set-key "\C-ctq" 'google-translate-query-translate)
-(global-set-key (kbd "C-c t Q") 'google-translate-query-translate-reverse)
+(global-set-key "\C-ctsba" 'google-translate-at-point)
+(global-set-key "\C-ctsbq" 'google-translate-query-translate)
+(global-set-key (kbd "C-c t s b Q") 'google-translate-query-translate-reverse)
 
 (require 'autopair)
 (autopair-global-mode t) ;; to enable in all buffers
