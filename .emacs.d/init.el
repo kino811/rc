@@ -25,7 +25,7 @@
  '(helm-gtags-suggested-key-mapping t)
  '(package-selected-packages
    (quote
-    (ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -162,9 +162,6 @@ skinparam monochrome true\n
   :config
   (avy-setup-default)
   )
-
-;; undo-tree-mode
-(global-undo-tree-mode)
 
 ;; shader-mode
 (add-to-list 'auto-mode-alist '("\\.shader\\'" . shader-mode))
@@ -522,3 +519,27 @@ skinparam monochrome true\n
 
 (require 'autopair)
 (autopair-global-mode t) ;; to enable in all buffers
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  )
+
+(use-package iy-go-to-char
+  :config
+  (key-chord-define-global " f" 'iy-go-up-to-char)
+  (key-chord-define-global " b" 'iy-go-to-char-backward)
+  )
+
+(defun kino/copy-line ()
+  (interactive)
+  (kill-ring-save (line-beginning-position) (line-end-position))
+  (kill-append "\n" nil)
+  )
+
+(use-package key-chord
+  :config
+  (key-chord-mode t)
+  )
