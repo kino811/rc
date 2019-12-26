@@ -529,8 +529,8 @@ skinparam monochrome true\n
 
 (use-package iy-go-to-char
   :config
-  (key-chord-define-global " f" 'iy-go-up-to-char)
-  (key-chord-define-global " b" 'iy-go-to-char-backward)
+  (global-set-key (kbd "C-c j f") 'iy-go-up-to-char)
+  (global-set-key (kbd "C-c j b") 'iy-go-to-char-backward)
   )
 
 (defun kino/copy-line ()
