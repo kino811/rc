@@ -33,26 +33,9 @@
  ;; If there is more than one, they won't work right.
  )
 
-(let ((package-refreshed nil))
-  (when (not (package-installed-p 'use-package))
-    (package-refresh-contents)
-    (setq-local package-refreshed t)
-    
-    (package-install 'use-package)
-    )
-  
-  (dolist (package-symbol package-selected-packages)
-    (when (not (package-installed-p package-symbol))
-      (if (not package-refreshed)
-	  (progn
-	    (package-refresh-contents)
-	    (setq-local package-refreshed t)
-	    )
-	)
-      
-      (package-install package-symbol)
-      )
-    )
+(when (not (package-installed-p 'use-package))
+  (package-refresh-contents)
+  (package-install 'use-package)
   )
 
 (when enable-multibyte-characters
