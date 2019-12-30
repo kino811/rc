@@ -25,7 +25,7 @@
  '(helm-gtags-suggested-key-mapping t)
  '(package-selected-packages
    (quote
-    (expand-region iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (key-chord expand-region iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -51,8 +51,18 @@
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
 
+;; 
 ;; set theme
-(load-theme 'solarized-dark t)
+(use-package solarized-theme
+  :ensure t)
+
+(use-package moe-theme
+  :ensure t)
+
+(if (display-graphic-p)
+    (load-theme 'solarized-dark t)
+  (load-theme 'moe-dark t))
+;; 
 
 ;; highlight brackets
 (show-paren-mode t)
@@ -358,7 +368,6 @@ skinparam monochrome true\n
 (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
-(helm-gtags-mode t)
 
 
 ;; bat-mode
@@ -491,7 +500,9 @@ skinparam monochrome true\n
 
 (global-set-key (kbd "C-c o a") 'org-agenda)
 
-(edit-server-start)
+(if (fboundp 'edit-server-start)
+    (edit-server-start))
+
 (server-start)
 
 (require 'google-translate)
@@ -500,8 +511,11 @@ skinparam monochrome true\n
 (global-set-key "\C-ctsbq" 'google-translate-query-translate)
 (global-set-key (kbd "C-c t s b Q") 'google-translate-query-translate-reverse)
 
-(require 'autopair)
-(autopair-global-mode t) ;; to enable in all buffers
+(use-package autopair
+  :ensure t
+  :config
+  (autopair-global-mode t)
+  )
 
 (use-package yasnippet
   :ensure t
@@ -511,6 +525,7 @@ skinparam monochrome true\n
   )
 
 (use-package iy-go-to-char
+  :ensure t
   :config
   (global-set-key (kbd "C-c j f") 'iy-go-up-to-char)
   (global-set-key (kbd "C-c j b") 'iy-go-to-char-backward)
@@ -523,6 +538,7 @@ skinparam monochrome true\n
   )
 
 (use-package key-chord
+  :ensure t
   :config
   (key-chord-mode t)
   )
