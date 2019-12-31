@@ -17,7 +17,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
+    ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
  '(google-translate-default-source-language "auto")
  '(google-translate-default-target-language "ko")
  '(helm-gtags-prefix-key "tg")
@@ -63,7 +63,7 @@
   :ensure t)
 
 (if (display-graphic-p)
-    (load-theme 'solarized-dark t)
+    (load-theme 'moe-dark t)
   (load-theme 'moe-dark t))
 ;; 
 
