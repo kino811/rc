@@ -37,13 +37,15 @@
   (package-install 'use-package)
   )
 
-(if (executable-find "chrome")
-    (progn (browse-url-generic-program "chrome"))
-  (progn (setq browse-url-browser-function 'eww-browse-url)))
+;; (if (executable-find "chrome")
+;;     (progn (browse-url-generic-program "chrome"))
+;;   (progn (setq browse-url-browser-function 'eww-browse-url)))
 
 (when enable-multibyte-characters
   (set-language-environment "Korean"))
 
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
 (subword-mode t)
@@ -53,6 +55,13 @@
 
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
+
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  )
 
 ;; 
 ;; set theme
@@ -495,7 +504,7 @@ skinparam monochrome true\n
   :mode (("\\.md\\'" . markdown-mode)
 	 ("\\.markdown\\'" . markdown-mode))
   :init
-  (setq markdown-command "multimarkdown")
+  (setq markdown-command "markdown")
   )
 
 (put 'upcase-region 'disabled nil)
