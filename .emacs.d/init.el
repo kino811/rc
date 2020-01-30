@@ -62,7 +62,7 @@
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)
-    (exec-path-from-shell-copy-envs '("LANG" "LC_ALL"))
+    (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS"))
     (message "Initialized PATH and other variables from SHELL.")
     )  
   )
@@ -146,10 +146,8 @@
 	      (when org-inline-image-overlays
 		(org-redisplay-inline-images))))
   (add-to-list 'org-structure-template-alist
-	       '("u" "#+BEGIN_SRC plantuml :file ?.png\n
-skinparam monochrome true\n
-#+END_SRC"))
-
+	       '("u" . "src plantuml :file .png")
+	       )
   (setq org-startup-with-inline-images t)
   )
 
@@ -199,6 +197,7 @@ skinparam monochrome true\n
 
 (use-package lsp-mode
   :ensure t
+  :init (setq lsp-keymap-prefix "C-c L")
   :hook (prog-mode . lsp-deferred)
   :commands lsp-deferred
   )
@@ -384,7 +383,7 @@ skinparam monochrome true\n
 
 (require 'helm)
 (require 'helm-config)
-(helm-mode t)
+;; (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
@@ -570,4 +569,11 @@ skinparam monochrome true\n
   :ensure t
   :config
   (global-set-key (kbd "M-@") 'er/expand-region)
+  )
+
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode t)
+  (define-key projectile-mode-map (kbd "C-c P") 'projectile-command-map)
   )
