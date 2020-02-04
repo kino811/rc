@@ -24,7 +24,7 @@
  '(helm-gtags-suggested-key-mapping t)
  '(package-selected-packages
    (quote
-    (markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -47,7 +47,7 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-(set-locale-environment "ko_KR")
+(set-locale-environment "ko_KR.UTF-8")
 
 (subword-mode t)
 
@@ -57,12 +57,14 @@
 ;; don't show splash-screen
 (setq inhibit-splash-screen t)
 
+(global-visual-line-mode t)
+
 (use-package exec-path-from-shell
   :ensure t
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)
-    (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS"))
+    (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS" "CFLAGS"))
     (message "Initialized PATH and other variables from SHELL.")
     )  
   )
@@ -199,12 +201,16 @@
   :ensure t
   :init (setq lsp-keymap-prefix "C-c L")
   :hook (prog-mode . lsp-deferred)
-  :commands lsp-deferred
+  :commands lsp-deferred lsp
   )
 
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+  (add-hook 'c++-mode-hook 'flycheck-mode)
   )
 
 (use-package company-lsp
@@ -224,12 +230,12 @@
 
 (use-package ccls
   :ensure t
+  :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp)))
   :config
   (setq ccls-executable "ccls")
   (setq lsp-prefer-flymake nil)
   (setq-default flycheck-disabled-checkers
 		'(c/c++-clang c/c++-cppcheck c/c++-gcc))
-  :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp)))
   )
 
 (use-package elpy
@@ -383,7 +389,6 @@
 
 (require 'helm)
 (require 'helm-config)
-;; (helm-mode t)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
@@ -403,10 +408,10 @@
 (defun kino/jupyter-notebook ()
   (interactive)
   (if (eq system-type 'windows-nt)
-	  (async-shell-command
-	   (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
+      (async-shell-command
+       (format "start cmd /k \"cd %s & jupyter notebook\"" (eval default-directory)))
     (if (eq system-type 'darwin)
-		(async-shell-command "open jupyter notebook"))))
+	(async-shell-command "open jupyter notebook"))))
 
 ;; python simple server
 (defun kino/open-server-working-dir-http ()
@@ -414,9 +419,9 @@
   (let (shell-cmd)
     (setq shell-cmd "python3 -m http.server")
     (if (eq system-type 'windows-nt)
-		(setq shell-cmd (concat "start " shell-cmd))
+	(setq shell-cmd (concat "start " shell-cmd))
       (if (eq system-type 'darwin)
-		  (setq shell-cmd (concat "open " shell-cmd))))
+	  (setq shell-cmd (concat "open " shell-cmd))))
     (async-shell-command shell-cmd)))
 
 (defun kino/open-server-working-dir-ftp ()
@@ -424,9 +429,9 @@
   (let (shell-cmd)
     (setq shell-cmd "python3 -m pyftpdlib")
     (if (eq system-type 'windows-nt)
-		(setq shell-cmd (concat "start " shell-cmd))
+	(setq shell-cmd (concat "start " shell-cmd))
       (if (eq system-type 'darwin)
-		  (setq shell-cmd (concat "open " shell-cmd))))
+	  (setq shell-cmd (concat "open " shell-cmd))))
     (async-shell-command shell-cmd)))
 
 (defun kino/set-c-common-style ()
@@ -455,11 +460,11 @@
   (interactive)
   (let (sel-word-target-url)
     (setq word
-		  (if (and transient-mark-mode mark-active)
-			  (buffer-substring-no-properties (region-beginning) (region-end))
-			(thing-at-point 'symbol)))
+	  (if (and transient-mark-mode mark-active)
+	      (buffer-substring-no-properties (region-beginning) (region-end))
+	    (thing-at-point 'symbol)))
     (setq word (replace-regexp-in-string " " "%20" word))
-	(kino/translate-string word)))
+    (kino/translate-string word)))
 
 (defun kino/translate-string(string)
   "translate input string"
@@ -468,7 +473,8 @@
 
 (defun kino/translate-string-google(string)
   (setq target-url (concat "http://translate.google.com/#auto|ko|" string))
-  (browse-url target-url))
+  (browse-url target-url)
+  )
 
 (defun kino/insert-pair-char (arg char)
   "insert pair character"
@@ -520,7 +526,7 @@
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
-(global-set-key (kbd "C-c o a") 'org-agenda)
+(global-set-key (kbd "C-c O a") 'org-agenda)
 
 (if (fboundp 'edit-server-start)
     (edit-server-start))
@@ -576,4 +582,10 @@
   :config
   (projectile-mode t)
   (define-key projectile-mode-map (kbd "C-c P") 'projectile-command-map)
+  )
+
+(use-package undo-tree
+  :ensure t
+  :config
+  (global-undo-tree-mode t)
   )
