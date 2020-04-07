@@ -17,14 +17,14 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
+    ("ae65ccecdcc9eb29ec29172e1bfb6cadbe68108e1c0334f3ae52414097c501d2" "26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" default)))
  '(google-translate-default-source-language "auto")
  '(google-translate-default-target-language "ko")
  '(helm-gtags-prefix-key "tg")
  '(helm-gtags-suggested-key-mapping t)
  '(package-selected-packages
    (quote
-    (undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode helm-lsp treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi google-translate powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-helm wgrep-ag w3 use-package-chords swiper-helm solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile helm-rg helm-projectile helm-gtags helm-company google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -75,11 +75,12 @@
   :ensure t)
 
 (use-package moe-theme
-  :ensure t)
-
-(if (display-graphic-p)
-    (load-theme 'moe-dark t)
-  (load-theme 'moe-dark t))
+  :ensure t
+  :config
+  (if (display-graphic-p)
+      (load-theme 'moe-dark t)
+    (load-theme 'moe-dark t))
+  )
 ;; 
 
 ;; highlight brackets
@@ -92,7 +93,11 @@
 (defalias 'list-buffers 'ibuffer)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(which-key-mode t)
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode t)
+  )
 
 ;; windmove
 (use-package windmove
@@ -151,6 +156,7 @@
 	       '("u" . "src plantuml :file .png")
 	       )
   (setq org-startup-with-inline-images t)
+  (org-indent-mode t)
   )
 
 (use-package swiper
@@ -201,7 +207,11 @@
   :ensure t
   :init (setq lsp-keymap-prefix "C-c L")
   :hook (prog-mode . lsp-deferred)
-  :commands lsp-deferred lsp
+  :commands (lsp-deferred lsp)
+  :config
+  (setq gc-cons-threshold 100000000)
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
   )
 
 (use-package lsp-ui
@@ -224,6 +234,11 @@
   :commands helm-lsp-workspace-symbol
   )
 
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list
+  )
+
 (use-package dap-mode
   :ensure t
   )
@@ -236,6 +251,16 @@
   (setq lsp-prefer-flymake nil)
   (setq-default flycheck-disabled-checkers
 		'(c/c++-clang c/c++-cppcheck c/c++-gcc))
+  (setq ccls-initialization-options
+	'(:index (:comments 2)
+		 :completion (:detailedLabel t)
+		 :clang (:extraArgs ["-isystem/usr/local/include"
+				     "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/include"
+				     "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+				     "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+				     "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+				     "-isystem/usr/local/Cellar/llvm/9.0.1/include/c++/v1"]
+				    :resourceDir "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0")))
   )
 
 (use-package elpy
@@ -299,6 +324,8 @@
   (setq company-backends (delete 'company-semantic company-backends))
   (define-key c-mode-map (kbd "C-M-i") 'company-complete)
   (define-key c++-mode-map (kbd "C-M-i") 'company-complete)
+  (setq company-minimum-prefix-length 1
+	company-idle-delay 0.0)
   )
 
 (use-package company-jedi
@@ -391,6 +418,7 @@
 (require 'helm-config)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
 
 
 ;; bat-mode
@@ -589,3 +617,5 @@
   :config
   (global-undo-tree-mode t)
   )
+
+(unbind-key "S-SPC")
