@@ -59,8 +59,25 @@
 
 (global-visual-line-mode t)
 (unbind-key "S-SPC")
-(defalias 'yes-or-no-p 'y-or-n-p)
 
+(defalias 'yes-or-no-p 'y-or-n-p)
+(defalias 'list-buffers 'ibuffer)
+
+(show-paren-mode t)
+(desktop-save-mode t)
+
+;; 
+;; Begin use-package
+;; 
+(use-package windmove
+  :ensure t
+  :config
+  (global-key-binding (kbd "C-c w h") 'windmove-left)
+  (global-key-binding (kbd "C-c w l") 'windmove-right)
+  (global-key-binding (kbd "C-c w k") 'windmove-up)
+  (global-key-binding (kbd "C-c w j") 'windmove-down)
+  ;; (windmove-default-keybindings 'shift)
+  )
 
 (use-package exec-path-from-shell
   :ensure t
@@ -81,10 +98,9 @@
   :ensure t
   :config
   (if (display-graphic-p)
-      (load-theme 'solarized-dark)
-    (load-theme 'moe-dark)
-    )
-  )
+      ;; (load-theme 'solarized-dark)
+      (load-theme 'moe-dark)
+    (load-theme 'moe-dark)))
 
 (use-package ivy
   :ensure t
@@ -116,8 +132,8 @@
 (use-package avy
   :ensure t
   :config
-  (global-set-key (kbd "C-c f c") 'avy-goto-char)
-  (global-set-key (kbd "C-c f l") 'avy-goto-line)
+  (global-set-key (kbd "C-c j c") 'avy-goto-char)
+  (global-set-key (kbd "C-c j l") 'avy-goto-line)
   )
 
 (use-package iedit
@@ -144,6 +160,8 @@
 (use-package multi-term
   :ensure t
   :config
+  (setq multi-term-program "/bin/zsh")
+  (global-set-key (kbd "C-c t m") 'multi-term)
   )
 
 (use-package which-key
@@ -154,7 +172,84 @@
 
 (use-package magit
   :ensure t
+  :bind
+  ("C-x g" . 'magit-status)
   :config
   )
 
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode t)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  )
+
+(use-package recentf
+  :ensure t
+  :config
+  (recentf-mode t)
+  )
+
+(use-package powerline
+  :ensure t
+  :config
+  (powerline-default-theme)
+  )
+
+(use-package org
+  :ensure t
+  :bind
+  (:map org-mode-map
+	("C-c C-c" . (lambda ()
+		       (interactive)
+		       (org-ctrl-c-ctrl-c)
+		       (org-display-inline-images))))
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages
+			       '((emacs-lisp . t)
+				 (python . t)
+				 (C . t)
+				 (plantuml . t)))
+  (setq org-src-fontify-natively t)
+  (setq org-todo-keywords
+	'((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
+  (setq org-plantuml-jar-pathm
+	(if (file-directory-p "~/rc/.emacs.d")
+	    (expand-file-name "~/rc/.emacs.d/plantuml.jar")
+	  (expand-file-name "~/.emacs.d/plantuml.jar")))
+  (add-hook 'org-babel-after-execute-hook
+	    (lambda ()
+	      (when org-inline-image-overlays
+		(org-redisplay-inline-images))))
+  (add-to-list 'org-structure-template-alist
+	       '("u" . "src plantuml :file .png"))
+  (setq org-startup-with-inline-images t)
+  (org-indent-mode t)
+  (global-set-key (kbd "C-c o a") 'org-agenda))
+
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-default-bindings (kbd "C-c g r")))
+
+(use-package lsp-mode
+  :ensure t
+  :init (setq lsp-keymap-prefix "C-c l")
+  :hook (prog-mode . lsp-deferred)
+  :config
+  )
+
+(use-package ccls
+  :ensure t
+  :config
+  )
+
+(use-package yasnippet
+  :ensure t
+  )
+
+(use-package undo-tree
+  :ensure t
+  :config
+  (global-undo-tree-mode t)
+  )
