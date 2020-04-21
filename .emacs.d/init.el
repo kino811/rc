@@ -5,7 +5,7 @@
 (when (>= emacs-major-version 24)
   (require 'package)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages") t)
+  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 
 (package-initialize)
@@ -22,9 +22,10 @@
  '(google-translate-default-target-language "ko")
  '(helm-gtags-prefix-key "tg")
  '(helm-gtags-suggested-key-mapping t)
+ '(org-agenda-files (quote ("~/work/todo/todo.org")))
  '(package-selected-packages
    (quote
-    (org-plus-contrib google-translate multi-term lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs company-lsp lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (helm counsel company-lsp ivy-xref org-plus-contrib google-translate multi-term lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -105,8 +106,14 @@
 (use-package ivy
   :ensure t
   :config
-  (ivy-mode t)
-  )
+  (ivy-mode t))
+
+(use-package ivy-xref
+  :ensure t
+  :init
+  (when (>= emacs-major-version 27)
+    (setq xref-show-definitions-function #'ivy-xref-show-defs))
+  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (use-package prodigy
   :ensure t
@@ -148,9 +155,16 @@
 
 (use-package company
   :ensure t
+  :hook (after-init . global-company-mode)
+  :bind ("C-c c c" . company-complete)
   :config
-  (add-hook 'after-init-hook 'global-company-mode)
-  )
+  (setq company-minimum-prefix-length 1
+	company-idle-delay 0.0))
+
+(use-package company-lsp
+  :ensure t
+  :config
+  (push 'company-lsp company-backends))
 
 (use-package flycheck
   :ensure t
@@ -234,17 +248,27 @@
   :config
   (rg-enable-default-bindings (kbd "C-c g r")))
 
+;; language server protocol
 (use-package lsp-mode
   :ensure t
   :init (setq lsp-keymap-prefix "C-c l")
-  :hook (prog-mode . lsp-deferred)
-  :config
-  )
+  :hook ((prog-mode . lsp)
+	 (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
 
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+
+(use-package lsp-ivy
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
+
+;; cc language server
 (use-package ccls
   :ensure t
   :config
-  )
+  (setq ccls-executable "/usr/local/bin/ccls"))
 
 (use-package yasnippet
   :ensure t
@@ -262,3 +286,12 @@
   (require 'google-translate-default-ui)
   (global-set-key (kbd "C-c d a") 'google-translate-at-point)
   (global-set-key (kbd "C-c d q") 'google-translate-query-translate))
+
+(use-package counsel
+  :ensure t
+  :config
+  (counsel-mode t)
+  (defalias 'execute-extended-command 'counsel-M-x)
+  (defalias 'find-file 'counsel-find-file)
+  (defalias 'bookmark-jump 'counsel-bookmark)
+  (defalias 'imenu 'counsel-imenu))
