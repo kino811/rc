@@ -4,7 +4,7 @@
 
 (when (>= emacs-major-version 24)
   (require 'package)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 
@@ -196,6 +196,15 @@
   :config
   (projectile-mode t)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  
+  (setq projectile-enable-caching t)
+  (setq gc-cons-threshold 1000000000)
+  (defun my-minibuffer-setup-hook ()
+    (setq gc-cons-threshold most-positive-fixnum))
+  (defun my-minibuffer-exit-hook ()
+    (setq gc-cons-threshold 800000))
+  (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+  (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
   )
 
 (use-package recentf
@@ -260,10 +269,6 @@
   :ensure t
   :commands lsp-ui-mode)
 
-(use-package lsp-ivy
-  :ensure t
-  :commands lsp-ivy-workspace-symbol)
-
 ;; cc language server
 (use-package ccls
   :ensure t
@@ -290,8 +295,4 @@
 (use-package counsel
   :ensure t
   :config
-  (counsel-mode t)
-  (defalias 'execute-extended-command 'counsel-M-x)
-  (defalias 'find-file 'counsel-find-file)
-  (defalias 'bookmark-jump 'counsel-bookmark)
-  (defalias 'imenu 'counsel-imenu))
+  (counsel-mode t))
