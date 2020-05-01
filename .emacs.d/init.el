@@ -4,7 +4,7 @@
 
 (when (>= emacs-major-version 24)
   (require 'package)
-  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 
@@ -25,7 +25,7 @@
  '(org-agenda-files (quote ("~/work/todo/todo.org")))
  '(package-selected-packages
    (quote
-    (helm counsel company-lsp ivy-xref org-plus-contrib google-translate multi-term lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib google-translate multi-term lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -69,14 +69,24 @@
 
 ;; 
 ;; Begin use-package
-;; 
+;;
+(use-package quelpa
+  :ensure t
+  :config
+  )
+
+(use-package quelpa-use-package
+  :ensure t
+  :config
+  )
+
 (use-package windmove
   :ensure t
   :config
-  (global-key-binding (kbd "C-c w h") 'windmove-left)
-  (global-key-binding (kbd "C-c w l") 'windmove-right)
-  (global-key-binding (kbd "C-c w k") 'windmove-up)
-  (global-key-binding (kbd "C-c w j") 'windmove-down)
+  (global-set-key (kbd "C-c w h") 'windmove-left)
+  (global-set-key (kbd "C-c w l") 'windmove-right)
+  (global-set-key (kbd "C-c w k") 'windmove-up)
+  (global-set-key (kbd "C-c w j") 'windmove-down)
   ;; (windmove-default-keybindings 'shift)
   )
 
@@ -296,3 +306,11 @@
   :ensure t
   :config
   (counsel-mode t))
+
+(use-package actionscript-mode
+  :quelpa ((actionscript-mode
+	    :fetcher github
+	    :repo "austinhaas/actionscript-mode")
+	   :upgrade t)
+  :config
+  (add-to-list 'auto-mode-alist '("\\.as\\'" . actionscript-mode)))
