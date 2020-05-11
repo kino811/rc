@@ -215,6 +215,9 @@
     (setq gc-cons-threshold 800000))
   (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
   (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+  (when (memq window-system '(w32))
+    (setq projectile-indexing-method 'alien)
+    )
   )
 
 (use-package recentf
@@ -323,5 +326,5 @@
 (use-package eyebrowse
   :ensure t
   :config
-  (3eyebrowse-mode t)
+  (eyebrowse-mode t)
   )
