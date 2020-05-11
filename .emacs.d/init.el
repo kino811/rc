@@ -314,3 +314,14 @@
 	   :upgrade t)
   :config
   (add-to-list 'auto-mode-alist '("\\.as\\'" . actionscript-mode)))
+
+(use-package display-line-numbers
+  :ensure t
+  :hook ((prog-mode . display-line-numbers-mode)
+	 (actionscript-mode . display-line-numbers-mode)))
+
+(use-package eyebrowse
+  :ensure t
+  :config
+  (3eyebrowse-mode t)
+  )
