@@ -103,7 +103,11 @@
 ;; 
 ;; set theme
 (use-package solarized-theme
-  :ensure t)
+  :ensure t
+  :config
+  (if (display-graphic-p)
+      (load-theme 'solarized-dark))
+  )
 
 (use-package moe-theme
   :ensure t
@@ -111,9 +115,6 @@
   (if (not (display-graphic-p))
       (load-theme 'moe-dark))
   )
-
-(if (display-graphic-p)
-    (load-theme 'whiteboard))
 
 (use-package ivy
   :ensure t
