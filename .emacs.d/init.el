@@ -108,10 +108,12 @@
 (use-package moe-theme
   :ensure t
   :config
-  (if (display-graphic-p)
-      ;; (load-theme 'solarized-dark)
-      (load-theme 'moe-dark)
-    (load-theme 'moe-dark)))
+  (if (not (display-graphic-p))
+      (load-theme 'moe-dark))
+  )
+
+(if (display-graphic-p)
+    (load-theme 'whiteboard))
 
 (use-package ivy
   :ensure t
