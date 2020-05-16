@@ -300,7 +300,7 @@
   (add-to-list 'org-structure-template-alist
 	       '("u" . "src plantuml :file .png"))
   (setq org-startup-with-inline-images t)
-  (org-indent-mode t)
+  (add-hook 'org-mode-hook 'org-indent-mode)
   (global-set-key (kbd "C-c o a") 'org-agenda))
 
 (use-package rg
