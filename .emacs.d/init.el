@@ -398,9 +398,25 @@
 
 (use-package json-mode
   :ensure t)
+
 (use-package helpful
   :ensure t
   :bind (("C-h f" . helpful-callable)
 	 ("C-h F" . helpful-command)
 	 ("C-h v" . helpful-variable)
 	 ("C-h k" . helpful-key)))
+
+(defun current-buffer-name()
+  "get current buffer name"
+  (interactive)
+  (insert (buffer-name (window-buffer (minibuffer-selected-window)))))
+
+(defun current-buffer-file-name()
+  "get current buffer name"
+  (interactive)
+  (insert (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+
+(global-set-key (kbd "C-c i b n") 'current-buffer-name)
+(global-set-key (kbd "C-c i b p") 'current-buffer-file-name)
+
+(put 'upcase-region 'disabled nil)
