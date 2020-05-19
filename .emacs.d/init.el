@@ -413,9 +413,9 @@
 	   :upgrade t)
   :config
   (global-set-key (kbd "C-q") 'emacs-surround)
-  (add-to-list 'emacs-surround-alist '(("~" . ("~" . "~"))
-				       ("=" . ("=" . "="))
-				       ("`" . ("`" . "`")))))
+  (add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
+  (add-to-list 'emacs-surround-alist '("=" . ("=" . "=")))
+  (add-to-list 'emacs-surround-alist '("`" . ("`" . "`"))))
 
 (defun current-buffer-name()
   "get current buffer name"
