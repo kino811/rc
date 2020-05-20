@@ -72,6 +72,8 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defalias 'list-buffers 'ibuffer)
 
+(setq make-backup-files nil)
+
 (desktop-save-mode t)
 
 ;; 
