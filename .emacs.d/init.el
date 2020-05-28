@@ -26,7 +26,7 @@
  '(org-agenda-files (quote ("~/work/todo/todo.org")))
  '(package-selected-packages
    (quote
-    (p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib google-translate multi-term lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib google-translate lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -105,10 +105,10 @@
 (use-package windmove
   :ensure t
   :config
-  (global-set-key (kbd "C-c w h") 'windmove-left)
-  (global-set-key (kbd "C-c w l") 'windmove-right)
-  (global-set-key (kbd "C-c w k") 'windmove-up)
-  (global-set-key (kbd "C-c w j") 'windmove-down)
+  (global-set-key (kbd "C-x w h") 'windmove-left)
+  (global-set-key (kbd "C-x w l") 'windmove-right)
+  (global-set-key (kbd "C-x w k") 'windmove-up)
+  (global-set-key (kbd "C-x w j") 'windmove-down)
   ;; (windmove-default-keybindings 'shift)
   )
 
@@ -221,13 +221,6 @@
   :config
   )
 
-(use-package multi-term
-  :ensure t
-  :config
-  (setq mulcti-term-program "/bin/zsh")
-  (global-set-key (kbd "C-c t m") 'multi-term)
-  )
-
 (use-package which-key
   :ensure t
   :config
@@ -313,7 +306,8 @@
 ;; language server protocol
 (use-package lsp-mode
   :ensure t
-  :init (setq lsp-keymap-prefix "C-c l")
+  :init
+  (setq lsp-keymap-prefix (kbd "C-c l"))
   :hook ((prog-mode . lsp)
 	 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
@@ -376,7 +370,7 @@
 (use-package eyebrowse
   :ensure t
   :init
-  (setq eyebrowse-keymap-prefix (kbd "C-c w e"))
+  (setq eyebrowse-keymap-prefix (kbd "C-x w e"))
   :config
   (eyebrowse-mode t)
 
