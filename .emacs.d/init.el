@@ -23,7 +23,7 @@
  '(google-translate-default-target-language "ko")
  '(helm-gtags-prefix-key "tg")
  '(helm-gtags-suggested-key-mapping t)
- '(org-agenda-files (quote ("~/work/todo/todo.org")))
+ '(org-agenda-files (quote ("~/work/todo.org")))
  '(package-selected-packages
    (quote
     (p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib google-translate lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
@@ -36,8 +36,7 @@
 
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
-  (package-install 'use-package)
-  )
+  (package-install 'use-package))
 
 ;; (if (executable-find "chrome")
 ;;     (progn (browse-url-generic-program "chrome"))
@@ -61,7 +60,6 @@
 (setq inhibit-splash-screen t)
 
 (global-visual-line-mode t)
-(unbind-key "S-SPC")
 
 ;; turn off sound bell and use visible bell
 (setq visible-bell t)
@@ -81,13 +79,31 @@
 ;;
 (use-package quelpa
   :ensure t
-  :config
-  )
+  :config)
 
 (use-package quelpa-use-package
   :ensure t
+  :config)
+
+(use-package which-key
+  :ensure t
+  :bind (("C-c x m" . 'which-key-show-major-mode)
+	 (("C-c x x" . 'which-key-show-top-level)))
   :config
-  )
+  (which-key-mode t)
+  (which-key-add-key-based-replacements
+    (kbd "C-c x") "execute"
+    (kbd "C-c s") "search,select"
+    (kbd "C-c g") "goto"
+    (kbd "C-c w") "window"
+    (kbd "C-c p") "project"
+    (kbd "C-c t") "translate"
+    (kbd "C-c i") "insert"
+    (kbd "C-c i b") "buffer"
+    (kbd "C-c o") "open"
+    (kbd "C-c e") "edit"
+    (kbd "C-c a") "autocomplete"
+    (kbd "C-c &") "yasnippet"))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -105,22 +121,18 @@
 (use-package windmove
   :ensure t
   :config
-  (global-set-key (kbd "C-x w h") 'windmove-left)
-  (global-set-key (kbd "C-x w l") 'windmove-right)
-  (global-set-key (kbd "C-x w k") 'windmove-up)
-  (global-set-key (kbd "C-x w j") 'windmove-down)
-  ;; (windmove-default-keybindings 'shift)
-  )
+  (global-set-key (kbd "C-c w h") 'windmove-left)
+  (global-set-key (kbd "C-c w l") 'windmove-right)
+  (global-set-key (kbd "C-c w k") 'windmove-up)
+  (global-set-key (kbd "C-c w j") 'windmove-down))
 
 (use-package exec-path-from-shell
   :ensure t
   :config
-  (when (memq window-system '(mac ns x))
+  (when (memq window-system '(ns x))
     (exec-path-from-shell-initialize)
     (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS" "CFLAGS"))
-    (message "Initialized PATH and other variables from SHELL.")
-    )  
-  )
+    (message "Initialized PATH and other variables from SHELL.")))
 
 ;; 
 ;; set theme
@@ -166,7 +178,7 @@
 
 (use-package prodigy
   :ensure t
-  :bind ("C-c v p" . prodigy)
+  :bind ("C-c o p" . prodigy)
   :config
   (prodigy-define-service
     :name "Python app"
@@ -175,38 +187,35 @@
     :cwd "~/work/python-http-home"
     :tags '(work)
     :stop-signal 'sigkill
-    :kill-process-buffer-on-stop t
-    )
-  )
+    :kill-process-buffer-on-stop t))
 
 (use-package swiper
   :ensure t
   :config
   (global-set-key (kbd "C-c s s") 'swiper)
-  (global-set-key (kbd "C-c s a") 'swiper-all)
-  )
+  (global-set-key (kbd "C-c s S") 'swiper-all))
 
 (use-package avy
   :ensure t
   :config
-  (global-set-key (kbd "C-c j c") 'avy-goto-char)
-  (global-set-key (kbd "C-c j l") 'avy-goto-line)
-  )
+  (global-set-key (kbd "C-c g c") 'avy-goto-char)
+  (global-set-key (kbd "C-c g l") 'avy-goto-line))
 
 (use-package iedit
   :ensure t
-  :config
-  )
+  :config)
 
 (use-package wgrep
   :ensure t
-  :config
-  )
+  :config)
 
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
-  :bind ("C-c c c" . company-complete)
+  :bind (("C-c a c" . company-complete)
+	 :map company-active-map
+	 ("C-n" . 'company-select-next)
+	 ("C-p" . 'company-select-previous))
   :config
   (setq company-minimum-prefix-length 1
 	company-idle-delay 0.0))
@@ -218,52 +227,41 @@
 
 (use-package flycheck
   :ensure t
-  :config
-  )
-
-(use-package which-key
-  :ensure t
-  :config
-  (which-key-mode t)
-  )
+  :config)
 
 (use-package magit
   :ensure t
   :bind
-  ("C-x g" . 'magit-status)
-  :config
-  )
+  ("C-c p g" . 'magit-status)
+  :config)
 
 (use-package projectile
   :ensure t
   :config
   (projectile-mode t)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p p") 'projectile-command-map)
   
   (setq projectile-enable-caching t)
   (setq gc-cons-threshold 1000000000)
   (defun my-minibuffer-setup-hook ()
     (setq gc-cons-threshold most-positive-fixnum))
   (defun my-minibuffer-exit-hook ()
-    (setq gc-cons-threshold 800000))
+    (psetq gc-cons-threshold 800000))
   (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
   (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
   (when (memq window-system '(w32))
     (setq projectile-indexing-method 'alien)
-    )
-  )
+    ))
 
 (use-package recentf
   :ensure t
   :config
-  (recentf-mode t)
-  )
+  (recentf-mode t))
 
 (use-package powerline
   :ensure t
   :config
-  (powerline-default-theme)
-  )
+  (powerline-default-theme))
 
 (use-package org
   :ensure t
@@ -307,7 +305,7 @@
 (use-package lsp-mode
   :ensure t
   :init
-  (setq lsp-keymap-prefix (kbd "C-c l"))
+  (setq lsp-keymap-prefix (kbd "C-c a l"))
   :hook ((prog-mode . lsp)
 	 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
@@ -334,7 +332,7 @@
 
 (use-package expand-region
   :ensure t
-  :bind (("C-c m e" . er/expand-region)))
+  :bind (("C-c s e" . er/expand-region)))
 
 (use-package undo-tree
   :ensure t
@@ -346,8 +344,8 @@
   :ensure t
   :config
   (require 'google-translate-default-ui)
-  (global-set-key (kbd "C-c d a") 'google-translate-at-point)
-  (global-set-key (kbd "C-c d q") 'google-translate-query-translate))
+  (global-set-key (kbd "C-c t a") 'google-translate-at-point)
+  (global-set-key (kbd "C-c t q") 'google-translate-query-translate))
 
 (use-package counsel
   :ensure t
@@ -370,7 +368,7 @@
 (use-package eyebrowse
   :ensure t
   :init
-  (setq eyebrowse-keymap-prefix (kbd "C-x w e"))
+  (setq eyebrowse-keymap-prefix (kbd "C-c w o c")) ;window layout
   :config
   (eyebrowse-mode t)
 
@@ -386,11 +384,12 @@
   (if (display-graphic-p)
       (progn
         (setq frame-title-format
-              '(:eval (my-title-bar-format)))))
-  )
+              '(:eval (my-title-bar-format))))))
 
 (use-package winner
   :ensure t
+  :bind (("C-c w o h" . winner-undo)
+	 ("C-c w o l" . winner-redo))
   :config
   (winner-mode t))
 
@@ -410,13 +409,26 @@
 	    :repo "ganmacs/emacs-surround")
 	   :upgrade t)
   :config
-  (global-set-key (kbd "C-c r s") 'emacs-surround)
+  (global-set-key (kbd "C-c e s") 'emacs-surround)
   (add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
   (add-to-list 'emacs-surround-alist '("=" . ("=" . "=")))
   (add-to-list 'emacs-surround-alist '("`" . ("`" . "`"))))
 
 (use-package p4
-  :ensure t)
+  :ensure t
+  :config
+  (p4-update-global-key-prefix 'p4-global-key-prefix (kbd "C-c p P")))
+
+(use-package treemacs
+  :ensure t
+  :bind (("C-c o t" . 'treemacs))
+  :config)
+
+(use-package evil
+  :ensure t
+  :bind (("C-c o e" . 'evil-mode))
+  :config
+  (define-key evil-motion-state-map "\C-e" nil))
 
 (defun current-buffer-name()
   "get current buffer name"
