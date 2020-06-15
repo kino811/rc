@@ -94,7 +94,7 @@
   (which-key-add-key-based-replacements
     (kbd "C-c x") "execute"
     (kbd "C-c s") "search,select"
-    (kbd "C-c g") "goto"
+    (kbd "C-c j") "jump"
     (kbd "C-c w") "window"
     (kbd "C-c p") "project"
     (kbd "C-c t") "translate"
@@ -198,8 +198,8 @@
 (use-package avy
   :ensure t
   :config
-  (global-set-key (kbd "C-c g c") 'avy-goto-char)
-  (global-set-key (kbd "C-c g l") 'avy-goto-line))
+  (global-set-key (kbd "C-c j c") 'avy-goto-char)
+  (global-set-key (kbd "C-c j l") 'avy-goto-line))
 
 (use-package iedit
   :ensure t
