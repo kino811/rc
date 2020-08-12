@@ -24,7 +24,7 @@
  '(org-agenda-files (quote ("~/work/todo.org")))
  '(package-selected-packages
    (quote
-    (lua-mode undo-tree yasnippet projectile flycheck company wgrep ivy p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib google-translate lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
+    (google-translate org-download lua-mode undo-tree yasnippet projectile flycheck company wgrep ivy p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib lsp-ivy undo-tree-mode shader-mode markdown-mode+ edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell markdown-mode yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -75,13 +75,17 @@
 ;; 
 ;; Begin use-package
 ;;
-(use-package quelpa
-  :ensure t
-  :config)
+
+;; (use-package quelpa
+;;   :ensure t
+;;   :config
+;;   (setq quelpa-update-melpa-p nil)
+;;   )
 
 (use-package quelpa-use-package
   :ensure t
-  :config)
+  :config
+  (setq quelpa-update-melpa-p nil))
 
 (use-package which-key
   :ensure t
@@ -209,7 +213,7 @@
 
 (use-package company
   :ensure t
-  :hook (after-init . global-company-mode)
+  ;; :hook (after-init . global-company-mode)
   :bind (("C-c a c" . company-complete)
 	 :map company-active-map
 	 ("C-n" . 'company-select-next)
@@ -353,7 +357,7 @@
   :quelpa ((actionscript-mode
 	    :fetcher github
 	    :repo "austinhaas/actionscript-mode")
-	   :upgrade t)
+	   )
   :config
   (add-to-list 'auto-mode-alist '("\\.as\\'" . actionscript-mode)))
 
@@ -404,7 +408,7 @@
   :quelpa ((emacs-surround
 	    :fetcher github
 	    :repo "ganmacs/emacs-surround")
-	   :upgrade t)
+	   )
   :config
   (global-set-key (kbd "C-c e s") 'emacs-surround)
   (add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
@@ -429,6 +433,21 @@
 
 (use-package lua-mode
   :ensure t)
+
+(use-package org-download
+  :ensure t
+  :config
+  (add-hook 'dired-mode-hook 'org-download-enable)
+  (cond
+   ((memq window-system '(w32))
+    (setq org-download-screenshot-method "imagemagick/convert"))))
+
+(use-package google-translate
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c t g a") 'google-translate-at-point)
+  (global-set-key (kbd "C-c t g q") 'google-translate-query-translate)
+  )
 
 (defun current-buffer-name()
   "get current buffer name"
