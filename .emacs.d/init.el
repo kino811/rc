@@ -22,7 +22,7 @@
  '(helm-gtags-suggested-key-mapping t)
  '(org-agenda-files '("~/work/todo.org"))
  '(package-selected-packages
-   '(eshell-toggle google-translate lua-mode org-download undo-tree yasnippet projectile flycheck company wgrep ivy p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel company-lsp ivy-xref org-plus-contrib lsp-ivy undo-tree-mode shader-mode edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode)))
+   '(eshell-toggle google-translate lua-mode org-download undo-tree yasnippet projectile flycheck company wgrep ivy p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel ivy-xref org-plus-contrib lsp-ivy undo-tree-mode shader-mode edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -140,12 +140,6 @@
   :ensure t
   :config)
 
-(use-package moe-theme
-  :ensure t
-  :config
-  (if (not (display-graphic-p))
-      (load-theme 'moe-dark)))
-
 (use-package spacemacs-theme
   :ensure t
   :defer t
@@ -220,11 +214,6 @@
   (setq company-minimum-prefix-length 1
 	company-idle-delay 0.0))
 
-(use-package company-lsp
-  :ensure t
-  :config
-  (push 'company-lsp company-backends))
-
 (use-package flycheck
   :ensure t
   :config)
@@ -293,7 +282,7 @@
   (add-to-list 'org-structure-template-alist
 	       '("u" . "src plantuml :file .png"))
   (setq org-startup-with-inline-images t)
-  (add-hook 'org-mode-hook 'org-indent-mode)
+  ;; (add-hook 'org-mode-hook 'org-indent-mode)
   (global-set-key (kbd "C-c o a") 'org-agenda))
 
 (use-package rg
@@ -324,7 +313,24 @@
 (use-package ccls
   :ensure t
   :config
-  (setq ccls-executable "/usr/local/bin/ccls"))
+  (when (eq system-type 'darwin)
+    (setq ccls-args (list (concat "--init={"
+				  (concat "\"clang\":{"
+					  (concat "\"extraArgs\":["
+						  ;; "\"/usr/local/opt/llvm/bin/clang++\","
+						  ;; "\"-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1\","
+						  ;; "\"-isystem/usr/local/opt/llvm/include/c++/v1\","
+						  ;; "\"-isystem/usr/local/opt/icu4c/include\","
+						  ;; "\"-I.\","
+						  "\"-std=c++17\""
+						  "]")
+					  ;; ","
+					  ;; (concat "\"resourceDir\":"
+					  ;; 	"\"/usr/local/Cellar/llvm/10.0.1/lib/clang/10.0.1\"")
+					  "}")
+				  "}")))
+    )
+  )
 
 (use-package yasnippet
   :ensure t
@@ -489,3 +495,9 @@ same directory as the org-buffer and insert a link to this file."
 (global-set-key (kbd "C-c i b p") 'current-buffer-file-name)
 
 (put 'upcase-region 'disabled nil)
+
+(defun my-c++-mode-hook ()
+  (setq c-basic-offset 4)
+  )
+(add-hook 'c++-mode-hook 'my-c++-mode-hook)
+
