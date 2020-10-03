@@ -348,8 +348,9 @@
 
 (use-package undo-tree
   :ensure t
+  :bind (("C-x u" . undo-tree-visualize))
   :config
-  (global-undo-tree-mode t)
+  ;; (global-undo-tree-mode t)
   )
 
 (use-package counsel
