@@ -22,7 +22,7 @@
  '(helm-gtags-suggested-key-mapping t)
  '(org-agenda-files '("~/work/todo.org"))
  '(package-selected-packages
-   '(eshell-toggle google-translate lua-mode org-download undo-tree yasnippet projectile flycheck company wgrep ivy p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel ivy-xref org-plus-contrib lsp-ivy undo-tree-mode shader-mode edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode)))
+   '(browse-kill-ring eshell-toggle google-translate lua-mode org-download undo-tree yasnippet projectile flycheck company wgrep ivy p4 emacs-surround true highlight-indent-guides material-theme spacemacs-theme helpful ns-auto-titlebar json-mode actionscript-mode quelpa-use-package helm counsel ivy-xref org-plus-contrib lsp-ivy undo-tree-mode shader-mode edit-indirect flycheck-iron swiper powerline key-chord expand-region iy-go-to-char ccls dap-mode treemacs lsp-treemacs lsp-ui lsp-mode ggtags autopair python-black jedi powershell yasnippet-snippets yaml-mode wsd-mode which-key wgrep-ag w3 use-package-chords solarized-theme rtags rg python-docstring pyenv-mode projectile-ripgrep prodigy plantuml-mode org-projectile omnisharp narrowed-page-navigation narrow-reindent multishell mark-multiple magit jupyter irony-eldoc iedit ibuffer-projectile google-c-style flymake-yaml flymake-shell flymake-lua flymake-json flycheck-pycheckers flycheck-irony eyebrowse exec-path-from-shell evil elpy el-get ein edit-server dotnet company-shell company-lua company-jedi company-irony-c-headers company-irony company-glsl company-anaconda command-log-mode cmake-mode cmake-ide blacken avy airline-themes ace-jump-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -502,3 +502,8 @@ same directory as the org-buffer and insert a link to this file."
   )
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
+(use-package browse-kill-ring
+  :ensure t
+  :bind (("C-c o k" . browse-kill-ring))
+  :config
+  )
