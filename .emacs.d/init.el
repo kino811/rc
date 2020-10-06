@@ -442,7 +442,9 @@
   :ensure t
   :bind (("C-c o e" . 'evil-mode))
   :config
-  (define-key evil-motion-state-map "\C-e" nil))
+  (define-key evil-motion-state-map "\C-e" nil)
+  (global-undo-tree-mode -1)
+  )
 
 (use-package lua-mode
   :ensure t)
