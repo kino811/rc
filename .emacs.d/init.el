@@ -284,6 +284,10 @@
   (setq org-startup-with-inline-images t)
   ;; (add-hook 'org-mode-hook 'org-indent-mode)
   (global-set-key (kbd "C-c o a") 'org-agenda)
+  (set-face-font 'default "Monaco-12")
+  (set-fontset-font "fontset-default" '(#x1100 . #xffdc)
+		    '("AppleGothic" . "unicode-bmp"))
+  (setq face-font-rescale-alist '(("AppleGothic" . 1.2)))
   )
 
 (use-package ox-confluence-en
@@ -358,7 +362,7 @@
   :ensure t
   :bind (("C-x u" . undo-tree-visualize))
   :config
-  ;; (global-undo-tree-mode t)
+  (global-undo-tree-mode t)
   )
 
 (use-package counsel
@@ -479,13 +483,12 @@ same directory as the org-buffer and insert a link to this file."
     (progn
       (setq org-download-screenshot-method "screencapture")))))
 
-(when (eq system-type 'windows-nt)
-  (use-package google-translate
-    :ensure t
-    :config
-    (global-set-key (kbd "C-c t g a") 'google-translate-at-point)
-    (global-set-key (kbd "C-c t g q") 'google-translate-query-translate)
-    )
+(use-package google-translate
+  :ensure t
+  :bind (("C-c t g a" . 'google-translate-at-point)
+	 ("C-c t g q" . 'google-translate-query-translate)
+	 ("C-c t g t" . 'google-translate-smooth-translate))
+  :config
   )
 
 (use-package eshell-toggle
@@ -517,3 +520,5 @@ same directory as the org-buffer and insert a link to this file."
   :bind (("C-c o k" . browse-kill-ring))
   :config
   )
+
+(server-start)
