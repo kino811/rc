@@ -502,6 +502,7 @@ same directory as the org-buffer and insert a link to this file."
 
 (use-package eshell-toggle
   :ensure t
+  :bind (("C-c o s e" . eshell-toggle))
   :config)
 
 (defun current-buffer-name()
