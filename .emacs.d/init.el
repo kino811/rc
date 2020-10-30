@@ -531,4 +531,11 @@ same directory as the org-buffer and insert a link to this file."
   :config
   )
 
+(use-package edit-server
+  :ensure t
+  :config
+  (setq edit-server-url-major-mode-alist
+        '(("github\\.com" . markdown-mode)))
+  (edit-server-start))
+
 (server-start)
