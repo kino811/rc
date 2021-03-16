@@ -71,6 +71,14 @@
 
 (desktop-save-mode t)
 
+(defun my-find-fie-check-make-large-file-read-only-hook ()
+  "If a file is over a given size, make the buffer read only for speed"
+  (when (> (buffer-size) (* 1024 1024))
+    (setq buffer-read-only t)
+    (buffer-disable-undo)
+    (fundamental-mode)))
+(add-hook 'find-file-hook 'my-find-fie-check-make-large-file-read-only-hook)
+
 ;; 
 ;; Begin use-package
 ;;
@@ -390,6 +398,7 @@
 
 (use-package display-line-numbers
   :ensure t
+  :bind (("C-c s l" . display-line-numbers-mode))
   :hook ((prog-mode . display-line-numbers-mode)
 	 (actionscript-mode . display-line-numbers-mode)))
 
