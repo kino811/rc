@@ -2,7 +2,7 @@
 	email = kino811@gmail.com
 	name = kino
 [core]
-	editor = emacs -q -nw
+	editor = emacsclient
 	crlf = input
 [merge]
 	tool = emerge -q -nw
@@ -12,8 +12,8 @@
 	tool = ediff -q -nw
 [alias]
 	st = status
-	logt = log --oneline --decorate --graph --all
+	logl = log --oneline --decorate --graph --all
 [credential]
 	helper = cache
 [color]
-	ui = true
+	ui = always
