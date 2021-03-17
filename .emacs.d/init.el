@@ -540,8 +540,11 @@ same directory as the org-buffer and insert a link to this file."
   (edit-server-start))
 
 (use-package ini-mode
+  :ensure t)
+
+(use-package command-log-mode
   :ensure t
-  :config
-  (setq ))
+  :custom
+  (command-log-mode-key-binding-open-log "C-c o c l"))
 
 (server-start)
