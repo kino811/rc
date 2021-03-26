@@ -325,11 +325,17 @@
   :ensure t
   :init
   :hook ((prog-mode . lsp)
-	 (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+	 (lsp-mode . (lambda ()
+		       (let ((lsp-keymap-prefix "C-c c l"))
+			 (lsp-enable-which-key-integration)))))
+  :commands lsp
+  :config
+  (define-key lsp-mode-map (kbd "C-c c l") lsp-command-map))
 
 (use-package lsp-ivy
-  :ensure t)
+  :ensure t
+  :bind (("C-c c l i w s" . lsp-ivy-workspace-symbol))
+  :config)
 
 (use-package lsp-ui
   :ensure t
@@ -405,7 +411,7 @@
 (use-package eyebrowse
   :ensure t
   :init
-  (setq eyebrowse-keymap-prefix (kbd "C-c w o c")) ;window layout
+  (setq eyebrowse-keymap-prefix (kbd "C-c w e")) ;window layout
   :config
   (eyebrowse-mode t)
 
@@ -425,8 +431,8 @@
 
 (use-package winner
   :ensure t
-  :bind (("C-c w o h" . winner-undo)
-	 ("C-c w o l" . winner-redo))
+  :bind (("C-c w w u" . winner-undo)
+	 ("C-c w w r" . winner-redo))
   :config
   (winner-mode t))
 
