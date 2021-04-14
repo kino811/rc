@@ -6,7 +6,6 @@
   (require 'package)
   (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 
 (package-initialize)
@@ -447,10 +446,13 @@
 	    :repo "ganmacs/emacs-surround")
 	   )
   :config
-  (global-set-key (kbd "C-c e s") 'emacs-surround)
+  (global-set-key (kbd "C-c e e") 'emacs-surround)
   (add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
   (add-to-list 'emacs-surround-alist '("=" . ("=" . "=")))
-  (add-to-list 'emacs-surround-alist '("`" . ("`" . "`"))))
+  (add-to-list 'emacs-surround-alist '("`" . ("`" . "`")))
+  (add-to-list 'emacs-surround-alist '("<" . ("<" . ">")))
+  (add-to-list 'emacs-surround-alist '("(" . ("(" . ")")))
+  (add-to-list 'emacs-surround-alist '("{" . ("{" . "}"))))
 
 (use-package p4
   :ensure t
