@@ -21,7 +21,9 @@
  '(helm-gtags-prefix-key "tg")
  '(helm-gtags-suggested-key-mapping t)
  '(nxml-child-indent 4)
- '(org-agenda-files '("~/work/todo.org")))
+ '(org-agenda-files '("~/work/todo.org"))
+ '(package-selected-packages
+   '(ivy-hydra yasnippet-snippets which-key undo-tree treemacs spacemacs-theme solarized-theme rg quelpa-use-package projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy json-mode ivy-xref ini-mode iedit highlight-indent-guides helpful helm google-translate flycheck eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround edit-server counsel command-log-mode ccls browse-kill-ring actionscript-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -268,7 +270,8 @@
 			       '((emacs-lisp . t)
 				 (python . t)
 				 (C . t)
-				 (plantuml . t)))
+				 (plantuml . t)
+				 (shell . t)))
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords
 	'((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
@@ -398,7 +401,10 @@
   :ensure t
   :bind (("C-c s l" . display-line-numbers-mode))
   :hook ((prog-mode . display-line-numbers-mode)
-	 (actionscript-mode . display-line-numbers-mode)))
+	 (actionscript-mode . display-line-numbers-mode))
+  :config
+  (setq display-line-numbers-type 'relative)
+  (global-display-line-numbers-mode t))
 
 (use-package eyebrowse
   :ensure t
