@@ -365,16 +365,14 @@
 (use-package yasnippet
   :ensure t
   :init
-  (yas-reload-all)
-  (add-hook 'prog-mode-hook #'yas-minor-mode)
-  (add-hook 'org-mode-hook #'yas-minor-mode))
+  (yas-global-mode 1))
 
 (use-package yasnippet-snippets
   :ensure t)
 
 (use-package expand-region
   :ensure t
-  :bind (("C-c s e" . er/expand-region)))
+  :bind (("C-@" . er/expand-region)))
 
 (use-package undo-tree
   :ensure t
