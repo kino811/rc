@@ -284,7 +284,7 @@
   (add-to-list 'org-structure-template-alist
 	       '("u" . "src plantuml :file .png :exports plantuml"))
   (setq org-startup-with-inline-images t)
-  ;; (add-hook 'org-mode-hook 'org-indent-mode)
+  (add-hook 'org-mode-hook 'org-indent-mode)
   (global-set-key (kbd "C-c o a") 'org-agenda)
   (when (eq system-type 'darwin)
     (progn (set-face-font 'default "Monaco-12")
