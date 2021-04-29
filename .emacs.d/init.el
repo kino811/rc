@@ -22,7 +22,7 @@
  '(nxml-child-indent 4)
  '(org-agenda-files nil)
  '(package-selected-packages
-   '(emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
+   '(htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -558,5 +558,17 @@ same directory as the org-buffer and insert a link to this file."
   :ensure t
   :custom
   (command-log-mode-key-binding-open-log "C-c o c l"))
+
+;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
+(when (and (not (f-directory? "~/reveal.js"))
+	   (executable-find "git"))
+  (shell-command-to-string "git clone https://github.com/hakimel/reveal.js ~/reveal.js"))
+(use-package ox-reveal
+  :ensure t
+  :config
+  (setq org-reveal-root "file:///Users/kino811/reveal.js"))
+
+(use-package htmlize
+  :ensure t)
 
 (server-start)
