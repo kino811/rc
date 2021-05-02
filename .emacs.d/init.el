@@ -1,6 +1,7 @@
 ;;; package --- kino's init
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
+(add-to-list 'load-path "~/rc/.emacs.d/lisp")
 
 (when (>= emacs-major-version 24)
   (require 'package)
@@ -578,5 +579,10 @@ same directory as the org-buffer and insert a link to this file."
 	("C-c b b p" . bm-previous)
 	("C-c b b s a" . bm-show-all)
 	("C-c b b s s" . bm-show)))
+
+;; https://www.voidtools.com/ko-kr/downloads/
+(when (eq system-type 'windows)
+  (require 'everything)
+  (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe"))
 
 (server-start)
