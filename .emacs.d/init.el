@@ -23,7 +23,7 @@
  '(nxml-child-indent 4)
  '(org-agenda-files nil)
  '(package-selected-packages
-   '(bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
+   '(lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -384,7 +384,8 @@
 (use-package counsel
   :ensure t
   :config
-  (counsel-mode t))
+  (counsel-mode t)
+  )
 
 (use-package actionscript-mode
   :quelpa ((actionscript-mode
@@ -581,7 +582,7 @@ same directory as the org-buffer and insert a link to this file."
 	("C-c b b s s" . bm-show)))
 
 ;; https://www.voidtools.com/ko-kr/downloads/
-(when (eq system-type 'windows)
+(when (eq system-type 'windows-nt)
   (require 'everything)
   (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe"))
 
