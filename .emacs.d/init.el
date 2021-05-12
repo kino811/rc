@@ -246,8 +246,10 @@
 
 (use-package recentf
   :ensure t
+  :bind ("C-c o r" . 'recentf-open-files)
   :config
-  (recentf-mode t))
+  (recentf-mode t)
+  )
 
 (use-package powerline
   :ensure t
