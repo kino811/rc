@@ -200,7 +200,7 @@
   :ensure t
   :config
   (global-set-key (kbd "C-c s s") 'swiper)
-  (global-set-key (kbd "C-c s S") 'swiper-all))
+  )
 
 (use-package avy
   :ensure t
@@ -583,7 +583,10 @@ same directory as the org-buffer and insert a link to this file."
 
 ;; https://www.voidtools.com/ko-kr/downloads/
 (when (eq system-type 'windows-nt)
+  (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
+  (setq everything-ffap-integration nil)
+  (global-set-key (kbd "C-c s e") 'everything)
   (require 'everything)
-  (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe"))
+  )
 
 (server-start)
