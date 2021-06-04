@@ -77,7 +77,8 @@
   (when (> (buffer-size) (* 1024 1024))
     (setq buffer-read-only t)
     (buffer-disable-undo)
-    (fundamental-mode)))
+    (fundamental-mode)
+    (display-line-numbers-mode nil)))
 (add-hook 'find-file-hook 'my-find-fie-check-make-large-file-read-only-hook)
 
 ;; 
@@ -199,7 +200,8 @@
 (use-package swiper
   :ensure t
   :config
-  (global-set-key (kbd "C-c s s") 'swiper)
+  (global-set-key (kbd "C-c s s s") 'swiper)
+  (global-set-key (kbd "C-c s s a") 'swiper-thing-at-point)
   )
 
 (use-package avy
@@ -403,7 +405,7 @@
   :hook ((prog-mode . display-line-numbers-mode)
 	 (actionscript-mode . display-line-numbers-mode))
   :config
-  (setq display-line-numbers-type 'relative)
+  ;; (setq display-line-numbers-type 'relative)
   (global-display-line-numbers-mode t))
 
 (use-package eyebrowse
@@ -592,3 +594,4 @@ same directory as the org-buffer and insert a link to this file."
   )
 
 (server-start)
+(put 'narrow-to-region 'disabled nil)
