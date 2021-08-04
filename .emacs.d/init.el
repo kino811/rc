@@ -21,7 +21,7 @@
  '(helm-gtags-prefix-key "tg")
  '(helm-gtags-suggested-key-mapping t)
  '(nxml-child-indent 4)
- '(org-agenda-files nil)
+ '(org-agenda-files '("h:/work/ffo4/work/todo.org"))
  '(package-selected-packages
    '(nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
 
@@ -264,46 +264,46 @@
   :ensure org-plus-contrib
   :bind
   (:map org-mode-map
-	("C-c C-c" . (lambda ()
-		       (interactive)
-		       (org-ctrl-c-ctrl-c)
-		       (org-display-inline-images))))
+		("C-c C-c" . (lambda ()
+					   (interactive)
+					   (org-ctrl-c-ctrl-c)
+					   (org-display-inline-images))))
   :config
   (require 'ox-confluence)
   (org-babel-do-load-languages 'org-babel-load-languages
-			       '((emacs-lisp . t)
-				 (python . t)
-				 (C . t)
-				 (plantuml . t)
-				 (shell . t)))
+							   '((emacs-lisp . t)
+								 (python . t)
+								 (C . t)
+								 (plantuml . t)
+								 (shell . t)))
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords
-	'((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
+		'((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
   (setq org-plantuml-jar-path
-	(if (file-directory-p "~/rc/.emacs.d")
-	    (expand-file-name "~/rc/.emacs.d/plantuml.jar")
-	  (expand-file-name "~/.emacs.d/plantuml.jar")))
+		(if (file-directory-p "~/rc/.emacs.d")
+			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
+		  (expand-file-name "~/.emacs.d/plantuml.jar")))
   (add-hook 'org-babel-after-execute-hook
-	    (lambda ()
-	      (when org-inline-image-overlays
-		(org-redisplay-inline-images))))
+			(lambda ()
+			  (when org-inline-image-overlays
+				(org-redisplay-inline-images))))
   (add-to-list 'org-structure-template-alist
-	       '("u" . "src plantuml :file .png :exports plantuml"))
+			   '("u" . "src plantuml :file .png :exports plantuml"))
   (setq org-startup-with-inline-images t)
   (add-hook 'org-mode-hook 'org-indent-mode)
   (global-set-key (kbd "C-c o a") 'org-agenda)
   (when (eq system-type 'darwin)
     (progn (set-face-font 'default "Monaco-12")
-	   (set-fontset-font "fontset-default" '(#x1100 . #xffdc)
-			     '("AppleGothic" . "unicode-bmp"))
-	   (setq face-font-rescale-alist '(("AppleGothic" . 1.2))))
+		   (set-fontset-font "fontset-default" '(#x1100 . #xffdc)
+							 '("AppleGothic" . "unicode-bmp"))
+		   (setq face-font-rescale-alist '(("AppleGothic" . 1.2))))
     )
   (when (eq system-type 'windows-nt)
     (progn (set-face-attribute 'default nil :family "Consolas")
-	   (set-face-attribute 'default nil :height 100)
-	   (set-fontset-font t 'hangul (font-spec :name "NanumBarunGothic"))
-	   (setq face-font-rescale-alist '(("NanumBarunGothic" . 1.3)))
-	   )
+		   (set-face-attribute 'default nil :height 100)
+		   (set-fontset-font t 'hangul (font-spec :name "NanumBarunGothic"))
+		   (setq face-font-rescale-alist '(("NanumBarunGothic" . 1.3)))
+		   )
     )
   )
 
@@ -565,6 +565,18 @@ same directory as the org-buffer and insert a link to this file."
   :ensure t
   :custom
   (command-log-mode-key-binding-open-log "C-c o c l"))
+
+(use-package plantuml-mode
+  :ensure t
+  :bind (:map plantuml-mode-map
+			  ("C-M-i" . plantuml-complete-symbol))
+  :config
+  (setq plantuml-jar-path 
+		(if (file-directory-p "~/rc/.emacs.d")
+			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
+		  (expand-file-name "~/.emacs.d/plantuml.jar")))
+  (setq plantuml-default-exec-mode 'jar)
+  (setq plantuml-indent-level 4))
 
 ;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
 (when (and (not (f-directory? "~/reveal.js"))
