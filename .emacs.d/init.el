@@ -579,13 +579,17 @@ same directory as the org-buffer and insert a link to this file."
   (setq plantuml-indent-level 4))
 
 ;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
+(when (and (not (f-directory? "~/reveal.js"))
+		   (executable-find "git"))
+  (shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js"))
+ 
 (use-package ox-reveal
   :ensure t
   :config
   (cond
    ((eq system-type 'windows-nt)
 	(progn
-	  (setq org-reveal-root "~/.emacs.d/reveal.js")))
+	  (setq org-reveal-root "file:///c:/Users/myjung/reveal.js")))
    ((eq system-type 'darwin)
 	(progn
 	  (setq org-reveal-root "file:///Users/kino811/reveal.js")))))
