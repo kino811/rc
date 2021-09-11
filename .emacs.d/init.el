@@ -5,9 +5,9 @@
 
 (when (>= emacs-major-version 24)
   (require 'package)
-  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+  )
 
 (package-initialize)
 
@@ -23,7 +23,7 @@
  '(nxml-child-indent 4)
  '(org-agenda-files '("h:/work/ffo4/work/todo.org"))
  '(package-selected-packages
-   '(shell-pop nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
+   '(rainbow-delimiter rainbow-delimiters python-mode smex cmake-mode rtags shell-pop nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -34,14 +34,16 @@
 
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
-  (package-install 'use-package))
+  (package-install 'use-package)
+  )
 
 ;; (if (executable-find "chrome")
 ;;     (progn (browse-url-generic-program "chrome"))
 ;;   (progn (setq browse-url-browser-function 'eww-browse-url)))
 
 (when enable-multibyte-characters
-  (set-language-environment "Korean"))
+  (set-language-environment "Korean")
+  )
 
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
@@ -74,12 +76,13 @@
 (desktop-save-mode t)
 
 (defun my-find-fie-check-make-large-file-read-only-hook ()
-  "If a file is over a given size, make the buffer read only for speed"
+  "If a file is over a given size, make the buffer read only for speed."
   (when (> (buffer-size) (* 1024 1024))
     (setq buffer-read-only t)
     (buffer-disable-undo)
     (fundamental-mode)
     (display-line-numbers-mode nil)))
+
 (add-hook 'find-file-hook 'my-find-fie-check-make-large-file-read-only-hook)
 
 ;; 
@@ -95,12 +98,13 @@
 (use-package quelpa-use-package
   :ensure t
   :config
-  (setq quelpa-update-melpa-p nil))
+  (setq quelpa-update-melpa-p nil)
+  )
 
 (use-package which-key
   :ensure t
   :bind (("C-c x m" . 'which-key-show-major-mode)
-	 (("C-c x x" . 'which-key-show-top-level)))
+		 (("C-c x x" . 'which-key-show-top-level)))
   :config
   (which-key-mode t)
   (which-key-add-key-based-replacements
@@ -115,20 +119,24 @@
     (kbd "C-c o") "open"
     (kbd "C-c e") "edit"
     (kbd "C-c a") "autocomplete"
-    (kbd "C-c &") "yasnippet"))
+    (kbd "C-c &") "yasnippet")
+  )
 
 (use-package highlight-indent-guides
   :ensure t
+  :hook ((prog-mode) . highlight-indent-guides-mode)
   :config
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+  )
 
 (use-package paren
   :init
-  (show-paren-mode t))
+  (show-paren-mode t)
+  )
 
 (use-package hl-line
   :init
-  (global-hl-line-mode t))
+  (global-hl-line-mode t)
+  )
 
 (use-package windmove
   :ensure t
@@ -136,7 +144,8 @@
   (global-set-key (kbd "C-c w h") 'windmove-left)
   (global-set-key (kbd "C-c w l") 'windmove-right)
   (global-set-key (kbd "C-c w k") 'windmove-up)
-  (global-set-key (kbd "C-c w j") 'windmove-down))
+  (global-set-key (kbd "C-c w j") 'windmove-down)
+  )
 
 (use-package exec-path-from-shell
   :ensure t
@@ -144,13 +153,16 @@
   (when (memq window-system '(ns x))
     (exec-path-from-shell-initialize)
     (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS" "CFLAGS"))
-    (message "Initialized PATH and other variables from SHELL.")))
+    (message "Initialized PATH and other variables from SHELL.")
+	)
+  )
 
 ;; 
 ;; set theme
 (use-package solarized-theme
   :ensure t
-  :config)
+  :config
+  )
 
 (use-package spacemacs-theme
   :ensure t
@@ -159,21 +171,25 @@
   (load-theme 'spacemacs-dark t)
   :config
   (setq spacemacs-theme-org-agenda-height nil)
-  (setq spacemacs-theme-org-height nil))
+  (setq spacemacs-theme-org-height nil)
+  )
 
 (if (display-graphic-p)
-    (load-theme 'spacemacs-dark))
+    (load-theme 'spacemacs-dark)
+  )
 ;;
 
 (use-package ns-auto-titlebar
   :ensure t
   :config
-  (when (eq system-type 'darwin) (ns-auto-titlebar-mode)))
+  (when (eq system-type 'darwin) (ns-auto-titlebar-mode))
+  )
 
 (use-package ivy
   :ensure t
   :config
-  (ivy-mode t))
+  (ivy-mode t)
+  )
 
 (use-package ivy-hydra
   :ensure t)
@@ -183,7 +199,14 @@
   :init
   (when (>= emacs-major-version 27)
     (setq xref-show-definitions-function #'ivy-xref-show-defs))
-  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
+  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
+  )
+
+(use-package smex
+  :ensure t
+  :config
+  (smex-initialize)
+  )
 
 (use-package prodigy
   :ensure t
@@ -196,7 +219,8 @@
     :cwd "~/work/python-http-home"
     :tags '(work)
     :stop-signal 'sigkill
-    :kill-process-buffer-on-stop t))
+    :kill-process-buffer-on-stop t)
+  )
 
 (use-package swiper
   :ensure t
@@ -209,43 +233,50 @@
   :ensure t
   :config
   (global-set-key (kbd "C-c j c") 'avy-goto-char)
-  (global-set-key (kbd "C-c j l") 'avy-goto-line))
+  (global-set-key (kbd "C-c j l") 'avy-goto-line)
+  )
 
 (use-package iedit
   :ensure t
-  :config)
+  :config
+  )
 
 (use-package wgrep
   :ensure t
-  :config)
+  :config
+  )
 
 (use-package flycheck
   :ensure t
-  :config)
+  :init (global-flycheck-mode)
+  :config
+  )
 
 (use-package magit
   :ensure t
   :bind
   ("C-c p g" . 'magit-status)
-  :config)
+  :config
+  )
 
 (use-package projectile
   :ensure t
+  :bind-keymap ("C-c p p" . projectile-command-map)
   :config
   (projectile-mode t)
-  (define-key projectile-mode-map (kbd "C-c p p") 'projectile-command-map)
-  
   (setq projectile-enable-caching t)
   (setq gc-cons-threshold 1000000000)
   (defun my-minibuffer-setup-hook ()
     (setq gc-cons-threshold most-positive-fixnum))
   (defun my-minibuffer-exit-hook ()
-    (psetq gc-cons-threshold 800000))
+    (psetq gc-cons-threshold 800000)
+	)
   (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
   (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
   (when (memq window-system '(w32))
     (setq projectile-indexing-method 'alien)
-    ))
+    )
+  )
 
 (use-package recentf
   :ensure t
@@ -257,17 +288,19 @@
 (use-package powerline
   :ensure t
   :config
-  (powerline-default-theme))
+  (powerline-default-theme)
+  )
 
 (use-package org
   :ensure t
   :ensure org-plus-contrib
-  :bind
-  (:map org-mode-map
-		("C-c C-c" . (lambda ()
-					   (interactive)
-					   (org-ctrl-c-ctrl-c)
-					   (org-display-inline-images))))
+  :bind (:map org-mode-map
+			  ("C-c C-c" . (lambda ()
+							 (interactive)
+							 (org-ctrl-c-ctrl-c)
+							 (org-display-inline-images)
+							 ))
+			  )
   :config
   (require 'ox-confluence)
   (org-babel-do-load-languages 'org-babel-load-languages
@@ -317,31 +350,36 @@
 (use-package rg
   :ensure t
   :config
-  (rg-enable-default-bindings (kbd "C-c s r")))
+  (rg-enable-default-bindings (kbd "C-c s r"))
+  )
 
 ;; language server protocol
 (use-package lsp-mode
   :ensure t
   :init
-  :hook ((prog-mode . lsp)
-	 (lsp-mode . (lambda ()
-		       (let ((lsp-keymap-prefix "C-c c l"))
-			 (lsp-enable-which-key-integration)))))
+  :hook ((prog-mode . lsp-deferred)
+		 (lsp-mode . (lambda ()
+					   (let ((lsp-keymap-prefix "C-c c l"))
+						 (lsp-enable-which-key-integration)))))
   :commands lsp
+  :bind-keymap ("C-c c l" . lsp-command-map)
   :config
-  (define-key lsp-mode-map (kbd "C-c c l") lsp-command-map))
+  ;; (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024))
+  )
 
 (use-package lsp-ivy
   :ensure t
-  :bind (("C-c c l i w s" . lsp-ivy-workspace-symbol))
-  :config)
+  :config
+  )
 
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
+  :bind (([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+		 ([remap xref-find-references] . lsp-ui-peek-find-references)
+		 )
   :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   )
 
 ;; cc language server
@@ -350,34 +388,37 @@
   :config
   (when (eq system-type 'darwin)
     (setq ccls-args (list (concat "--init={"
-				  (concat "\"clang\":{"
-					  (concat "\"extraArgs\":["
-						  ;; "\"/usr/local/opt/llvm/bin/clang++\","
-						  ;; "\"-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1\","
-						  ;; "\"-isystem/usr/local/opt/llvm/include/c++/v1\","
-						  ;; "\"-isystem/usr/local/opt/icu4c/include\","
-						  ;; "\"-I.\","
-						  "\"-std=c++17\""
-						  "]")
-					  ;; ","
-					  ;; (concat "\"resourceDir\":"
-					  ;; 	"\"/usr/local/Cellar/llvm/10.0.1/lib/clang/10.0.1\"")
-					  "}")
-				  "}")))
+								  (concat "\"clang\":{"
+										  (concat "\"extraArgs\":["
+												  ;; "\"/usr/local/opt/llvm/bin/clang++\","
+												  ;; "\"-isystem/Library/Developer/CommandLineTools/usr/include/c++/v1\","
+												  ;; "\"-isystem/usr/local/opt/llvm/include/c++/v1\","
+												  ;; "\"-isystem/usr/local/opt/icu4c/include\","
+												  ;; "\"-I.\","
+												  "\"-std=c++17\""
+												  "]")
+										  ;; ","
+										  ;; (concat "\"resourceDir\":"
+										  ;; 	"\"/usr/local/Cellar/llvm/10.0.1/lib/clang/10.0.1\"")
+										  "}")
+								  "}")))
     )
   )
 
 (use-package yasnippet
   :ensure t
   :init
-  (yas-global-mode 1))
+  (yas-global-mode 1)
+  )
 
 (use-package yasnippet-snippets
-  :ensure t)
+  :ensure t
+  )
 
 (use-package expand-region
   :ensure t
-  :bind (("C-@" . er/expand-region)))
+  :bind (("C-@" . er/expand-region))
+  )
 
 (use-package undo-tree
   :ensure t
@@ -394,20 +435,21 @@
 
 (use-package actionscript-mode
   :quelpa ((actionscript-mode
-	    :fetcher github
-	    :repo "austinhaas/actionscript-mode")
-	   )
+			:fetcher github
+			:repo "austinhaas/actionscript-mode")
+		   )
   :config
-  (add-to-list 'auto-mode-alist '("\\.as\\'" . actionscript-mode)))
+  (add-to-list 'auto-mode-alist '("\\.as\\'" . actionscript-mode))
+  )
 
 (use-package display-line-numbers
   :ensure t
   :bind (("C-c s l" . display-line-numbers-mode))
-  :hook ((prog-mode . display-line-numbers-mode)
-	 (actionscript-mode . display-line-numbers-mode))
+  :hook ((prog-mode actionscript-mode) . display-line-numbers-mode)
   :config
   ;; (setq display-line-numbers-type 'relative)
-  (global-display-line-numbers-mode t))
+  (global-display-line-numbers-mode t)
+  )
 
 (use-package eyebrowse
   :ensure t
@@ -428,30 +470,34 @@
   (if (display-graphic-p)
       (progn
         (setq frame-title-format
-              '(:eval (my-title-bar-format))))))
+              '(:eval (my-title-bar-format)))))
+  )
 
 (use-package winner
   :ensure t
   :bind (("C-c w w u" . winner-undo)
-	 ("C-c w w r" . winner-redo))
+		 ("C-c w w r" . winner-redo))
   :config
-  (winner-mode t))
+  (winner-mode t)
+  )
 
 (use-package json-mode
-  :ensure t)
+  :ensure t
+  )
 
 (use-package helpful
   :ensure t
   :bind (("C-h f" . helpful-callable)
-	 ("C-h F" . helpful-command)
-	 ("C-h v" . helpful-variable)
-	 ("C-h k" . helpful-key)))
+		 ("C-h F" . helpful-command)
+		 ("C-h v" . helpful-variable)
+		 ("C-h k" . helpful-key))
+  )
 
 (use-package emacs-surround
   :quelpa ((emacs-surround
-	    :fetcher github
-	    :repo "ganmacs/emacs-surround")
-	   )
+			:fetcher github
+			:repo "ganmacs/emacs-surround")
+		   )
   :config
   (global-set-key (kbd "C-c e e") 'emacs-surround)
   (add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
@@ -459,33 +505,37 @@
   (add-to-list 'emacs-surround-alist '("`" . ("`" . "`")))
   (add-to-list 'emacs-surround-alist '("<" . ("<" . ">")))
   (add-to-list 'emacs-surround-alist '("(" . ("(" . ")")))
-  (add-to-list 'emacs-surround-alist '("{" . ("{" . "}"))))
+  (add-to-list 'emacs-surround-alist '("{" . ("{" . "}")))
+  )
 
 (use-package p4
   :ensure t
   :config
-  (p4-update-global-key-prefix 'p4-global-key-prefix (kbd "C-c p P")))
+  (p4-update-global-key-prefix 'p4-global-key-prefix (kbd "C-c p P"))
+  )
 
 (use-package treemacs
   :ensure t
   :bind (("C-c o t" . 'treemacs))
-  :config)
+  :config
+  )
 
 (use-package evil
   :ensure t
-  :bind (("C-c o e" . 'evil-mode))
+  :bind (("C-c o e" . 'evil-mode)
+		 :map evil-motion-state-map
+		 ("C-e" . nil)
+		 )
   :config
-  (define-key evil-motion-state-map "\C-e" nil)
-  (global-undo-tree-mode -1)
   )
 
 (use-package lua-mode
-  :ensure t)
+  :ensure t
+  )
 
 ;; window 10 insert screenshot
 (defun my-org-screenshot-w32 ()
-  "Take a screenshot into a time stamped unique-named file in the
-same directory as the org-buffer and insert a link to this file."
+  "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
   (interactive)
   (setq filename
         (concat
@@ -497,12 +547,13 @@ same directory as the org-buffer and insert a link to this file."
   ;; (shell-command "snippingtool /clip")
   (shell-command (concat "powershell -command \"Add-Type -AssemblyName System.Windows.Forms;if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {$image = [System.Windows.Forms.Clipboard]::GetImage();[System.Drawing.Bitmap]$image.Save('" filename "',[System.Drawing.Imaging.ImageFormat]::Png); Write-Output 'clipboard content saved as file'} else {Write-Output 'clipboard does not contain image data'}\""))
   (insert (concat "[[file:" filename "]]"))
-  (org-display-inline-images))
+  (org-display-inline-images)
+  )
 
 (use-package org-download
   :ensure t
+  :hook (dired-mode . org-download-enable)
   :config
-  (add-hook 'dired-mode-hook 'org-download-enable)
   (cond
    ((eq system-type 'windows-nt)
     (progn
@@ -510,30 +561,34 @@ same directory as the org-buffer and insert a link to this file."
       (global-set-key (kbd "C-c i s") 'my-org-screenshot-w32)))
    ((eq system-type 'darwin)
     (progn
-      (setq org-download-screenshot-method "screencapture")))))
+      (setq org-download-screenshot-method "screencapture"))))
+  )
 
 (use-package google-translate
   :ensure t
   :bind (("C-c t g a" . 'google-translate-at-point)
-	 ("C-c t g q" . 'google-translate-query-translate)
-	 ("C-c t g t" . 'google-translate-smooth-translate))
+		 ("C-c t g q" . 'google-translate-query-translate)
+		 ("C-c t g t" . 'google-translate-smooth-translate))
   :config
   )
 
 (use-package eshell-toggle
   :ensure t
   :bind (("C-c o s e" . eshell-toggle))
-  :config)
+  :config
+  )
 
 (defun current-buffer-name()
-  "get current buffer name"
+  "get current buffer name."
   (interactive)
-  (insert (buffer-name (window-buffer (minibuffer-selected-window)))))
+  (insert (buffer-name (window-buffer (minibuffer-selected-window))))
+  )
 
 (defun current-buffer-file-name()
-  "get current buffer name"
+  "get current buffer name."
   (interactive)
-  (insert (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+  (insert (buffer-file-name (window-buffer (minibuffer-selected-window))))
+  )
 
 (global-set-key (kbd "C-c i b n") 'current-buffer-name)
 (global-set-key (kbd "C-c i b p") 'current-buffer-file-name)
@@ -543,6 +598,7 @@ same directory as the org-buffer and insert a link to this file."
 (defun my-c++-mode-hook ()
   (setq c-basic-offset 4)
   )
+
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
 (use-package browse-kill-ring
@@ -556,15 +612,18 @@ same directory as the org-buffer and insert a link to this file."
   :config
   (setq edit-server-url-major-mode-alist
         '(("github\\.com" . markdown-mode)))
-  (edit-server-start))
+  (edit-server-start)
+  )
 
 (use-package ini-mode
-  :ensure t)
+  :ensure t
+  )
 
 (use-package command-log-mode
   :ensure t
   :custom
-  (command-log-mode-key-binding-open-log "C-c o c l"))
+  (command-log-mode-key-binding-open-log "C-c o c l")
+  )
 
 (use-package plantuml-mode
   :ensure t
@@ -576,13 +635,15 @@ same directory as the org-buffer and insert a link to this file."
 			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
 		  (expand-file-name "~/.emacs.d/plantuml.jar")))
   (setq plantuml-default-exec-mode 'jar)
-  (setq plantuml-indent-level 4))
+  (setq plantuml-indent-level 4)
+  )
 
 ;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
 (when (and (not (f-directory? "~/reveal.js"))
 		   (executable-find "git"))
-  (shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js"))
- 
+  (shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js")
+  )
+
 (use-package ox-reveal
   :ensure t
   :config
@@ -592,18 +653,32 @@ same directory as the org-buffer and insert a link to this file."
 	  (setq org-reveal-root "file:///c:/Users/myjung/reveal.js")))
    ((eq system-type 'darwin)
 	(progn
-	  (setq org-reveal-root "file:///Users/kino811/reveal.js")))))
+	  (setq org-reveal-root "file:///Users/kino811/reveal.js"))))
+  )
 
 (use-package htmlize
-  :ensure t)
+  :ensure t
+  )
 
 (use-package bm
   :ensure t
   :bind(("C-c b b t" . bm-toggle)
-	("C-c b b n" . bm-next)
-	("C-c b b p" . bm-previous)
-	("C-c b b s a" . bm-show-all)
-	("C-c b b s s" . bm-show)))
+		("C-c b b n" . bm-next)
+		("C-c b b p" . bm-previous)
+		("C-c b b s a" . bm-show-all)
+		("C-c b b s s" . bm-show))
+  )
+
+(use-package python
+  :ensure t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python" . python-mode)
+  )
+
+(use-package rainbow-delimiters
+  :ensure t
+  :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
+  )
 
 ;; https://www.voidtools.com/ko-kr/downloads/
 (when (eq system-type 'windows-nt)
