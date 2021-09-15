@@ -23,7 +23,7 @@
  '(nxml-child-indent 4)
  '(org-agenda-files '("h:/work/ffo4/work/todo.org"))
  '(package-selected-packages
-   '(rainbow-delimiter rainbow-delimiters python-mode smex cmake-mode rtags shell-pop nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
+   '(evil-indent-textobject evil-surround evil-leader rainbow-delimiter rainbow-delimiters python-mode smex cmake-mode rtags shell-pop nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -250,6 +250,7 @@
   :ensure t
   :init (global-flycheck-mode)
   :config
+  (setq flycheck-flake8-maximum-line-length 124)
   )
 
 (use-package magit
@@ -364,6 +365,7 @@
   :commands lsp
   :bind-keymap ("C-c c l" . lsp-command-map)
   :config
+  (setq lsp-print-io nil)
   ;; (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024))
   )
@@ -378,8 +380,28 @@
   :commands lsp-ui-mode
   :bind (([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
 		 ([remap xref-find-references] . lsp-ui-peek-find-references)
+		 :map lsp-mode-map
+		 ("C-S <space>" . lsp-ui-doc-show)
 		 )
   :config
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-sideline-show-diagnostics t)
+  (setq lsp-ui-sideline-show-hover t)
+  (setq lsp-ui-sideline-show-code-actions t)
+  (setq lsp-ui-sideline-update-mode 'line)
+  (setq lsp-ui-sideline-ignore-duplicate t)
+
+  (setq lsp-ui-peek-enable t)
+  (setq lsp-ui-peek-show-directory t)
+
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-doc-position 'top)
+  (setq lsp-ui-doc-delay 0.2)
+  (setq lsp-ui-doc-show-with-cursor t)
+  (setq lsp-ui-doc-use-childframe t)
+  (setq lsp-ui-doc-include-signature t)
+
+  (setq lsp-ui-flycheck-list-position 'right)
   )
 
 ;; cc language server
@@ -522,11 +544,38 @@
 
 (use-package evil
   :ensure t
-  :bind (("C-c o e" . 'evil-mode)
-		 :map evil-motion-state-map
-		 ("C-e" . nil)
-		 )
   :config
+  ;; (evil-mode t)
+  (bind-key (kbd "C-c o e") 'evil-mode)
+
+  (use-package evil-leader
+	:ensure t
+	:config
+	(global-evil-leader-mode)
+	)
+  (use-package evil-surround
+	:ensure t
+	:config
+	(global-evil-surround-mode)
+	)
+  (use-package evil-indent-textobject
+	:ensure t
+	)
+  
+  (dolist (mode '(ag-mode
+				  flycheck-error-list-mode
+				  git-rebase-mode))
+	(add-to-list 'evil-emacs-state-modes mode))
+  
+  (add-hook 'occur-mode-hook
+			(lambda ()
+			  (evil-add-hjkl-bindings occur-mode-map 'emacs
+				(kbd "/") 'evil-search-forward
+				(kbd "n") 'evil-search-next
+				(kbd "N") 'evil-search-previous
+				(kbd "C-d") 'evil-scroll-down
+				(kdb "C-u") 'evil-scroll-up
+				(kdb "C-w C-w") 'other-window)))
   )
 
 (use-package lua-mode
