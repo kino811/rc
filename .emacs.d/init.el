@@ -23,7 +23,7 @@
  '(nxml-child-indent 4)
  '(org-agenda-files '("h:/work/ffo4/work/todo.org"))
  '(package-selected-packages
-   '(evil-indent-textobject evil-surround evil-leader rainbow-delimiter rainbow-delimiters python-mode smex cmake-mode rtags shell-pop nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
+   '(ob-typescript ob-ipython evil-indent-textobject evil-surround evil-leader rainbow-delimiter rainbow-delimiters python-mode smex cmake-mode rtags shell-pop nhexl-mode lsp-mode auto-complete-nxml bm org-attach-screenshot htmlize ox-reveal emacsql-sqlite3 sqlite3 yasnippet-snippets which-key undo-tree spacemacs-theme solarized-theme rg quelpa-use-package pyenv-mode projectile prodigy powerline plantuml-mode p4 ox-confluence-en org-plus-contrib org-download omnisharp ns-auto-titlebar magit lua-mode lsp-ui lsp-ivy key-chord json-mode iy-go-to-char ivy-xref ivy-hydra irony-eldoc ini-mode iedit highlight-indent-guides helpful google-translate google-c-style flycheck-irony eyebrowse expand-region exec-path-from-shell evil eshell-toggle emacs-surround elpy ein edit-server dap-mode counsel company-jedi company-irony company-anaconda command-log-mode ccls browse-kill-ring autopair actionscript-mode)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -303,10 +303,19 @@
 							 ))
 			  )
   :config
+  (use-package ob-ipython
+	:ensure t
+	:config)
+  (use-package ob-typescript
+	:ensure t
+	:config)
+  
   (require 'ox-confluence)
   (org-babel-do-load-languages 'org-babel-load-languages
 							   '((emacs-lisp . t)
 								 (python . t)
+								 (ipython . t)
+								 (typescript . t)
 								 (C . t)
 								 (plantuml . t)
 								 (shell . t)))
@@ -358,12 +367,14 @@
 (use-package lsp-mode
   :ensure t
   :init
-  :hook ((prog-mode . lsp-deferred)
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((python-mode . lsp-deferred)
+		 (c++-mode . lsp-deferred)
+		 (csharp-mode . lsp-deferred)
 		 (lsp-mode . (lambda ()
 					   (let ((lsp-keymap-prefix "C-c c l"))
 						 (lsp-enable-which-key-integration)))))
-  :commands lsp
-  :bind-keymap ("C-c c l" . lsp-command-map)
+  :commands (lsp lsp-deferred)
   :config
   (setq lsp-print-io nil)
   ;; (setq gc-cons-threshold 100000000)
@@ -372,7 +383,7 @@
 
 (use-package lsp-ivy
   :ensure t
-  :config
+  :commands lsp-ivy-workspace-symbol
   )
 
 (use-package lsp-ui
@@ -381,7 +392,7 @@
   :bind (([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
 		 ([remap xref-find-references] . lsp-ui-peek-find-references)
 		 :map lsp-mode-map
-		 ("C-S <space>" . lsp-ui-doc-show)
+		 ("C-S-<space>" . lsp-ui-doc-show)
 		 )
   :config
   (setq lsp-ui-sideline-enable nil)
@@ -546,8 +557,6 @@
   :ensure t
   :config
   ;; (evil-mode t)
-  (bind-key (kbd "C-c o e") 'evil-mode)
-
   (use-package evil-leader
 	:ensure t
 	:config
@@ -613,12 +622,15 @@
       (setq org-download-screenshot-method "screencapture"))))
   )
 
+(require 'google-translate)
 (use-package google-translate
   :ensure t
   :bind (("C-c t g a" . 'google-translate-at-point)
 		 ("C-c t g q" . 'google-translate-query-translate)
 		 ("C-c t g t" . 'google-translate-smooth-translate))
   :config
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
+  (setq google-translate-backend-method 'curl)
   )
 
 (use-package eshell-toggle
@@ -711,11 +723,11 @@
 
 (use-package bm
   :ensure t
-  :bind(("C-c b b t" . bm-toggle)
-		("C-c b b n" . bm-next)
-		("C-c b b p" . bm-previous)
-		("C-c b b s a" . bm-show-all)
-		("C-c b b s s" . bm-show))
+  :bind(("C-c k k t" . bm-toggle)
+		("C-c k k n" . bm-next)
+		("C-c k k p" . bm-previous)
+		("C-c k k s a" . bm-show-all)
+		("C-c k k b s s" . bm-show))
   )
 
 (use-package python
@@ -740,3 +752,17 @@
 (server-start)
 (put 'narrow-to-region 'disabled nil)
 (put 'erase-buffer 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(defun kill-all-buffers ()
+  "Kill all buffers."
+  (interactive)
+  (mapc 'kill-buffer (buffer-list)))
+
+(defun kill-other-buffers-test ()
+  "Kill all other buffers."
+  (interactive)
+  (mapc 'kill-buffer
+		(delq (current-buffer)
+			  (buffer-list))))
+
