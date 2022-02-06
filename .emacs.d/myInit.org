@@ -1,0 +1,792 @@
+#+startup: overview
+
+* default turn off options
+** narrow region
+#+begin_src emacs-lisp
+(put 'narrow-to-region 'disabled nil)
+#+end_src
+
+* interface
+** hide start screen
+   #+begin_src emacs-lisp
+   (setq inhibit-startup-screen t)
+   #+end_src
+
+** hide toolbar
+   #+begin_src emacs-lisp
+   (tool-bar-mode -1)
+   #+end_src
+
+** revert buffer
+   #+begin_src emacs-lisp
+     (global-set-key (kbd "C-c r") 'revert-buffer)
+   #+end_src
+
+** subword-mode
+e.g.   GtkWindow          =>  "Gtk" and "Window"
+#+begin_src emacs-lisp
+(subword-mode t)
+#+end_src
+
+** global visual line mode
+#+begin_src emacs-lisp
+(global-visual-line-mode t)
+#+end_src
+
+** tune off sound bell and use visible bell
+#+begin_src emacs-lisp
+(setq visible-bell t)
+#+end_src
+
+** delete selection when type
+#+begin_src emacs-lisp
+(delete-selection-mode t)
+#+end_src
+
+** i don't want to make backup file auto
+#+begin_src emacs-lisp
+(setq make-backup-files nil)
+#+end_src
+
+** default tab size
+#+begin_src emacs-lisp
+(setq-default tab-width 4)
+#+end_src
+
+** i want to save desktop state for emacs open after
+#+begin_src emacs-lisp
+(desktop-save-mode t)
+#+end_src
+
+* alias
+  #+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (defalias 'list-buffers 'ibuffer)
+  #+end_src
+
+* language
+** enviroment
+#+begin_src emacs-lisp
+  ;; (when enable-multibyte-characters
+  ;;   (set-language-environment "Korean")
+  ;;   )
+#+end_src
+** encoding
+for default encoding is best that utf-8
+#+begin_src emacs-lisp
+  ;; (set-terminal-coding-system 'utf-8)
+  ;; (set-keyboard-coding-system 'utf-8)
+  ;; (set-selection-coding-system 'utf-8)
+  ;; (prefer-coding-system 'utf-8)
+  ;; (set-locale-environment "ko_KR.UTF-8")
+#+end_src
+
+* my custom function
+** check big file
+#+begin_src emacs-lisp
+(defun my-find-fie-check-make-large-file-read-only-hook ()
+  "If a file is over a given size, make the buffer read only for speed."
+  (when (> (buffer-size) (* 1024 1024))
+    (setq buffer-read-only t)
+    (buffer-disable-undo)
+    (fundamental-mode)
+    (display-line-numbers-mode nil)))
+#+end_src
+
+*** set when find file
+#+begin_src emacs-lisp
+(add-hook 'find-file-hook 'my-find-fie-check-make-large-file-read-only-hook)
+#+end_src
+** current buffer name
+#+begin_src emacs-lisp
+
+(defun current-buffer-name()
+  "get current buffer name."
+  (interactive)
+  (insert (buffer-name (window-buffer (minibuffer-selected-window))))
+  )
+
+(defun current-buffer-file-name()
+  "get current buffer name."
+  (interactive)
+  (insert (buffer-file-name (window-buffer (minibuffer-selected-window))))
+  )
+
+(global-set-key (kbd "C-c i b n") 'current-buffer-name)
+(global-set-key (kbd "C-c i b p") 'current-buffer-file-name)
+
+#+end_src
+
+* about package
+** first setting for package
+   #+begin_src emacs-lisp
+     (require 'package)
+     (setq package-enable-at-startup nil)
+
+     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+     (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+
+     (package-initialize)
+     (unless (package-installed-p 'use-package)
+       (package-refresh-contents)
+       (package-install 'use-package))
+   #+end_src
+
+** quelpa
+   download package from git
+#+begin_src emacs-lisp
+
+  (use-package quelpa
+	:ensure t
+	:config
+	(setq quelpa-update-melpa-p nil)
+	)
+
+  (use-package quelpa-use-package
+	:ensure t
+	:config
+	(setq quelpa-update-melpa-p nil)
+	)
+
+#+end_src
+
+** try
+   try apply package for temp package that not download
+   #+begin_src emacs-lisp
+     (use-package try
+       :ensure t)
+   #+end_src
+
+** manual elisp path
+   #+begin_src emacs-lisp
+     (add-to-list 'load-path "~/.emacs.d/lisp")
+   #+end_src
+
+* interface package
+** highlight indent  guides
+#+begin_src emacs-lisp
+(use-package highlight-indent-guides
+  :ensure t
+  :hook ((prog-mode) . highlight-indent-guides-mode)
+  :config
+  )
+#+end_src
+** highlight pair point
+#+begin_src emacs-lisp
+  (use-package paren
+    :ensure t
+    :init
+    (show-paren-mode t)
+    )
+#+end_src
+** highlight line
+#+begin_src emacs-lisp
+  (use-package hl-line
+    :ensure t
+    :init
+    (global-hl-line-mode t)
+    )
+#+end_src
+** powerline
+customizing mode line
+#+begin_src emacs-lisp
+
+(use-package powerline
+  :ensure t
+  :config
+  (powerline-default-theme)
+  )
+
+#+end_src
+** display line number
+#+begin_src emacs-lisp
+
+  (use-package display-line-numbers
+	:ensure t
+	;; :hook ((prog-mode actionscript-mode) . display-line-numbers-mode)
+	:config
+	;; (setq display-line-numbers-type 'relative)
+	(global-display-line-numbers-mode t)
+	)
+
+#+end_src
+** eyebrowse
+#+begin_src emacs-lisp
+  (use-package eyebrowse
+	:ensure t
+	:init
+	(setq eyebrowse-keymap-prefix (kbd "C-c w l"))
+	:config
+	(eyebrowse-mode t)
+	)
+#+end_src
+** rainbow delimiter
+#+begin_src emacs-lisp
+
+(use-package rainbow-delimiters
+  :ensure t
+  :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
+  )
+
+#+end_src
+* which key
+  brings up some help
+  #+begin_src emacs-lisp
+    (use-package which-key
+      :ensure t
+      :config
+      (which-key-mode 1)
+      )
+  #+end_src
+
+* shell
+** exec path for shell
+ when window
+ #+begin_src emacs-lisp
+
+ (use-package exec-path-from-shell
+   :ensure t
+   :config
+   (when (memq window-system '(ns x))
+     (exec-path-from-shell-initialize)
+     (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS" "CFLAGS"))
+     (message "Initialized PATH and other variables from SHELL.")
+	 )
+   )
+
+ #+end_src
+** eshell toggle
+#+begin_src emacs-lisp
+
+(use-package eshell-toggle
+  :ensure t
+  :bind (("C-c o s e" . eshell-toggle))
+  :config
+  )
+
+#+end_src
+
+* org-mode stuff
+** org
+#+begin_src emacs-lisp
+  (use-package org
+	:ensure t
+	:bind (("C-c a" . org-agenda))
+	:config
+	;; (require 'ox-confluence)
+
+	;; (org-babel-do-load-languages 'org-babel-load-languages
+	;; 							   '((emacs-lisp . t)
+	;; 								 (python . t)
+	;; 								 (ipython . t)
+	;; 								 (C . t)
+	;; 								 (plantuml . t)
+	;; 								 (shell . t)))
+
+	;; (setq org-plantuml-jar-path
+	;; 		(if (file-directory-p "~/rc/.emacs.d")
+	;; 			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
+	;; 		  (expand-file-name "~/.emacs.d/plantuml.jar")))
+
+	;; (add-to-list 'org-structure-template-alist
+	;; 			   '("u" . "src plantuml :file .png :exports plantuml"))
+
+	(when (eq system-type 'windows-nt)
+	  (progn (set-face-attribute 'default nil :family "Consolas")
+			 (set-face-attribute 'default nil :height 100)
+			 (set-fontset-font t 'hangul (font-spec :name "NanumBarunGothic"))
+			 (setq face-font-rescale-alist '(("NanumBarunGothic" . 1.3)))
+			 )
+	  )
+	)
+#+end_src
+** org bullet
+   #+begin_src emacs-lisp
+     (use-package org-bullets
+       :ensure t
+       :config
+       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+       )
+   #+end_src
+** org confluence
+#+begin_src emacs-lisp
+
+  ;; (use-package ox-confluence-en
+  ;;   :quelpa (ox-confluence-en :fetcher github :repo "correl/ox-confluence-en")
+  ;;   :config
+  ;;   (require 'ox-confluence)
+  ;;   (setq ox-confluence-en-use-plantuml-macro t)
+  ;;   )
+
+#+end_src
+
+** org mode screenshot
+ #+begin_src emacs-lisp
+
+   ;; window 10 insert screenshot
+   (defun my-org-screenshot-w32 ()
+	 "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
+	 (interactive)
+	 (setq filename
+		   (concat
+			(make-temp-name
+			 (concat (buffer-file-name)
+					 "_"
+					 (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+	 ;; using just clip board captured before.
+	 ;; (shell-command "snippingtool /clip")
+	 (shell-command (concat "powershell -command \"Add-Type -AssemblyName System.Windows.Forms;if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {$image = [System.Windows.Forms.Clipboard]::GetImage();[System.Drawing.Bitmap]$image.Save('" filename "',[System.Drawing.Imaging.ImageFormat]::Png); Write-Output 'clipboard content saved as file'} else {Write-Output 'clipboard does not contain image data'}\""))
+	 (insert (concat "[[file:" filename "]]"))
+	 (org-display-inline-images)
+	 )
+
+ #+end_src
+
+ #+begin_src emacs-lisp
+
+   (use-package org-download
+	 :ensure t
+	 :hook (dired-mode . org-download-enable)
+	 :config
+	 (cond
+	  ((eq system-type 'windows-nt)
+	   (progn
+		 (setq org-download-screenshot-method "imagemagick/convert")
+		 (global-set-key (kbd "C-c i s") 'my-org-screenshot-w32)))
+	  ((eq system-type 'darwin)
+	   (progn
+		 (setq org-download-screenshot-method "screencapture"))))
+	 )
+
+ #+end_src
+
+** ox reveal
+#+begin_src emacs-lisp
+
+(use-package ox-reveal
+  :ensure t
+  :config
+  (cond
+   ((eq system-type 'windows-nt)
+	(progn
+	  (setq org-reveal-root "file:///c:/Users/myjung/reveal.js")))
+   ((eq system-type 'darwin)
+	(progn
+	  (setq org-reveal-root "file:///Users/kino811/reveal.js"))))
+  )
+
+#+end_src
+
+* etc
+  #+begin_src emacs-lisp
+    (setq indo-enable-flex-matching t)
+    (setq ido-everywhere t)
+    (ido-mode 1)
+  #+end_src
+
+* window
+** ace window
+   when move other window, possible choose by number when window count is more than 2
+  #+begin_src emacs-lisp
+	(use-package ace-window
+	  :ensure t
+	  :init
+	  (progn
+		(global-set-key [remap other-window] 'ace-window)
+		(custom-set-faces
+		 '(aw-leading-char-face
+		   ((t (:inherit ace-jump-face-foreground :height 3.0)))))
+		)
+	  )
+  #+end_src
+** winner
+   undo, redo window layout.
+#+begin_src emacs-lisp
+
+  (use-package winner
+	:ensure t
+	:config
+	(winner-mode t)
+	)
+
+#+end_src
+
+* ivy stuff
+  #+begin_src emacs-lisp
+	(use-package ivy
+	  :ensure t
+	  :diminish (ivy-mode)
+	  :bind (("C-x b" . ivy-switch-buffer)
+			 ("C-c C-r". ivy-resume))
+	  :config
+	  (ivy-mode 1)
+	  (setq ivy-use-virtual-buffers t)
+	  (setq ivy-display-style 'fancy)
+	  )
+	(use-package counsel
+	  :ensure t
+	  :config
+	  (counsel-mode t)
+	  )
+	(use-package swiper
+	  :ensure try
+	  :bind (("C-s" . swiper)
+			 ("C-r" . swiper))
+	  :config
+	  (ivy-mode 1)
+	  (setq ivy-use-virtual-buffers t)
+	  (setq ivy-display-style 'fancy)
+	  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+	  )
+  #+end_src
+
+* move
+  #+begin_src emacs-lisp
+    (use-package avy
+      :ensure t
+      :bind (("C-c m" . avy-goto-char))
+      )
+  #+end_src
+
+* theme
+  #+begin_src emacs-lisp
+    (use-package solarized-theme
+      :ensure t
+      :config
+      (load-theme 'solarized-dark t)
+      )
+  #+end_src
+
+* edit
+** iedit
+possible multi edit
+#+begin_src emacs-lisp
+
+(use-package iedit
+  :ensure t
+  :config
+  )
+
+#+end_src
+** possible edit in buffer
+#+begin_src emacs-lisp
+
+(use-package wgrep
+  :ensure t
+  :config
+  )
+
+#+end_src
+** browse kill ring
+#+begin_src emacs-lisp
+
+(use-package browse-kill-ring
+  :ensure t
+  :bind (("C-c o k" . browse-kill-ring))
+  :config
+  )
+
+#+end_src
+* version control
+** magit
+#+begin_src emacs-lisp
+
+  (use-package magit
+	:ensure t
+	:bind (("C-c p m" . magit-status))
+	)
+
+#+end_src
+** p4
+#+begin_src emacs-lisp
+
+(use-package p4
+  :ensure t
+  :config
+  (p4-update-global-key-prefix 'p4-global-key-prefix (kbd "C-c p 4"))
+  )
+
+#+end_src
+* manage 
+** nproject
+#+begin_src emacs-lisp
+
+(use-package projectile
+  :ensure t
+  :bind-keymap ("C-c p p" . projectile-command-map)
+  :config
+  (projectile-mode +1))
+
+#+end_src
+
+* file
+** recent file
+#+begin_src emacs-lisp
+(use-package recentf
+  :ensure t
+  :config
+  (recentf-mode 1)
+  )
+#+end_src
+** ini file
+#+begin_src emacs-lisp
+
+(use-package ini-mode
+  :ensure t
+  )
+
+#+end_src
+** plantuml
+#+begin_src emacs-lisp
+
+(use-package plantuml-mode
+  :ensure t
+  :bind (:map plantuml-mode-map
+			  ("C-M-i" . plantuml-complete-symbol))
+  :config
+  (setq plantuml-jar-path 
+		(if (file-directory-p "~/rc/.emacs.d")
+			(expand-file-name "~/rc/.emacs.d/plantuml.jar")
+		  (expand-file-name "~/.emacs.d/plantuml.jar")))
+  (setq plantuml-default-exec-mode 'jar)
+  (setq plantuml-indent-level 4)
+  )
+
+#+end_src
+** reveal
+#+begin_src emacs-lisp
+
+;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
+(when (and (not (f-directory? "~/reveal.js"))
+		   (executable-find "git"))
+  (shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js")
+  )
+
+#+end_src
+
+* search
+** ripgrep
+#+begin_src emacs-lisp
+
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-default-bindings (kbd "C-c s r r"))
+  )
+
+#+end_src
+** everything search
+#+begin_src emacs-lisp
+
+;; https://www.voidtools.com/ko-kr/downloads/
+(when (eq system-type 'windows-nt)
+  (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
+  (setq everything-ffap-integration nil)
+  (global-set-key (kbd "C-c s e") 'everything)
+  (require 'everything)
+  )
+
+#+end_src
+
+* completion
+
+** auto completion
+#+begin_src emacs-lisp
+  (use-package auto-complete
+	:ensure t
+	:init
+	(progn
+	  (ac-config-default)
+	  (global-auto-complete-mode t)
+
+	  ;; set moving candidate hotkey
+	  (setq ac-use-menu-map t)
+	  (define-key ac-menu-map "\C-n" 'ac-next)
+	  (define-key ac-menu-map "\C-p" 'ac-previous)
+	  )
+	)
+#+end_src
+
+** lsp
+#+begin_src emacs-lisp
+
+;; language server protocol
+(use-package lsp-mode
+  :ensure t
+  :bind-keymap ("C-c c l" . lsp-command-map)
+  :config
+  )
+
+#+end_src
+
+** yasnippet
+#+begin_src emacs-lisp
+
+  (use-package yasnippet
+	:ensure t
+	:init
+	(yas-global-mode 1)
+	)
+
+  (use-package yasnippet-snippets
+	:ensure t)
+
+#+end_src
+
+* selection
+** region
+*** expand region
+#+begin_src emacs-lisp
+
+(use-package expand-region
+  :ensure t
+  :bind (("C-@" . er/expand-region))
+  )
+
+#+end_src
+** surround
+#+begin_src emacs-lisp
+
+  (use-package emacs-surround
+	:quelpa ((emacs-surround :fetcher github :repo "ganmacs/emacs-surround"))
+	:config
+	(global-set-key (kbd "C-c e e") 'emacs-surround)
+	(add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
+	(add-to-list 'emacs-surround-alist '("=" . ("=" . "=")))
+	(add-to-list 'emacs-surround-alist '("`" . ("`" . "`")))
+	(add-to-list 'emacs-surround-alist '("<" . ("<" . ">")))
+	(add-to-list 'emacs-surround-alist '("(" . ("(" . ")")))
+	(add-to-list 'emacs-surround-alist '("{" . ("{" . "}")))
+	)
+
+#+end_src
+
+* undo
+** undo tree
+#+begin_src emacs-lisp
+
+  (use-package undo-tree
+	:ensure t
+	:config
+	(global-undo-tree-mode t)
+
+	;; example title: EmacsConfig [1/4] | configuration.org
+	(defun my-title-bar-format()
+	  (let* ((current-slot (eyebrowse--get 'current-slot))
+			 (window-configs (eyebrowse--get 'window-configs))
+			 (window-config (assoc current-slot window-configs))
+			 (window-config-name (nth 2 window-config))
+			 (num-slots (length window-configs)))
+		(concat window-config-name " [" (number-to-string current-slot)
+				"/" (number-to-string num-slots) "] | " "%b")))
+	(if (display-graphic-p)
+		(progn
+		  (setq frame-title-format
+				'(:eval (my-title-bar-format)))))
+	)
+
+#+end_src
+
+* programming
+** json mode
+#+begin_src emacs-lisp
+(use-package json-mode
+  :ensure t
+  )
+#+end_src
+** python
+#+begin_src emacs-lisp
+
+(use-package python
+  :ensure t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python" . python-mode)
+  )
+
+#+end_src
+
+* help
+** helpful
+#+begin_src emacs-lisp
+
+  (use-package helpful
+	:ensure t
+	:bind (("C-h f" . helpful-callable)
+		   ("C-h v" . helpful-variable)
+		   ("C-h k" . helpful-key))
+	:config
+	;; Lookup the current symbol at point. C-c C-d is a common keybinding
+	;; for this in lisp modes.
+	(global-set-key (kbd "C-c h a") #'helpful-at-point)
+
+	;; Look up *F*unctions (excludes macros).
+	;;
+	;; By default, C-h F is bound to `Info-goto-emacs-command-node'. Helpful
+	;; already links to the manual, if a function is referenced there.
+	(global-set-key (kbd "C-h F") #'helpful-function)
+
+	;; Look up *C*ommands.
+	;;
+	;; By default, C-h C is bound to describe `describe-coding-system'. I
+	;; don't find this very useful, but it's frequently useful to only
+	;; look at interactive functions.
+	(global-set-key (kbd "C-h C") #'helpful-command)
+
+	(setq counsel-describe-function-function #'helpful-callable)
+	(setq counsel-describe-variable-function #'helpful-variable)
+	)
+
+#+end_src
+* translate
+** google
+#+begin_src emacs-lisp
+
+(require 'google-translate)
+(use-package google-translate
+  :ensure t
+  :bind (("C-c t g a" . google-translate-at-point)
+		 ("C-c t g q" . google-translate-query-translate)
+		 ("C-c t g t" . google-translate-smooth-translate))
+  :config
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
+  (setq google-translate-backend-method 'curl)
+  )
+
+#+end_src
+* server
+** edit server
+#+begin_src emacs-lisp
+
+(use-package edit-server
+  :ensure t
+  :config
+  (setq edit-server-url-major-mode-alist
+        '(("github\\.com" . markdown-mode)))
+  (edit-server-start)
+  )
+
+#+end_src
+* log
+** command log
+#+begin_src emacs-lisp
+
+(use-package command-log-mode
+  :ensure t
+  :custom
+  (command-log-mode-key-binding-open-log "C-c o c l")
+  )
+
+#+end_src
+* bookmark
+#+begin_src emacs-lisp
+
+(use-package bm
+  :ensure t
+  :bind(("C-c b b t" . bm-toggle)
+		("C-c b b n" . bm-next)
+		("C-c b b p" . bm-previous)
+		("C-c b b s a" . bm-show-all)
+		("C-c b b s s" . bm-show))
+  )
+
+#+end_src
