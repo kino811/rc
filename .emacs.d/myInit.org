@@ -449,13 +449,23 @@ customizing mode line
   #+end_src
 
 * theme
-  #+begin_src emacs-lisp
-    (use-package solarized-theme
-      :ensure t
-      :config
-      (load-theme 'solarized-dark t)
-      )
-  #+end_src
+** solarize dark
+   #+begin_src emacs-lisp
+	 (use-package solarized-theme
+	   :ensure t
+	   :config
+	   (load-theme 'solarized-dark t)
+	   )
+   #+end_src
+** spacemacs
+#+begin_src emacs-lisp
+  (use-package spacemacs-theme
+	:ensure t
+	:defer t
+	:init
+	(load-theme 'spacemacs-dark t)
+	)
+#+end_src
 
 * edit
 ** iedit
@@ -556,11 +566,11 @@ possible multi edit
 ** reveal
 #+begin_src emacs-lisp
 
-;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
-(when (and (not (f-directory? "~/reveal.js"))
-		   (executable-find "git"))
-  (shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js")
-  )
+  ;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
+  (when (and (file-directory-p "~/reveal.js")
+			 (executable-find "git"))
+	(shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js")
+	)
 
 #+end_src
 
@@ -741,7 +751,6 @@ possible multi edit
 ** google
 #+begin_src emacs-lisp
 
-(require 'google-translate)
 (use-package google-translate
   :ensure t
   :bind (("C-c t g a" . google-translate-at-point)
