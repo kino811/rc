@@ -379,10 +379,15 @@ customizing mode line
 
 * etc
   #+begin_src emacs-lisp
-    (setq indo-enable-flex-matching t)
-    (setq ido-everywhere t)
-    (ido-mode 1)
+	(setq indo-enable-flex-matching t)
   #+end_src
+
+* ido
+if turn on ido, dired function(hotkey is "C-x d") change to ido-dired. i want to use ivy style dired find directory. therefore turn off ido.
+#+begin_src emacs-lisp
+  ;; (setq ido-everywhere t)
+  ;; (ido-mode 1)
+#+end_src
 
 * window
 ** ace window
@@ -423,11 +428,13 @@ customizing mode line
 	  (setq ivy-use-virtual-buffers t)
 	  (setq ivy-display-style 'fancy)
 	  )
+
 	(use-package counsel
 	  :ensure t
 	  :config
 	  (counsel-mode t)
 	  )
+
 	(use-package swiper
 	  :ensure try
 	  :bind (("C-s" . swiper)
@@ -437,6 +444,17 @@ customizing mode line
 	  (setq ivy-use-virtual-buffers t)
 	  (setq ivy-display-style 'fancy)
 	  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+	  )
+
+	(use-package ivy-hydra
+	  :ensure t)
+
+	(use-package ivy-xref
+	  :ensure t
+	  :init
+	  (when (>= emacs-major-version 27)
+		(setq xref-show-definitions-function #'ivy-xref-show-defs))
+	  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
 	  )
   #+end_src
 
@@ -585,16 +603,16 @@ possible multi edit
   )
 
 #+end_src
-** everything search
+** TODO everything search
 #+begin_src emacs-lisp
 
-;; https://www.voidtools.com/ko-kr/downloads/
-(when (eq system-type 'windows-nt)
-  (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
-  (setq everything-ffap-integration nil)
-  (global-set-key (kbd "C-c s e") 'everything)
-  (require 'everything)
-  )
+  ;; https://www.voidtools.com/ko-kr/downloads/
+  ;; (when (eq system-type 'windows-nt)
+  ;;   (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
+  ;;   (setq everything-ffap-integration nil)
+  ;;   (global-set-key (kbd "C-c s e") 'everything)
+  ;;   (require 'everything)
+  ;;   )
 
 #+end_src
 
