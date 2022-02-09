@@ -67,9 +67,9 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 * language
 ** enviroment
 #+begin_src emacs-lisp
-  ;; (when enable-multibyte-characters
-  ;;   (set-language-environment "Korean")
-  ;;   )
+  (when enable-multibyte-characters
+	(set-language-environment "Korean")
+	)
 #+end_src
 ** encoding
 for default encoding is best that utf-8
@@ -781,6 +781,11 @@ possible multi edit
 
 #+end_src
 * server
+** emacs server
+possible run emacsclient.exe to attach existed emacs client.
+#+begin_src emacs-lisp
+  (server-start)
+#+end_src
 ** edit server
 #+begin_src emacs-lisp
 
