@@ -5,6 +5,10 @@
 #+begin_src emacs-lisp
 (put 'narrow-to-region 'disabled nil)
 #+end_src
+* options for loading
+#+begin_src emacs-lisp
+  (setq load-prefer-newer t)
+#+end_src
 
 * interface
 ** hide start screen
@@ -56,6 +60,15 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 ** i want to save desktop state for emacs open after
 #+begin_src emacs-lisp
 (desktop-save-mode t)
+#+end_src
+
+** trail whitespace
+#+begin_src emacs-lisp
+  (define-minor-mode my:trailing-whitespace-mode
+	"Simple minor mode to highlight trailing white spaces."
+	:variable show-trailing-whitespace)
+
+  (add-hook 'prog-mode-hook 'my:trailing-whitespace-mode)
 #+end_src
 
 * alias
@@ -176,8 +189,7 @@ for default encoding is best that utf-8
   (use-package paren
     :ensure t
     :init
-    (show-paren-mode t)
-    )
+    (show-paren-mode t))
 #+end_src
 ** highlight line
 #+begin_src emacs-lisp
@@ -221,12 +233,13 @@ customizing mode line
 	)
 #+end_src
 ** rainbow delimiter
+in org mode, when `>` character inputed, wrong highlight occur, after lines at `(` or `)` and etc.
 #+begin_src emacs-lisp
 
-(use-package rainbow-delimiters
-  :ensure t
-  :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
-  )
+  ;; (use-package rainbow-delimiters
+  ;;   :ensure t
+  ;;   :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
+  ;;   )
 
 #+end_src
 * which key
@@ -271,7 +284,7 @@ customizing mode line
 #+begin_src emacs-lisp
   (use-package org
 	:ensure t
-	:bind (("C-c a" . org-agenda))
+	:bind (("C-c o a" . org-agenda))
 	:config
 	;; (require 'ox-confluence)
 
@@ -300,13 +313,17 @@ customizing mode line
 	  )
 	)
 #+end_src
-** org bullet
+** org bullets
    #+begin_src emacs-lisp
-     (use-package org-bullets
-       :ensure t
-       :config
-       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-       )
+     ;; next package's bullet sharp is breaked in solar theme.
+     ;; (use-package org-bullets
+     ;;   :ensure t
+     ;;   :config
+     ;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+     ;;   )
+
+     ;; therefore use this mode.
+     (add-hook 'org-mode-hook 'org-indent-mode)
    #+end_src
 ** org confluence
 #+begin_src emacs-lisp
@@ -375,18 +392,6 @@ customizing mode line
 	  (setq org-reveal-root "file:///Users/kino811/reveal.js"))))
   )
 
-#+end_src
-
-* etc
-  #+begin_src emacs-lisp
-	(setq indo-enable-flex-matching t)
-  #+end_src
-
-* ido
-if turn on ido, dired function(hotkey is "C-x d") change to ido-dired. i want to use ivy style dired find directory. therefore turn off ido.
-#+begin_src emacs-lisp
-  ;; (setq ido-everywhere t)
-  ;; (ido-mode 1)
 #+end_src
 
 * window
@@ -477,12 +482,11 @@ if turn on ido, dired function(hotkey is "C-x d") change to ido-dired. i want to
    #+end_src
 ** spacemacs
 #+begin_src emacs-lisp
-  (use-package spacemacs-theme
-	:ensure t
-	:defer t
-	:init
-	(load-theme 'spacemacs-dark t)
-	)
+  ;; (use-package spacemacs-theme
+  ;;   :ensure t
+  ;;   :defer t
+  ;;   :init
+  ;;   (load-theme 'spacemacs-dark t))
 #+end_src
 
 * edit
@@ -621,18 +625,18 @@ possible multi edit
 ** auto completion
 #+begin_src emacs-lisp
   (use-package auto-complete
-	:ensure t
-	:init
-	(progn
-	  (ac-config-default)
-	  (global-auto-complete-mode t)
+    :ensure t
+    :init
+    (progn
+      (ac-config-default)
+      (global-auto-complete-mode t)
 
-	  ;; set moving candidate hotkey
-	  (setq ac-use-menu-map t)
-	  (define-key ac-menu-map "\C-n" 'ac-next)
-	  (define-key ac-menu-map "\C-p" 'ac-previous)
-	  )
-	)
+      ;; set moving candidate hotkey
+      (setq ac-use-menu-map t)
+      (define-key ac-menu-map "\C-n" 'ac-next)
+      (define-key ac-menu-map "\C-p" 'ac-previous)
+      )
+    )
 #+end_src
 
 ** lsp
@@ -784,7 +788,10 @@ possible multi edit
 ** emacs server
 possible run emacsclient.exe to attach existed emacs client.
 #+begin_src emacs-lisp
-  (server-start)
+  (ignore-error
+	  (let ((warning-minimum-level :emergency)) ;a kind of tricky way to suppress warning
+		(require 'server)
+		(unless (server-running-p) (server-start))))
 #+end_src
 ** edit server
 #+begin_src emacs-lisp
@@ -795,17 +802,6 @@ possible run emacsclient.exe to attach existed emacs client.
   (setq edit-server-url-major-mode-alist
         '(("github\\.com" . markdown-mode)))
   (edit-server-start)
-  )
-
-#+end_src
-* log
-** command log
-#+begin_src emacs-lisp
-
-(use-package command-log-mode
-  :ensure t
-  :custom
-  (command-log-mode-key-binding-open-log "C-c o c l")
   )
 
 #+end_src
@@ -822,3 +818,4 @@ possible run emacsclient.exe to attach existed emacs client.
   )
 
 #+end_src
+
