@@ -1,9 +1,13 @@
 #+startup: overview
 
-* default turn off options
+* default options
 ** narrow region
 #+begin_src emacs-lisp
 (put 'narrow-to-region 'disabled nil)
+#+end_src
+** available can upper case hotkey
+#+begin_src emacs-lisp
+  (put 'upcase-region 'disabled nil)
 #+end_src
 * options for loading
 #+begin_src emacs-lisp
@@ -442,8 +446,8 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
 
 	(use-package swiper
 	  :ensure try
-	  :bind (("C-s" . swiper)
-			 ("C-r" . swiper))
+	  :bind (("C-c s s s" . swiper)
+			 ("C-c s s a" . swiper-thing-at-point))
 	  :config
 	  (ivy-mode 1)
 	  (setq ivy-use-virtual-buffers t)
@@ -465,10 +469,11 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
 
 * move
   #+begin_src emacs-lisp
-    (use-package avy
-      :ensure t
-      :bind (("C-c m" . avy-goto-char))
-      )
+        (use-package avy
+          :ensure t
+          :bind (("C-c m c" . avy-goto-char)
+                 ("C-c m l" . avy-goto-line))
+          )
   #+end_src
 
 * theme
@@ -518,6 +523,11 @@ possible multi edit
   :config
   )
 
+#+end_src
+** copyit
+#+begin_src emacs-lisp
+  (use-package copyit
+    :ensure t)
 #+end_src
 * version control
 ** magit
@@ -607,17 +617,15 @@ possible multi edit
   )
 
 #+end_src
-** TODO everything search
+** everything search
 #+begin_src emacs-lisp
-
   ;; https://www.voidtools.com/ko-kr/downloads/
-  ;; (when (eq system-type 'windows-nt)
-  ;;   (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
-  ;;   (setq everything-ffap-integration nil)
-  ;;   (global-set-key (kbd "C-c s e") 'everything)
-  ;;   (require 'everything)
-  ;;   )
-
+  (when (eq system-type 'windows-nt)
+    (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
+    (setq everything-ffap-integration nil)
+    (global-set-key (kbd "C-c s e") 'everything)
+    (require 'everything)
+    )
 #+end_src
 
 * completion
@@ -773,15 +781,15 @@ possible multi edit
 ** google
 #+begin_src emacs-lisp
 
-(use-package google-translate
-  :ensure t
-  :bind (("C-c t g a" . google-translate-at-point)
-		 ("C-c t g q" . google-translate-query-translate)
-		 ("C-c t g t" . google-translate-smooth-translate))
-  :config
-  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
-  (setq google-translate-backend-method 'curl)
-  )
+  (use-package google-translate
+    :ensure t
+    :bind (("C-c t g a" . google-translate-at-point)
+           ("C-c t g q" . google-translate-query-translate)
+           ("C-c t g t" . google-translate-smooth-translate))
+    :config
+    ;; (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
+    ;; (setq google-translate-backend-method 'curl)
+    )
 
 #+end_src
 * server
@@ -818,4 +826,5 @@ possible run emacsclient.exe to attach existed emacs client.
   )
 
 #+end_src
+
 
