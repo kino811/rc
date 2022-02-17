@@ -791,10 +791,9 @@ possible multi edit
 ** emacs server
 possible run emacsclient.exe to attach existed emacs client.
 #+begin_src emacs-lisp
-  (ignore-error
-	  (let ((warning-minimum-level :emergency)) ;a kind of tricky way to suppress warning
-		(require 'server)
-		(unless (server-running-p) (server-start))))
+  (require 'server)
+  (if (not (server-running-p))
+      (server-start))
 #+end_src
 ** edit server
 #+begin_src emacs-lisp
