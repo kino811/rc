@@ -85,17 +85,15 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 ** enviroment
 #+begin_src emacs-lisp
   (when enable-multibyte-characters
-	(set-language-environment "Korean")
-	)
+    (set-language-environment "Korean")
+    (set-locale-environment "ko_KR.UTF-8")
+    )
 #+end_src
 ** encoding
 for default encoding is best that utf-8
 #+begin_src emacs-lisp
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-locale-environment "ko_KR.UTF-8")
 #+end_src
 
 * my custom function
