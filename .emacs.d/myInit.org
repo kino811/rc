@@ -9,6 +9,10 @@
 #+begin_src emacs-lisp
   (put 'upcase-region 'disabled nil)
 #+end_src
+** auto revert buffer
+#+begin_src emacs-lisp
+  (global-auto-revert-mode 1)
+#+end_src
 * options for loading
 #+begin_src emacs-lisp
   (setq load-prefer-newer t)
@@ -130,6 +134,14 @@ for default encoding is best that utf-8
 (global-set-key (kbd "C-c i b n") 'current-buffer-name)
 (global-set-key (kbd "C-c i b p") 'current-buffer-file-name)
 
+#+end_src
+
+* macro
+
+** confluence file to image link
+#+begin_src emacs-lisp
+  (fset 'confluence-file-to-image-link
+   (kmacro-lambda-form [?\C-s ?\[ ?f ?i ?l ?e ?: return ?\C-a ?\C-  ?\C-e ?\C-r ?/ return backspace ?! ?\C-d ?\C-e backspace ?! ?\C-n ?\C-a] 0 "%d"))
 #+end_src
 
 * about package
@@ -286,7 +298,13 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
 #+begin_src emacs-lisp
   (use-package org
     :ensure t
-    :bind (("C-c o a" . org-agenda))
+    :ensure org-plus-contrib
+    ;; :bind (("C-c o a" . org-agenda)
+    ;;        :map org-mode-map
+    ;;        ("C-c C-c" . (lambda ()
+    ;;                       (interactive)
+    ;;                       (org-ctrl-c-ctrl-c)
+    ;;                       (org-display-inline-images))))
     :config
     (require 'ox-confluence)
 
@@ -296,7 +314,9 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
                                    (ipython . t)
                                    (C . t)
                                    (plantuml . t)
-                                   (shell . t)))
+                                   (shell . t)
+                                   (ditaa . t)
+                                   ))
 
     (setq org-plantuml-jar-path
           (if (file-directory-p "~/rc/.emacs.d")
@@ -313,6 +333,19 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
              (setq face-font-rescale-alist '(("NanumBarunGothic" . 1.3)))
              )
       )
+    (setq org-ditaa-jar-path
+          (if (file-directory-p "~/rc/.emacs.d")
+              (expand-file-name "~/rc/.emacs.d/ditaa.jar")
+            (expand-file-name "~/.emacs.d/ditaa.jar")
+            )
+          )
+    (setq org-todo-keywords
+          '((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
+    (add-hook 'org-babel-after-execute-hook
+              (lambda ()
+                (when org-inline-image-overlays
+                  (org-redisplay-inline-images))))
+    (setq org-startup-with-inline-images t)
     )
 #+end_src
 ** org bullets
@@ -394,6 +427,11 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
 
 #+end_src
 
+** TODO org insert inline image from url
+#+begin_src emacs-lisp
+  
+#+end_src
+
 * window
 ** ace window
    when move other window, possible choose by number when window count is more than 2
@@ -442,7 +480,10 @@ in org mode, when `>` character inputed, wrong highlight occur, after lines at `
     (use-package swiper
       :ensure try
       :bind (("C-c s s s" . swiper)
-             ("C-c s s a" . swiper-thing-at-point))
+             ("C-c s s a" . swiper-thing-at-point)
+             ("C-c s s e s" . swiper-all)
+             ("C-c s s e a" . swiper-all-thing-at-point)
+             )
       :config
       (ivy-mode 1)
       ;; (setq ivy-use-virtual-buffers t)
@@ -738,6 +779,17 @@ possible multi edit
   :interpreter ("python" . python-mode)
   )
 
+#+end_src
+* file extentsion
+** glsl
+OpenGL Shading Language
+#+begin_src emacs-lisp
+  (use-package glsl-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.fx\\'" . glsl-mode))
+    (add-to-list 'auto-mode-alist '("\\.fxh\\'" . glsl-mode))
+    )
 #+end_src
 
 * help
