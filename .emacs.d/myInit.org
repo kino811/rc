@@ -864,11 +864,11 @@ possible run emacsclient.exe to attach existed emacs client.
 
 (use-package bm
   :ensure t
-  :bind(("C-c b b t" . bm-toggle)
-		("C-c b b n" . bm-next)
-		("C-c b b p" . bm-previous)
-		("C-c b b s a" . bm-show-all)
-		("C-c b b s s" . bm-show))
+  :bind(("C-c m m t" . bm-toggle)
+		("C-c m m n" . bm-next)
+		("C-c m m p" . bm-previous)
+		("C-c m m s a" . bm-show-all)
+		("C-c m m s s" . bm-show))
   )
 
 #+end_src
