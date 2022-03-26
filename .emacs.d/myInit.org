@@ -306,6 +306,8 @@ when window
     ;;                       (org-ctrl-c-ctrl-c)
     ;;                       (org-display-inline-images))))
     :config
+    (use-package ob-ipython
+      :ensure t)
     (require 'ox-confluence)
 
     (org-babel-do-load-languages 'org-babel-load-languages
@@ -518,16 +520,16 @@ undo, redo window layout.
   (use-package solarized-theme
     :ensure t
     :config
-    (load-theme 'solarized-dark t)
+    ;; (load-theme 'solarized-dark t)
     )
 #+end_src
 ** spacemacs
 #+begin_src emacs-lisp
-  ;; (use-package spacemacs-theme
-  ;;   :ensure t
-  ;;   :defer t
-  ;;   :init
-  ;;   (load-theme 'spacemacs-dark t))
+  (use-package spacemacs-theme
+    :ensure t
+    :defer t
+    :init
+    (load-theme 'spacemacs-dark t))
 #+end_src
 
 * edit
@@ -782,10 +784,11 @@ possible multi edit
 #+end_src
 ** lua
 #+begin_src emacs-lisp
-  (use-package lua-mod
-    :ensuer t
-    :config
-    (setq lua-indent-level 4))
+  (use-package lua-mode
+    :ensure t
+    :custom
+    (lua-indent-level 4)
+    )
 #+end_src
 * file extentsion
 ** glsl
@@ -879,5 +882,3 @@ possible run emacsclient.exe to attach existed emacs client.
     )
 
 #+end_src
-
-
