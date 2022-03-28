@@ -802,6 +802,13 @@ possible multi edit
     (lua-indent-level 4)
     )
 #+end_src
+** cpp
+#+begin_src emacs-lisp
+  (use-package cpp
+    :config
+    (setq c-default-style "linux"
+          c-basic-offset 4))
+#+end_src
 * file extentsion
 ** glsl
 OpenGL Shading Language
