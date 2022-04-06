@@ -309,6 +309,7 @@ when window
     ;;                       (org-ctrl-c-ctrl-c)
     ;;                       (org-display-inline-images))))
     :config
+    (setq org-image-actual-width nil)
     (use-package ob-ipython
       :ensure t)
     (require 'ox-confluence)
@@ -520,8 +521,8 @@ undo, redo window layout.
 #+begin_src emacs-lisp
   (use-package avy
     :ensure t
-    :bind (("C-c m c" . avy-goto-char)
-           ("C-c m l" . avy-goto-line))
+    :bind (("C-c j c" . avy-goto-char)
+           ("C-c j l" . avy-goto-line))
     )
 #+end_src
 
