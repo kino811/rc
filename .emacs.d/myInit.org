@@ -731,7 +731,7 @@ possible multi edit
 
   (use-package expand-region
     :ensure t
-    :bind (("C-@" . er/expand-region))
+    :bind (("C-c s e" . er/expand-region))
     )
 
 #+end_src
