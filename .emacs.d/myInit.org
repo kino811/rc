@@ -909,3 +909,17 @@ possible run emacsclient.exe to attach existed emacs client.
     )
 
 #+end_src
+* note
+** deft
+#+begin_src emacs-lisp
+  (use-package deft
+    :ensure t
+    :bind (("C-c n d" . deft))
+    :config
+    (setq deft-use-filename-as-title t
+          deft-default-extension "org"
+          deft-recursive t
+          )
+    )
+#+end_src
+
