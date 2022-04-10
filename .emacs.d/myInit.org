@@ -13,6 +13,11 @@
 #+begin_src emacs-lisp
   (global-auto-revert-mode 1)
 #+end_src
+** customization file
+#+begin_src emacs-lisp
+  (setq custom-file "~/.emacs.d/emacs-custom.el")
+  (load custom-file)
+#+end_src
 * options for loading
 #+begin_src emacs-lisp
   (setq load-prefer-newer t)
