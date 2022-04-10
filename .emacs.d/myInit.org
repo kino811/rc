@@ -307,12 +307,14 @@ when window
   (use-package org
     :ensure t
     :ensure org-plus-contrib
-    ;; :bind (("C-c o a" . org-agenda)
+    :bind (
+           ("C-c o a" . org-agenda)
     ;;        :map org-mode-map
     ;;        ("C-c C-c" . (lambda ()
     ;;                       (interactive)
     ;;                       (org-ctrl-c-ctrl-c)
-    ;;                       (org-display-inline-images))))
+    ;;                       (org-display-inline-images)))
+           )
     :config
     (setq org-image-actual-width nil)
     (use-package ob-ipython
@@ -654,7 +656,7 @@ possible multi edit
 #+begin_src emacs-lisp
 
   ;; git clone https://github.com/hakimel/reveal.js ~/reveal.js
-  (when (and (file-directory-p "~/reveal.js")
+  (when (and (not (file-directory-p "~/reveal.js"))
              (executable-find "git"))
     (shell-command-to-string "cd ~ && git clone https://github.com/hakimel/reveal.js reveal.js")
     )
@@ -870,15 +872,15 @@ OpenGL Shading Language
            ("C-c t g t" . google-translate-smooth-translate))
     :config
     ;; (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
-  
-    (when (and (string-match "0.11.14"
-                             (google-translate-version))
-               (>= (time-to-seconds)
-                   (time-to-seconds
-                    (encode-time 0 0 0 23 9 2018))))
-      (defun google-translate--get-b-d1 ()
-        ;; TKK='427110.1469889687'
-        (list 427110 1469889687)))
+
+    ;; (when (and (string-match "0.11.14"
+    ;;                          (google-translate-version))
+    ;;            (>= (time-to-seconds)
+    ;;                (time-to-seconds
+    ;;                 (encode-time 0 0 0 23 9 2018))))
+    ;;   (defun google-translate--get-b-d1 ()
+    ;;     ;; TKK='427110.1469889687'
+    ;;     (list 427110 1469889687)))
     )
 #+end_src
 * server
