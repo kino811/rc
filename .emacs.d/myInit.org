@@ -15,8 +15,12 @@
 #+end_src
 ** customization file
 #+begin_src emacs-lisp
-  (setq custom-file "~/.emacs.d/emacs-custom.el")
-  (load custom-file)
+  (let ((emacs-custom-path "~/.emacs.d/emacs-custom.el"))
+    (when (file-exists-p emacs-custom-path)
+      (setq custom-file emacs-custom-path)
+      (load custom-file)
+      )
+    )
 #+end_src
 * options for loading
 #+begin_src emacs-lisp
@@ -329,6 +333,7 @@ when window
                                    (plantuml . t)
                                    (shell . t)
                                    (ditaa . t)
+                                   (eshell . t)
                                    ))
 
     (setq org-plantuml-jar-path
@@ -680,7 +685,7 @@ possible multi edit
   (when (eq system-type 'windows-nt)
     (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
     (setq everything-ffap-integration nil)
-    (global-set-key (kbd "C-c s e") 'everything)
+    (global-set-key (kbd "C-c o e") 'everything)
     (require 'everything)
     )
 #+end_src
