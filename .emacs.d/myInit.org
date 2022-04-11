@@ -423,6 +423,7 @@ when window
         (global-set-key (kbd "C-c i s") 'my-org-screenshot-w32)))
      ((eq system-type 'darwin)
       (progn
+        (setq-default org-download-heading-lvl nil)
         (setq org-download-screenshot-method "screencapture"))))
     )
 
