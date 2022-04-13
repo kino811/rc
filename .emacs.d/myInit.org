@@ -22,6 +22,17 @@
       )
     )
 #+end_src
+** for link
+#+begin_src emacs-lisp
+    (setq find-file-visit-truename t)
+#+end_src
+** wiki directory
+#+begin_src emacs-lisp
+  (setq wiki-directory "~/wiki")
+  (when (not (file-exists-p wiki-directory))
+      (make-directory wiki-directory)
+      )
+#+end_src
 * options for loading
 #+begin_src emacs-lisp
   (setq load-prefer-newer t)
@@ -159,6 +170,7 @@ for default encoding is best that utf-8
   (require 'package)
   (setq package-enable-at-startup nil)
 
+  (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
@@ -449,6 +461,27 @@ when window
 ** TODO org insert inline image from url
 #+begin_src emacs-lisp
   
+#+end_src
+
+** org roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :after org
+    :custom
+    (org-roam-directory (file-truename wiki-directory))
+    (org-roam-completion-everywhere t)
+    :bind (("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ("C-c n l" . org-roam-buffer-toggle)
+           ;; dailies
+           ("C-c n j" . org-roam-dailies-capture-today)
+           )
+    :config
+    (org-roam-setup)
+    )
 #+end_src
 
 * window
@@ -927,12 +960,13 @@ possible run emacsclient.exe to attach existed emacs client.
 #+begin_src emacs-lisp
   (use-package deft
     :ensure t
+    :after org
     :bind (("C-c n d" . deft))
-    :config
-    (setq deft-use-filename-as-title t
-          deft-default-extension "org"
-          deft-recursive t
-          )
+    :custom
+    (deft-recursive t)
+    (deft-use-filter-string-for-filename t)
+    (deft-default-extension "org")
+    (deft-directory wiki-directory)
     )
 #+end_src
 
