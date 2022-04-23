@@ -490,7 +490,7 @@ when move other window, possible choose by number when window count is more than
 #+begin_src emacs-lisp
   (use-package ace-window
     :ensure t
-    :bind (("C-c w o" . ace-window))
+    :bind (("M-o" . ace-window))
     :init
     (progn
       ;; (global-set-key [remap other-window] 'ace-window)
@@ -777,7 +777,7 @@ possible multi edit
 
   (use-package expand-region
     :ensure t
-    :bind (("C-c s e" . er/expand-region))
+    :bind (("C-=" . er/expand-region))
     )
 
 #+end_src
