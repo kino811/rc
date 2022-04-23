@@ -322,7 +322,7 @@ when window
 #+begin_src emacs-lisp
   (use-package org
     :ensure t
-    :ensure org-plus-contrib
+    :ensure org-contrib
     :bind (
            ("C-c o a" . org-agenda)
     ;;        :map org-mode-map
