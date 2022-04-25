@@ -265,7 +265,7 @@ customizing mode line
   (use-package eyebrowse
     :ensure t
     :init
-    (setq eyebrowse-keymap-prefix (kbd "C-c w l"))
+    (setq eyebrowse-keymap-prefix (kbd "C-c w L"))
     :config
     (eyebrowse-mode t)
     )
@@ -490,7 +490,7 @@ when move other window, possible choose by number when window count is more than
 #+begin_src emacs-lisp
   (use-package ace-window
     :ensure t
-    :bind (("M-o" . ace-window))
+    :bind (("C-c w o" . ace-window))
     :init
     (progn
       ;; (global-set-key [remap other-window] 'ace-window)
@@ -512,10 +512,10 @@ undo, redo window layout.
 ** windmove
 #+begin_src emacs-lisp
   (use-package windmove
-    :bind (("C-c w w h" . windmove-left)
-           ("C-c w w j" . windmove-down)
-           ("C-c w w k" . windmove-up)
-           ("C-c w w l" . windmove-right)
+    :bind (("C-c w h" . windmove-left)
+           ("C-c w j" . windmove-down)
+           ("C-c w k" . windmove-up)
+           ("C-c w l" . windmove-right)
            ))
 #+end_src
 
@@ -727,33 +727,72 @@ possible multi edit
 * completion
 
 ** auto completion
+dead.
+https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_2021/
 #+begin_src emacs-lisp
-  (use-package auto-complete
-    :ensure t
-    :bind (("C-c c C-M-i" . auto-complete))
-    :init
-    (progn
-      (ac-config-default)
-      (global-auto-complete-mode t)
+  ;; (use-package auto-complete
+  ;;   :ensure t
+  ;;   :bind (("C-c c C-M-i" . auto-complete))
+  ;;   :init
+  ;;   (progn
+  ;;     (ac-config-default)
+  ;;     (global-auto-complete-mode nil)
 
-      ;; set moving candidate hotkey
-      (setq ac-use-menu-map t)
-      (define-key ac-menu-map "\C-n" 'ac-next)
-      (define-key ac-menu-map "\C-p" 'ac-previous)
-      )
-    )
+  ;;     ;; set moving candidate hotkey
+  ;;     (setq ac-use-menu-map t)
+  ;;     (define-key ac-menu-map "\C-n" 'ac-next)
+  ;;     (define-key ac-menu-map "\C-p" 'ac-previous)
+  ;;     )
+  ;;   )
 #+end_src
+
+** TODO Company vs Corfu
 
 ** lsp
 #+begin_src emacs-lisp
-
   ;; language server protocol
   (use-package lsp-mode
     :ensure t
-    :bind-keymap ("C-c c l" . lsp-command-map)
+    :commands (lsp lsp-deferred)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
     :config
+    (lsp-enable-which-key-integration t)
     )
 
+  (defun my/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode)
+
+    :hook (lsp-mode . my/lsp-mode-setup)
+    )
+#+end_src
+
+*** lsp-ui-mode
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-doc-position'bottom)
+
+    (setq lsp-ui-sideline-enable nil)
+    (setq lsp-ui-sideline-show-hover nil)
+    )
+#+end_src
+
+*** lsp-treemacs
+#+begin_src emacs-lisp
+  (use-package lsp-treemacs
+    :ensure t
+    :after lsp
+    )
+#+end_src
+
+*** lsp-ivy
+#+begin_src emacs-lisp
+  (use-package lsp-ivy
+    :ensure t)
 #+end_src
 
 ** yasnippet
@@ -833,6 +872,14 @@ possible multi edit
 #+end_src
 ** python
 #+begin_src emacs-lisp
+  ;; this is something is wrong. when opened interpreter, cannot use find-file in python file.
+  ;; (use-package python-mode
+  ;;   :ensure t
+  ;;   :hook (python-mode . lsp-deferred)
+  ;;   ;; :custom
+  ;;   ;; Note: Set these if Python 3 is called "python3" on your system!
+  ;;   ;; (python-shell-interpreter "python3")
+  ;;   )
 
   (use-package python
     :ensure t
@@ -840,6 +887,10 @@ possible multi edit
     :interpreter ("python" . python-mode)
     )
 
+  (use-package pyvenv
+    :ensure t
+    :config
+    (pyvenv-mode 1))
 #+end_src
 ** lua
 #+begin_src emacs-lisp
@@ -855,6 +906,13 @@ possible multi edit
     :config
     (setq c-default-style "linux"
           c-basic-offset 4))
+#+end_src
+** flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode)
+    )
 #+end_src
 * file extentsion
 ** glsl
