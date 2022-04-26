@@ -172,7 +172,6 @@ for default encoding is best that utf-8
 
   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
   (package-initialize)
   (unless (package-installed-p 'use-package)
@@ -470,7 +469,7 @@ when window
     :after org
     :custom
     (org-roam-directory (file-truename wiki-directory))
-    (org-roam-completion-everywhere t)
+    (org-roam-completion-everywhere nil)
     :bind (("C-c n f" . org-roam-node-find)
            ("C-c n g" . org-roam-graph)
            ("C-c n i" . org-roam-node-insert)
@@ -912,6 +911,8 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
   (use-package flycheck
     :ensure t
     :init (global-flycheck-mode)
+    :config
+    (setq flycheck-flake8-maximum-line-length 124)
     )
 #+end_src
 * file extentsion
