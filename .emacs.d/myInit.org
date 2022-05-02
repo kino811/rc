@@ -331,6 +331,7 @@ when window
     ;;                       (org-display-inline-images)))
            )
     :config
+    (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
     (use-package ob-ipython
       :ensure t)
