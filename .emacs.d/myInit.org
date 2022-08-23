@@ -516,6 +516,10 @@ undo, redo window layout.
            ("C-c w j" . windmove-down)
            ("C-c w k" . windmove-up)
            ("C-c w l" . windmove-right)
+           ("C-c w s h" . windmove-swap-states-left)
+           ("C-c w s j" . windmove-swap-states-down)
+           ("C-c w s k" . windmove-swap-states-up)
+           ("C-c w s l" . windmove-swap-states-right)
            ))
 #+end_src
 
@@ -816,7 +820,7 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 
   (use-package expand-region
     :ensure t
-    :bind (("C-=" . er/expand-region))
+    :bind (("C-@" . er/expand-region))
     )
 
 #+end_src
