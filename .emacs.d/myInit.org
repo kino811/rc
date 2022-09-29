@@ -29,9 +29,9 @@
 ** wiki directory
 #+begin_src emacs-lisp
   (setq wiki-directory "~/wiki")
-  (when (not (file-exists-p wiki-directory))
-      (make-directory wiki-directory)
-      )
+  ;; (when (not (file-exists-p wiki-directory))
+  ;;     (make-directory wiki-directory)
+  ;;     )
 #+end_src
 * options for loading
 #+begin_src emacs-lisp
@@ -160,8 +160,8 @@ for default encoding is best that utf-8
 
 ** confluence file to image link
 #+begin_src emacs-lisp
-  (fset 'confluence-file-to-image-link
-        (kmacro-lambda-form [?\C-s ?\[ ?f ?i ?l ?e ?: return ?\C-a ?\C-  ?\C-e ?\C-r ?/ return backspace ?! ?\C-d ?\C-e backspace ?! ?\C-n ?\C-a] 0 "%d"))
+  ;; (fset 'confluence-file-to-image-link
+  ;;       (kmacro-lambda-form [?\C-s ?\[ ?f ?i ?l ?e ?: return ?\C-a ?\C-  ?\C-e ?\C-r ?/ return backspace ?! ?\C-d ?\C-e backspace ?! ?\C-n ?\C-a] 0 "%d"))
 #+end_src
 
 * about package
@@ -458,9 +458,12 @@ when window
 
 #+end_src
 
-** TODO org insert inline image from url
+** org insert inline image from url
 #+begin_src emacs-lisp
-  
+  (defun my-org-replace-tag-file-to-confluence-file ()
+    (interactive)
+    (query-replace-regexp "\\[file:[^\]]*?\\([^/ ]*?\\w\.png\\)\\]" "!\\1!")
+    )
 #+end_src
 
 ** org roam
