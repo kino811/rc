@@ -316,6 +316,12 @@ when window
 
 #+end_src
 
+* gnuplot
+#+begin_src emacs-lisp
+   (use-package gnuplot
+     :ensure t) 
+#+end_src
+
 * org-mode stuff
 ** org
 #+begin_src emacs-lisp
@@ -334,7 +340,13 @@ when window
     (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
     (use-package ob-ipython
-      :ensure t)
+      :ensure t
+      :config
+      (advice-add 'ob-ipython--collect-json :before
+                  (lambda (&rest args)
+                    (when (re-search-forward "{" nil t)
+                      (backward-char))))
+      )
     (require 'ox-confluence)
 
     (org-babel-do-load-languages 'org-babel-load-languages
@@ -346,6 +358,7 @@ when window
                                    (shell . t)
                                    (ditaa . t)
                                    (eshell . t)
+                                   (gnuplot . t)
                                    ))
 
     (setq org-plantuml-jar-path
@@ -892,6 +905,8 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
     :ensure t
     :mode ("\\.py\\'" . python-mode)
     :interpreter ("python" . python-mode)
+    :config
+    (setq python-indent-offset 4)
     )
 
   (use-package pyvenv
