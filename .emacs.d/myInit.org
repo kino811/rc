@@ -158,12 +158,6 @@ for default encoding is best that utf-8
 
 * macro
 
-** confluence file to image link
-#+begin_src emacs-lisp
-  ;; (fset 'confluence-file-to-image-link
-  ;;       (kmacro-lambda-form [?\C-s ?\[ ?f ?i ?l ?e ?: return ?\C-a ?\C-  ?\C-e ?\C-r ?/ return backspace ?! ?\C-d ?\C-e backspace ?! ?\C-n ?\C-a] 0 "%d"))
-#+end_src
-
 * about package
 ** first setting for package
 #+begin_src emacs-lisp
