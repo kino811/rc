@@ -324,11 +324,11 @@ when window
     :ensure org-contrib
     :bind (
            ("C-c o a" . org-agenda)
-    ;;        :map org-mode-map
-    ;;        ("C-c C-c" . (lambda ()
-    ;;                       (interactive)
-    ;;                       (org-ctrl-c-ctrl-c)
-    ;;                       (org-display-inline-images)))
+           ;;        :map org-mode-map
+           ;;        ("C-c C-c" . (lambda ()
+           ;;                       (interactive)
+           ;;                       (org-ctrl-c-ctrl-c)
+           ;;                       (org-display-inline-images)))
            )
     :config
     (setq org-hide-emphasis-markers t)
@@ -354,6 +354,31 @@ when window
                                    (eshell . t)
                                    (gnuplot . t)
                                    ))
+
+
+    (defun my/ox-confluence-en--macro (name contents &optional arguments)
+      "Build a Confluence wiki macro block.
+
+  Inserts CONTENTS into a macro NAME. ARGUMENTS may be provided as
+  an alist."
+      (let ((open-tag (concat "\{" name
+                              (when arguments
+                                (concat ":"
+                                        (mapconcat (lambda (pair) (format "%s=%s"
+                                                                          (car pair)
+                                                                          (cdr pair)))
+                                                   arguments
+                                                   "|")))
+                              "}"))
+            (close-tag (concat "{" name "}")))
+        (if contents (concat open-tag "\n" contents "\n" close-tag)
+          open-tag)))
+
+    (advice-add 'org-confluence--block :before-until
+                (lambda (language theme contents)
+                  (if (member language '("plantuml" "dot" "ditaa"))
+                      (my/ox-confluence-en--macro "plantuml" contents `((type . ,language)))
+                    nil)))
 
     (setq org-plantuml-jar-path
           (if (file-directory-p "~/rc/.emacs.d")
@@ -399,12 +424,12 @@ when window
 #+end_src
 ** org confluence
 #+begin_src emacs-lisp
-  (use-package ox-confluence-en
-    :quelpa (ox-confluence-en :fetcher github :repo "correl/ox-confluence-en")
-    :config
-    (require 'ox-confluence)
-    (setq ox-confluence-en-use-plantuml-macro t)
-    )
+  ;; (use-package ox-confluence-en
+  ;;   :quelpa (ox-confluence-en :fetcher github :repo "correl/ox-confluence-en")
+  ;;   :config
+  ;;   (require 'ox-confluence)
+  ;;   (setq ox-confluence-en-use-plantuml-macro t)
+  ;;   )
 #+end_src
 
 ** org mode screenshot
