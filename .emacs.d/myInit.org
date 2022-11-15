@@ -1008,9 +1008,9 @@ OpenGL Shading Language
 
   (use-package google-translate
     :ensure t
-    :bind (("C-c t g a" . google-translate-at-point)
-           ("C-c t g q" . google-translate-query-translate)
-           ("C-c t g t" . google-translate-smooth-translate))
+    :bind (("C-c t t a" . google-translate-at-point)
+           ("C-c t t q" . google-translate-query-translate)
+           ("C-c t t t" . google-translate-smooth-translate))
     :config
     ;; (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130))
 
