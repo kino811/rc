@@ -506,6 +506,7 @@ when window
     :after org
     :custom
     (org-roam-directory (file-truename wiki-directory))
+    (org-roam-db-location (expand-file-name "org-roam.db" org-roam-directory))
     (org-roam-completion-everywhere nil)
     :bind (("C-c n f" . org-roam-node-find)
            ("C-c n g" . org-roam-graph)
