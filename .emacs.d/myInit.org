@@ -1056,16 +1056,16 @@ possible run emacsclient.exe to attach existed emacs client.
 * note
 ** deft
 #+begin_src emacs-lisp
-    (use-package deft
-      :ensure t
-      :after org
-      :bind (("C-c n d d" . deft)
-             ("C-c n d f" . deft-find-file))
-      :custom
-      (deft-recursive t)
-      (deft-use-filter-string-for-filename t)
-      (deft-default-extension "org")
-      (deft-directory wiki-directory)
-      )
+  (use-package deft
+    :ensure t
+    :after org
+    :bind (("C-c n d d" . deft)
+           ("C-c n d f" . deft-find-file))
+    :custom
+    (deft-recursive t)
+    (deft-use-filter-string-for-filename t)
+    (deft-default-extension "org")
+    (deft-directory wiki-directory)
+    )
 #+end_src
 
