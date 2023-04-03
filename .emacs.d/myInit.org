@@ -24,7 +24,7 @@
 #+end_src
 ** for link
 #+begin_src emacs-lisp
-    (setq find-file-visit-truename t)
+  (setq find-file-visit-truename t)
 #+end_src
 ** wiki directory
 #+begin_src emacs-lisp
@@ -32,6 +32,10 @@
   ;; (when (not (file-exists-p wiki-directory))
   ;;     (make-directory wiki-directory)
   ;;     )
+#+end_src
+** confirmation when exiting emacs
+#+begin_src emacs-lisp
+  (setq confirm-kill-emacs #'yes-or-no-p)
 #+end_src
 * options for loading
 #+begin_src emacs-lisp
@@ -312,8 +316,8 @@ when window
 
 * gnuplot
 #+begin_src emacs-lisp
-   (use-package gnuplot
-     :ensure t) 
+  (use-package gnuplot
+    :ensure t) 
 #+end_src
 
 * org-mode stuff
@@ -356,7 +360,7 @@ when window
                                    ))
 
 
-    (defun my/ox-confluence-en--macro (name contents &optional arguments)
+    (defun my:ox-confluence-en--macro (name contents &optional arguments)
       "Build a Confluence wiki macro block.
 
   Inserts CONTENTS into a macro NAME. ARGUMENTS may be provided as
@@ -1022,8 +1026,7 @@ OpenGL Shading Language
 possible run emacsclient.exe to attach existed emacs client.
 #+begin_src emacs-lisp
   (require 'server)
-  (if (not (server-running-p))
-      (server-start))
+  (server-start)
 #+end_src
 ** edit server
 #+begin_src emacs-lisp
@@ -1053,15 +1056,16 @@ possible run emacsclient.exe to attach existed emacs client.
 * note
 ** deft
 #+begin_src emacs-lisp
-  (use-package deft
-    :ensure t
-    :after org
-    :bind (("C-c n d" . deft))
-    :custom
-    (deft-recursive t)
-    (deft-use-filter-string-for-filename t)
-    (deft-default-extension "org")
-    (deft-directory wiki-directory)
-    )
+    (use-package deft
+      :ensure t
+      :after org
+      :bind (("C-c n d d" . deft)
+             ("C-c n d f" . deft-find-file))
+      :custom
+      (deft-recursive t)
+      (deft-use-filter-string-for-filename t)
+      (deft-default-extension "org")
+      (deft-directory wiki-directory)
+      )
 #+end_src
 
