@@ -1068,4 +1068,11 @@ possible run emacsclient.exe to attach existed emacs client.
     (deft-directory wiki-directory)
     )
 #+end_src
+* default text scale
+#+begin_src emacs-lisp
+  (use-package default-text-scale
+    :ensure t
+    :custom
+    (default-text-scale-mode t))
+#+end_src
 
