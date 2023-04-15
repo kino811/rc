@@ -37,6 +37,12 @@
 #+begin_src emacs-lisp
   (setq confirm-kill-emacs #'yes-or-no-p)
 #+end_src
+** file performance issue
+*** avoid performance issue in files with very long lines.
+#+begin_src emacs-lisp
+  (global-so-long-mode t)
+  (setq bidi-inhibit-bpa t)
+#+end_src
 * options for loading
 #+begin_src emacs-lisp
   (setq load-prefer-newer t)
