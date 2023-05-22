@@ -387,7 +387,7 @@ when window
     (advice-add 'org-confluence--block :before-until
                 (lambda (language theme contents)
                   (if (member language '("plantuml" "dot" "ditaa"))
-                      (my/ox-confluence-en--macro "plantuml" contents `((type . ,language)))
+                      (my:ox-confluence-en--macro "plantuml" contents `((type . ,language)))
                     nil)))
 
     (setq org-plantuml-jar-path
