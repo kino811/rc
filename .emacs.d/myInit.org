@@ -486,7 +486,6 @@ when window
 
 ** ox reveal
 #+begin_src emacs-lisp
-
   (use-package ox-reveal
     :ensure t
     :config
@@ -496,9 +495,21 @@ when window
         (setq org-reveal-root "file:///c:/Users/myjung/reveal.js")))
      ((eq system-type 'darwin)
       (progn
-        (setq org-reveal-root "file:///Users/kino811/reveal.js"))))
+        (setq org-reveal-root "file:///Users/kino/reveal.js")
+        (advice-add 'org-reveal-export-to-html-and-browse :override
+                    (lambda (&optional async subtreep visible-only body-only ext-plist)
+                      "Export current buffer to a reveal.js and browse HTML file."
+                      (interactive)
+                      (browse-url-of-file
+                       ;; (expand-file-name
+                       (org-reveal-export-to-html async subtreep visible-only body-only ext-plist)
+                       ;; )
+                       )
+                      )
+                    )
+        )
+      ))
     )
-
 #+end_src
 
 ** org insert inline image from url
