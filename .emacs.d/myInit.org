@@ -301,9 +301,13 @@ when window
   (use-package exec-path-from-shell
     :ensure t
     :config
-    (when (memq window-system '(ns x))
+    (when (eq system-type 'darwin)
       (exec-path-from-shell-initialize)
-      (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS" "CFLAGS"))
+      ;; if you want to use plantuml.jar, you need to set GRAPHVIZ_DOT enviroment variable.
+      ;; e.g. you need to install graphviz by brew in mac or chocolate in windows
+      ;; and then you need to set shell's config with dot path to GRAPHVIZ_DOT
+      ;; and then you need to set here GRAPHVIZ_DOT
+      (exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LDFLAGS" "CPPFLAGS" "CFLAGS" "GRAPHVIZ_DOT"))
       (message "Initialized PATH and other variables from SHELL.")
       )
     )
