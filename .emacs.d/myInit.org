@@ -979,7 +979,8 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 #+begin_src emacs-lisp
   (use-package flycheck
     :ensure t
-    :init (global-flycheck-mode)
+    ;; for org-mode sparse trees function, disable global on setting
+    ;; :init (global-flycheck-mode) 
     :config
     (setq flycheck-flake8-maximum-line-length 124)
     )

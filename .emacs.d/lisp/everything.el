@@ -198,12 +198,15 @@ open it."
   "Prompt for a query and return the chosen filename.
 If the current major mode is dired or (e)shell-mode limit the search to
 the current directory and its sub-directories."
-  (let ((query (read-from-minibuffer (everything-create-query-prompt)
-				     (when (or (eq major-mode 'shell-mode)
-					       (eq major-mode 'eshell-mode)
-					       (eq major-mode 'dired-mode))
-				       (format "\"%s\" " (expand-file-name default-directory))))))
-    (unless (string= query "")
+  (let ((query (split-string
+				(read-from-minibuffer (everything-create-query-prompt)
+									  (when (or (eq major-mode 'shell-mode)
+												(eq major-mode 'eshell-mode)
+												(eq major-mode 'dired-mode))
+										(format "\"%s\" " (expand-file-name default-directory))
+										))
+				)))
+    (unless (if (typep query 'string) (string= query ""))
       (everything-select query))))
 
 
@@ -235,7 +238,7 @@ the current directory and its sub-directories."
 (defun everything-select (query)
   "Run the query query and return the chosen file.
 If query is already an existing file, return it without running a query."
-  (if (file-exists-p query)
+  (if (and (typep query 'string) (file-exists-p query))
       query
     (let ((files (everything-locate query)))
       (cond ((eq (length files) 0)
@@ -290,8 +293,10 @@ otherwise."
     (when matchpath (add-to-list 'args "-p" t))
     (add-to-list 'args "-n" t)
     (add-to-list 'args (number-to-string maxfiles) t)
-    (add-to-list 'args "-r"  t)
-    (add-to-list 'args query t)
+    ;; (add-to-list 'args "-r"  t)
+	(if (typep query 'list)
+		(append args query)
+	  (add-to-list 'args query t))
     (when (get-buffer everything-result-buffer)
       (kill-buffer everything-result-buffer))
     (apply #'call-process  everything-cmd nil (get-buffer-create everything-result-buffer) nil args)))
