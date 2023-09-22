@@ -203,7 +203,7 @@ the current directory and its sub-directories."
 									  (when (or (eq major-mode 'shell-mode)
 												(eq major-mode 'eshell-mode)
 												(eq major-mode 'dired-mode))
-										(format "\"%s\" " (expand-file-name default-directory))
+										(format "%s " (expand-file-name default-directory))
 										))
 				)))
     (unless (if (typep query 'string) (string= query ""))
@@ -295,11 +295,12 @@ otherwise."
     (add-to-list 'args (number-to-string maxfiles) t)
     ;; (add-to-list 'args "-r"  t)
 	(if (typep query 'list)
-		(append args query)
+		(setq args (append args query))
 	  (add-to-list 'args query t))
     (when (get-buffer everything-result-buffer)
       (kill-buffer everything-result-buffer))
-    (apply #'call-process  everything-cmd nil (get-buffer-create everything-result-buffer) nil args)))
+    (apply #'call-process everything-cmd nil (get-buffer-create everything-result-buffer) nil args)
+	))
 
 
 (defun everything-is-running ()
