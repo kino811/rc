@@ -1097,4 +1097,12 @@ possible run emacsclient.exe to attach existed emacs client.
     :custom
     (default-text-scale-mode t))
 #+end_src
+* syntax-subword
+#+begin_src emacs-lisp
+  (use-package syntax-subword
+    :ensure t
+    :custom
+    (global-syntax-subword-mode)
+    (setq syntax-subword-skip-spaces t))
+#+end_src
 
