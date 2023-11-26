@@ -754,6 +754,7 @@ possible multi edit
             (expand-file-name "~/.emacs.d/plantuml.jar")))
     (setq plantuml-default-exec-mode 'jar)
     (setq plantuml-indent-level 4)
+    (setq plantuml-output-type "png")
     )
 
 #+end_src
