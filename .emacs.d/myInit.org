@@ -546,6 +546,18 @@ when window
   ;;   )										;
 #+end_src
 
+** org mind map
+#+begin_src emacs-lisp
+  (use-package org-mind-map
+    :init
+    (require 'ox-org)
+    :ensure t
+    :config
+    ;; this is deault 
+    ;; (setq org-mind-map-engine "dot")
+    )
+#+end_src
+
 * window
 ** ace window
 when move other window, possible choose by number when window count is more than 2
