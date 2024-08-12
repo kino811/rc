@@ -111,7 +111,10 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 
 * alias
 #+begin_src emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  ;; when emacs-29 that is maybe problem about native compiler error
+  ;; (defalias 'yes-or-no-p 'y-or-n-p)
+  (setopt use-short-answers t)
+
   (defalias 'list-buffers 'ibuffer)
 #+end_src
 
@@ -244,6 +247,7 @@ try apply package for temp package that not download
 customizing mode line
 #+begin_src emacs-lisp
 
+  ;; not work in emacs-29
   (use-package powerline
     :ensure t
     :config
@@ -400,7 +404,7 @@ when window
             (expand-file-name "~/.emacs.d/plantuml.jar")))
 
     (add-to-list 'org-structure-template-alist
-                 '("u" . "src plantuml :file .png :exports plantuml"))
+                 '("u" . "src plantuml :file .png :exports both"))
 
     (when (eq system-type 'windows-nt)
       (progn (set-face-attribute 'default nil :family "Consolas")
@@ -729,9 +733,11 @@ possible multi edit
 
   (use-package projectile
     :ensure t
-    :bind-keymap ("C-c p p" . projectile-command-map)
+    ;; :bind-keymap ("C-c p p" . projectile-command-map)
     :config
-    (projectile-mode +1))
+    (projectile-mode +1)
+    (setq projectile-keymap-prefix (kbd "C-c p p"))
+  )
 
 #+end_src
 
@@ -796,7 +802,7 @@ possible multi edit
 #+begin_src emacs-lisp
   ;; https://www.voidtools.com/ko-kr/downloads/
   (when (eq system-type 'windows-nt)
-    (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
+    (setq everything-cmd "C:\\Program Files\\Everything\\es.exe")
     (setq everything-ffap-integration nil)
     (global-set-key (kbd "C-c o e") 'everything)
     (require 'everything)
@@ -870,6 +876,7 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 
 *** lsp-ivy
 #+begin_src emacs-lisp
+  ;; not work in emacs 29
   (use-package lsp-ivy
     :ensure t)
 #+end_src
@@ -1118,4 +1125,12 @@ possible run emacsclient.exe to attach existed emacs client.
     (global-syntax-subword-mode)
     (setq syntax-subword-skip-spaces t))
 #+end_src
-
+* centered cursor mode
+#+begin_src emacs-lisp
+  (use-package centered-cursor-mode
+    :ensure t
+    :init
+    :config
+    ;; (global-centered-cursor-mode +1)
+    )
+#+end_src
