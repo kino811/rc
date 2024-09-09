@@ -1,5 +1,10 @@
 #+startup: overview
 
+* native compile
+#+begin_src emacs-lisp
+  (setq native-comp-deferred-compilation nil)
+  (setq native-comp-async-report-warnings-errors nil)
+#+end_src
 * default options
 ** narrow region
 #+begin_src emacs-lisp
@@ -243,17 +248,29 @@ try apply package for temp package that not download
     (global-hl-line-mode t)
     )
 #+end_src
-** powerline
+** mode line
+*** powerline
 customizing mode line
 #+begin_src emacs-lisp
-
-  ;; not work in emacs-29
   (use-package powerline
     :ensure t
     :config
     (powerline-default-theme)
     )
-
+#+end_src
+*** add file path to mode line
+#+begin_src emacs-lisp
+  (setq-default mode-line-format
+                (list
+  			   '(:eval (if (buffer-modified-p)
+  						   "*"
+  						 " "))
+                 '(:eval (if (buffer-file-name)
+                             (abbreviate-file-name (buffer-file-name))
+  						 "%b"))
+                 "   "
+                 mode-line-modes
+                 mode-line-misc-info))
 #+end_src
 ** display line number
 #+begin_src emacs-lisp
@@ -280,12 +297,10 @@ customizing mode line
 ** rainbow delimiter
 in org mode, when `>` character inputed, wrong highlight occur, after lines at `(` or `)` and etc.
 #+begin_src emacs-lisp
-
-  ;; (use-package rainbow-delimiters
-  ;;   :ensure t
-  ;;   :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
-  ;;   )
-
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
+    )
 #+end_src
 * which key
 brings up some help
@@ -349,6 +364,7 @@ when window
            ;;                       (org-display-inline-images)))
            )
     :config
+    (setq org-image-max-width 'window)
     (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
     (use-package ob-ipython
@@ -390,7 +406,8 @@ when window
                               "}"))
             (close-tag (concat "{" name "}")))
         (if contents (concat open-tag "\n" contents "\n" close-tag)
-          open-tag)))
+          open-tag))
+  	)
 
     (advice-add 'org-confluence--block :before-until
                 (lambda (language theme contents)
@@ -423,8 +440,11 @@ when window
           '((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
     (add-hook 'org-babel-after-execute-hook
               (lambda ()
-                (when org-inline-image-overlays
-                  (org-redisplay-inline-images))))
+  			  (org-redisplay-inline-images)
+                ;; (when org-inline-image-overlays
+                ;;   (org-redisplay-inline-images))
+  			  )
+  			)
     (setq org-startup-with-inline-images t)
     )
 #+end_src
@@ -737,7 +757,7 @@ possible multi edit
     :config
     (projectile-mode +1)
     (setq projectile-keymap-prefix (kbd "C-c p p"))
-  )
+    )
 
 #+end_src
 
@@ -802,7 +822,7 @@ possible multi edit
 #+begin_src emacs-lisp
   ;; https://www.voidtools.com/ko-kr/downloads/
   (when (eq system-type 'windows-nt)
-    (setq everything-cmd "C:\\Program Files\\Everything\\es.exe")
+    (setq everything-cmd "C:\\user\\bin\\es.exe")
     (setq everything-ffap-integration nil)
     (global-set-key (kbd "C-c o e") 'everything)
     (require 'everything)
@@ -1133,4 +1153,9 @@ possible run emacsclient.exe to attach existed emacs client.
     :config
     ;; (global-centered-cursor-mode +1)
     )
+#+end_src
+* display file path in mode line
+* xml
+#+begin_src emacs-lisp
+  (setq nxml-child-indent 4)
 #+end_src
