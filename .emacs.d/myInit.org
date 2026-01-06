@@ -111,7 +111,10 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 
 * alias
 #+begin_src emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  ;; when emacs-29 that is maybe problem about native compiler error
+  ;; (defalias 'yes-or-no-p 'y-or-n-p)
+  (setopt use-short-answers t)
+
   (defalias 'list-buffers 'ibuffer)
 #+end_src
 
@@ -240,16 +243,29 @@ try apply package for temp package that not download
     (global-hl-line-mode t)
     )
 #+end_src
-** powerline
+** mode line
+*** powerline
 customizing mode line
 #+begin_src emacs-lisp
-
   (use-package powerline
     :ensure t
     :config
     (powerline-default-theme)
     )
-
+#+end_src
+*** add file path to mode line
+#+begin_src emacs-lisp
+  (setq-default mode-line-format
+                (list
+  			   '(:eval (if (buffer-modified-p)
+  						   "*"
+  						 " "))
+                 '(:eval (if (buffer-file-name)
+                             (abbreviate-file-name (buffer-file-name))
+  						 "%b"))
+                 "   "
+                 mode-line-modes
+                 mode-line-misc-info))
 #+end_src
 ** display line number
 #+begin_src emacs-lisp
@@ -276,12 +292,10 @@ customizing mode line
 ** rainbow delimiter
 in org mode, when `>` character inputed, wrong highlight occur, after lines at `(` or `)` and etc.
 #+begin_src emacs-lisp
-
-  ;; (use-package rainbow-delimiters
-  ;;   :ensure t
-  ;;   :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
-  ;;   )
-
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook ((prog-mode org-mode) . rainbow-delimiters-mode)
+    )
 #+end_src
 * which key
 brings up some help
@@ -345,6 +359,7 @@ when window
            ;;                       (org-display-inline-images)))
            )
     :config
+    (setq org-image-max-width 'window)
     (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
     (use-package ob-ipython
@@ -386,7 +401,8 @@ when window
                               "}"))
             (close-tag (concat "{" name "}")))
         (if contents (concat open-tag "\n" contents "\n" close-tag)
-          open-tag)))
+          open-tag))
+  	)
 
     (advice-add 'org-confluence--block :before-until
                 (lambda (language theme contents)
@@ -400,7 +416,7 @@ when window
             (expand-file-name "~/.emacs.d/plantuml.jar")))
 
     (add-to-list 'org-structure-template-alist
-                 '("u" . "src plantuml :file .png :exports plantuml"))
+                 '("u" . "src plantuml :file .png :exports both"))
 
     (when (eq system-type 'windows-nt)
       (progn (set-face-attribute 'default nil :family "Consolas")
@@ -419,8 +435,11 @@ when window
           '((sequencep "TODO" "PROGRESS" "WAITING" "DONE")))
     (add-hook 'org-babel-after-execute-hook
               (lambda ()
-                (when org-inline-image-overlays
-                  (org-redisplay-inline-images))))
+  			  (org-redisplay-inline-images)
+                ;; (when org-inline-image-overlays
+                ;;   (org-redisplay-inline-images))
+  			  )
+  			)
     (setq org-startup-with-inline-images t)
     )
 #+end_src
@@ -729,9 +748,11 @@ possible multi edit
 
   (use-package projectile
     :ensure t
-    :bind-keymap ("C-c p p" . projectile-command-map)
+    ;; :bind-keymap ("C-c p p" . projectile-command-map)
     :config
-    (projectile-mode +1))
+    (projectile-mode +1)
+    (setq projectile-keymap-prefix (kbd "C-c p p"))
+    )
 
 #+end_src
 
@@ -796,7 +817,7 @@ possible multi edit
 #+begin_src emacs-lisp
   ;; https://www.voidtools.com/ko-kr/downloads/
   (when (eq system-type 'windows-nt)
-    (setq everything-cmd "C:\\Program Files (x86)\\Everything\\es.exe")
+    (setq everything-cmd "C:\\user\\bin\\es.exe")
     (setq everything-ffap-integration nil)
     (global-set-key (kbd "C-c o e") 'everything)
     (require 'everything)
@@ -870,6 +891,7 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 
 *** lsp-ivy
 #+begin_src emacs-lisp
+  ;; not work in emacs 29
   (use-package lsp-ivy
     :ensure t)
 #+end_src
@@ -1127,4 +1149,7 @@ for default key binding conflict "C-M-=" and "C-M--".
     :ensure t
     :custom
     (default-text-scale-mode t))
+* xml
+#+begin_src emacs-lisp
+  (setq nxml-child-indent 4)
 #+end_src
