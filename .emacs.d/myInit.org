@@ -1103,13 +1103,6 @@ possible run emacsclient.exe to attach existed emacs client.
     (deft-directory wiki-directory)
     )
 #+end_src
-* default text scale
-#+begin_src emacs-lisp
-  (use-package default-text-scale
-    :ensure t
-    :custom
-    (default-text-scale-mode t))
-#+end_src
 * syntax-subword
 #+begin_src emacs-lisp
   (use-package syntax-subword
@@ -1118,4 +1111,20 @@ possible run emacsclient.exe to attach existed emacs client.
     (global-syntax-subword-mode)
     (setq syntax-subword-skip-spaces t))
 #+end_src
-
+* ordered
+for default key binding conflict "C-M-=" and "C-M--".
+** cnetered cursor mode
+#+begin_src emacs-lisp
+    (use-package centered-cursor-mode
+      :ensure t
+      :config
+      (global-centered-cursor-mode +1)
+      )
+#+end_src
+** default text scale
+#+begin_src emacs-lisp
+  (use-package default-text-scale
+    :ensure t
+    :custom
+    (default-text-scale-mode t))
+#+end_src
