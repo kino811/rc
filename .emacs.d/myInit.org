@@ -1,6 +1,11 @@
 #+startup: overview
-
 * default options
+** check wsl
+#+begin_src emacs-lisp
+  (defun my/in-wsl-p ()
+    (or (getenv "WSL_INTEROP")
+        (getenv "WSL_DISTRO_NAME")))
+#+end_src
 ** narrow region
 #+begin_src emacs-lisp
   (put 'narrow-to-region 'disabled nil)
@@ -122,15 +127,21 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 ** enviroment
 #+begin_src emacs-lisp
   (when enable-multibyte-characters
-    (set-language-environment "Korean")
+    ;; (set-language-environment "Korean")
+    (set-language-environment "UTF-8")
     (set-locale-environment "ko_KR.UTF-8")
     )
 #+end_src
 ** encoding
 for default encoding is best that utf-8
 #+begin_src emacs-lisp
-  (set-selection-coding-system 'utf-8)
+  ;; 다음 두옵션은 설정하지 말것. 시스템 로케일로 자동 설정되야함.
+  ;; (set-selection-coding-system 'utf-8)
+  ;; (set-clipboard-coding-system 'utf-8)
+
   (prefer-coding-system 'utf-8)
+
+  (setq default-process-coding-system '(utf-8 . utf-8))
 #+end_src
 
 * my custom function
@@ -169,13 +180,13 @@ for default encoding is best that utf-8
 
 #+end_src
 
-* macro
-
 * about package
 ** first setting for package
 #+begin_src emacs-lisp
+  ;; must be before (require 'package)
+  (setq package-install-upgrade-built-in nil)
+
   (require 'package)
-  (setq package-enable-at-startup nil)
 
   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -184,6 +195,10 @@ for default encoding is best that utf-8
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
+
+  ;; use-package basic policy
+  (require 'use-package)
+  (setq use-package-always-ensure nil)
 
   (when (equal emacs-version "27.2")
     (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
@@ -210,8 +225,8 @@ download package from git
 ** try
 try apply package for temp package that not download
 #+begin_src emacs-lisp
-  (use-package try
-    :ensure t)
+    (use-package try
+  	:ensure t)
 #+end_src
 
 ** manual elisp path
@@ -247,28 +262,39 @@ try apply package for temp package that not download
 *** powerline
 customizing mode line
 #+begin_src emacs-lisp
-
-  ;; not work in emacs-29
   (use-package powerline
+    ;; :if (display-graphic-p)
     :ensure t
     :config
     (powerline-default-theme)
-    )
 
+    ;; ;; change file name to path
+    ;; (defpowerline my-powerline-buffer-id
+    ;; 				(if (buffer-file-name)
+    ;; 					(abbreviate-file-name (buffer-file-name))
+    ;; 				  "%b"))
+    ;; (defalias 'powerline-buffer-id 'my-powerline-buffer-id)
+    )
 #+end_src
 *** add file path to mode line
 #+begin_src emacs-lisp
-  (setq-default mode-line-format
-                (list
-  			   '(:eval (if (buffer-modified-p)
-  						   "*"
-  						 " "))
-                 '(:eval (if (buffer-file-name)
-                             (abbreviate-file-name (buffer-file-name))
-  						 "%b"))
-                 "   "
-                 mode-line-modes
-                 mode-line-misc-info))
+  ;; (defun my-input-method-indicator ()
+  ;;   "Display input method status in mode line."
+  ;;   (if current-input-method
+  ;;       " [ko]"
+  ;;     " [en]"))
+  ;; (setq-default mode-line-format
+  ;;               (list
+  ;; 			   '(:eval (if (buffer-modified-p)
+  ;; 						   "*"
+  ;; 						 " "))
+  ;; 			   '(:eval (my-input-method-indicator))
+  ;;                '(:eval (if (buffer-file-name)
+  ;;                            (abbreviate-file-name (buffer-file-name))
+  ;; 						 "%b"))
+  ;;                "   "
+  ;;                mode-line-modes
+  ;;                mode-line-misc-info))
 #+end_src
 ** display line number
 #+begin_src emacs-lisp
@@ -311,11 +337,26 @@ brings up some help
 #+end_src
 
 * shell
+** encoding
+#+begin_src emacs-lisp
+  (add-hook 'shell-mode-hook
+  		  (lambda ()
+  			(let ((p (get-buffer-process (current-buffer))))
+  			  (when p (set-process-coding-system p 'utf-8 'utf-8)))
+  			)
+  		  )
+
+  (add-hook 'eshell-mode-hook
+  		  (lambda ()
+  			(set (make-local-variable 'coding-system-for-read) 'utf-8)
+  			(set (make-local-variable 'coding-system-for-write) 'utf-8)))
+#+end_src
 ** exec path for shell
 when window
 #+begin_src emacs-lisp
 
   (use-package exec-path-from-shell
+    :if (not (my/in-wsl-p))
     :ensure t
     :config
     (when (eq system-type 'darwin)
@@ -340,19 +381,17 @@ when window
     )
 
 #+end_src
-
 * gnuplot
 #+begin_src emacs-lisp
-  (use-package gnuplot
-    :ensure t) 
+    (use-package gnuplot
+  	:ensure t)
 #+end_src
 
 * org-mode stuff
 ** org
 #+begin_src emacs-lisp
   (use-package org
-    :ensure t
-    :ensure org-contrib
+    :ensure nil
     :bind (
            ("C-c o a" . org-agenda)
            ;;        :map org-mode-map
@@ -366,14 +405,31 @@ when window
     (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
     (use-package ob-ipython
-      :ensure t
+  	:ensure t
       :config
       (advice-add 'ob-ipython--collect-json :before
                   (lambda (&rest args)
                     (when (re-search-forward "{" nil t)
                       (backward-char))))
       )
-    (require 'ox-confluence)
+    (require 'ox-confluence nil t)
+    (require 'ox-md)
+
+    ;; For confluence wiki file link format.
+    (add-to-list 'org-export-filter-final-output-functions
+                 (lambda (output backend info)
+                   (if (org-export-derived-backend-p backend 'confluence)
+                       (progn
+                         (setq output
+                               (replace-regexp-in-string "\\[file:[^]]*?\\([^/ ]*?\\w\\.png\\)\\]"
+                                                         "!\\1!"
+                                                         output))
+                         (setq output
+                               (replace-regexp-in-string "\\[\\([^]]*|?\\)file:\\([^[]*\\)\\]"
+                                                         "[\\1^\\2]"
+                                                         output))
+                         output)
+                     output)))
 
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)
@@ -419,12 +475,14 @@ when window
             (expand-file-name "~/.emacs.d/plantuml.jar")))
 
     (add-to-list 'org-structure-template-alist
-                 '("u" . "src plantuml :file .png :exports both"))
+                 '("u" . "src plantuml :file .png :exports both")
+  			   '("p" . "src python :results file :dir . :exports both"))
 
     (when (eq system-type 'windows-nt)
       (progn (set-face-attribute 'default nil :family "Consolas")
              (set-face-attribute 'default nil :height 100)
              (set-fontset-font t 'hangul (font-spec :name "NanumBarunGothic"))
+             (set-fontset-font t 'emoji (font-spec :name "Segoe UI Emoji") nil 'prepend)
              (setq face-font-rescale-alist '(("NanumBarunGothic" . 1.3)))
              )
       )
@@ -444,8 +502,72 @@ when window
   			  )
   			)
     (setq org-startup-with-inline-images t)
+    (setq org-blank-before-new-entry
+  		'((heading . nil) (plain-list-item . nil)))
     )
+
+  (use-package org-contrib
+  :ensure t)
 #+end_src
+
+#+RESULTS:
+
+** org-babel named src block selector
+#+begin_src emacs-lisp
+  (defun my/org-babel-select-named-src-block ()
+    "Select and jump to any src block in the current buffer using completing-read.
+Named blocks show their name; unnamed blocks show heading + index."
+    (interactive)
+    (let* ((blocks-and-pos
+            (save-excursion
+              (goto-char (point-min))
+              (let (results heading-counts)
+                (while (re-search-forward "^[ \t]*#\\+begin_src" nil t)
+                  (let* ((block-pos (match-beginning 0))
+                         (name (save-excursion
+                                 (goto-char block-pos)
+                                 (when (re-search-backward
+                                        "^[ \t]*#\\+name:[ \t]*\\(.+\\)"
+                                        (save-excursion (outline-previous-heading) (point))
+                                        t)
+                                   (string-trim (match-string 1)))))
+                         (heading (save-excursion
+                                    (goto-char block-pos)
+                                    (or (ignore-errors
+                                          (let ((path (org-get-outline-path t t)))
+                                            (mapconcat #'identity path " > ")))
+                                        "(top-level)")))
+                         (lang (save-excursion
+                                 (goto-char block-pos)
+                                 (when (looking-at "^[ \t]*#\\+begin_src[ \t]+\\([^ \t\n]+\\)")
+                                   (match-string 1))))
+                         (label
+                          (if name
+                              (format "[name] %s  %s  (%s)" name heading lang)
+                            (let* ((key heading)
+                                   (idx (1+ (or (cdr (assoc key heading-counts)) 0))))
+                              (setq heading-counts
+                                    (cons (cons key idx)
+                                          (assq-delete-all key heading-counts)))
+                              (format "[%d] %s  (%s)" idx heading lang)))))
+                    (push (cons label block-pos) results)))
+                (nreverse results))))
+           (labels (mapcar #'car blocks-and-pos)))
+      (if (null labels)
+          (message "No src blocks found in this buffer.")
+        (let* ((selected (completing-read "Go to src block: " labels nil t))
+               (pos (cdr (assoc selected blocks-and-pos))))
+          (when pos
+            (goto-char pos)
+            (org-reveal)
+            (recenter))))))
+
+
+#+end_src
+
+#+RESULTS:
+: my/org-babel-select-named-src-block
+
 ** org bullets
 #+begin_src emacs-lisp
   ;; next package's bullet sharp is breaked in solar theme.
@@ -458,16 +580,6 @@ when window
   ;; therefore use this mode.
   (add-hook 'org-mode-hook 'org-indent-mode)
 #+end_src
-** org confluence
-#+begin_src emacs-lisp
-  ;; (use-package ox-confluence-en
-  ;;   :quelpa (ox-confluence-en :fetcher github :repo "correl/ox-confluence-en")
-  ;;   :config
-  ;;   (require 'ox-confluence)
-  ;;   (setq ox-confluence-en-use-plantuml-macro t)
-  ;;   )
-#+end_src
-
 ** org mode screenshot
 #+begin_src emacs-lisp
 
@@ -483,7 +595,7 @@ when window
                     (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
     ;; using just clip board captured before.
     ;; (shell-command "snippingtool /clip")
-    (shell-command (concat "powershell -command \"Add-Type -AssemblyName System.Windows.Forms;if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {$image = [System.Windows.Forms.Clipboard]::GetImage();[System.Drawing.Bitmap]$image.Save('" filename "',[System.Drawing.Imaging.ImageFormat]::Png); Write-Output 'clipboard content saved as file'} else {Write-Output 'clipboard does not contain image data'}\""))
+    (shell-command (concat "powershell.exe -command \"Add-Type -AssemblyName System.Windows.Forms;if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {$image = [System.Windows.Forms.Clipboard]::GetImage();[System.Drawing.Bitmap]$image.Save('" filename "',[System.Drawing.Imaging.ImageFormat]::Png); Write-Output 'clipboard content saved as file'} else {Write-Output 'clipboard does not contain image data'}\""))
     ;; (insert (concat "[[file:" filename "]]"))
     (insert (concat "[[file:" (file-name-nondirectory filename) "]]"))
     (org-display-inline-images)
@@ -494,18 +606,19 @@ when window
 #+begin_src emacs-lisp
 
   (use-package org-download
+    :if (display-graphic-p)
     :ensure t
     :hook (dired-mode . org-download-enable)
     :config
     (cond
      ((eq system-type 'windows-nt)
       (progn
-        (setq org-download-screenshot-method "imagemagick/convert")
-        (global-set-key (kbd "C-c i s") 'my-org-screenshot-w32)))
+  	(setq org-download-screenshot-method "imagemagick/convert")
+  	(global-set-key (kbd "C-c i s") 'my-org-screenshot-w32)))
      ((eq system-type 'darwin)
       (progn
-        (setq-default org-download-heading-lvl nil)
-        (setq org-download-screenshot-method "screencapture"))))
+  	(setq-default org-download-heading-lvl nil)
+  	(setq org-download-screenshot-method "screencapture"))))
     )
 
 #+end_src
@@ -538,14 +651,6 @@ when window
     )
 #+end_src
 
-** org insert inline image from url
-#+begin_src emacs-lisp
-  (defun my-org-replace-tag-file-to-confluence-file ()
-    (interactive)
-    (query-replace-regexp "\\[file:[^\]]*?\\([^/ ]*?\\w\.png\\)\\]" "!\\1!")
-    )
-#+end_src
-
 ** org roam
 #+begin_src emacs-lisp
   ;; (use-package org-roam
@@ -571,12 +676,26 @@ when window
 ** org mind map
 #+begin_src emacs-lisp
   (use-package org-mind-map
+    :ensure t
     :init
     (require 'ox-org)
-    :ensure t
     :config
     ;; this is deault 
     ;; (setq org-mind-map-engine "dot")
+    )
+#+end_src
+
+** org header hierarchy
+
+*** org sticky mode
+#+begin_src emacs-lisp
+  (use-package org-sticky-header
+    :ensure t
+    :hook (org-mode . org-sticky-header-mode)
+    ;; next is not working.
+    ;; :custom
+    ;; (org-sticky-header-full-path t)  ;; 헤더 계층 전체 표시
+    ;; (org-sticky-header-outline-path-separator " -> ") ;; 계층 구분자 설정
     )
 #+end_src
 
@@ -608,6 +727,7 @@ undo, redo window layout.
 ** windmove
 #+begin_src emacs-lisp
   (use-package windmove
+    :ensure t
     :bind (("C-c w h" . windmove-left)
            ("C-c w j" . windmove-down)
            ("C-c w k" . windmove-up)
@@ -638,18 +758,17 @@ undo, redo window layout.
     )
 
   (use-package swiper
-    :ensure try
+    :ensure t
     :bind (("C-c s s s" . swiper)
            ("C-c s s a" . swiper-thing-at-point)
            ("C-c s s e s" . swiper-all)
            ("C-c s s e a" . swiper-all-thing-at-point)
            )
     :config
-    (ivy-mode 1)
-    ;; (setq ivy-use-virtual-buffers t)
-    (setq ivy-display-style 'fancy)
     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
     )
+  (use-package try
+  	:ensure t)
 
   (use-package ivy-hydra
     :ensure t)
@@ -722,8 +841,16 @@ possible multi edit
 #+end_src
 ** copyit
 #+begin_src emacs-lisp
-  (use-package copyit
-    :ensure t)
+    (use-package copyit
+  	:ensure t)
+#+end_src
+** multiple-cursors
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :ensure t
+    :config
+    (global-set-key (kbd "C-c e m c") 'mc/edit-lines)
+    )
 #+end_src
 * version control
 ** magit
@@ -751,10 +878,9 @@ possible multi edit
 
   (use-package projectile
     :ensure t
-    ;; :bind-keymap ("C-c p p" . projectile-command-map)
-    :config
+    :init
     (projectile-mode +1)
-    (setq projectile-keymap-prefix (kbd "C-c p p"))
+    :bind-keymap ("C-c p p" . projectile-command-map)
     )
 
 #+end_src
@@ -771,9 +897,8 @@ possible multi edit
 ** ini file
 #+begin_src emacs-lisp
 
-  (use-package ini-mode
-    :ensure t
-    )
+    (use-package ini-mode
+  	:ensure t)
 
 #+end_src
 ** plantuml
@@ -849,85 +974,117 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
   ;;   )
 #+end_src
 
-** TODO Company vs Corfu
+** Corfu
+#+begin_src emacs-lisp
+  (use-package corfu
+    :ensure t
+    :init (global-corfu-mode))   ;; 전역 활성화
 
+  ;; 선택: 추가 후보 소스
+  (use-package cape
+    :ensure t)
+
+  ;; 선택: 터미널에서 사용
+  (use-package corfu-terminal
+    :if (not (display-graphic-p))
+    :ensure t
+    :config (corfu-terminal-mode 1))
+#+end_src
 ** lsp
 #+begin_src emacs-lisp
-  ;; language server protocol
-  (use-package lsp-mode
-    :ensure t
-    :commands (lsp lsp-deferred)
-    :init
-    (setq lsp-keymap-prefix "C-c l")
-    :config
-    (lsp-enable-which-key-integration t)
-    )
+  (when (not (my/in-wsl-p))
+    ;; language server protocol
+    (use-package lsp-mode
+  	:ensure t
+  	:commands (lsp lsp-deferred)
+  	:init
+  	(setq lsp-keymap-prefix "C-c l")
+  	
+  	:custom
+  	(lsp-enable-file-watchers nil)
+  	(lsp-restart 'auto-restart)
+  	:hook (lsp-mode . my/lsp-mode-setup)
+  	:config
+  	(lsp-enable-which-key-integration t)
+  	)
 
-  (defun my/lsp-mode-setup ()
-    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-    (lsp-headerline-breadcrumb-mode)
-
-    :hook (lsp-mode . my/lsp-mode-setup)
+    (defun my/lsp-mode-setup ()
+  	(setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  	(lsp-headerline-breadcrumb-mode)
+  	)
     )
 #+end_src
 
 *** lsp-ui-mode
 #+begin_src emacs-lisp
-  (use-package lsp-ui
-    :ensure t
-    :hook (lsp-mode . lsp-ui-mode)
-    :config
-    (setq lsp-ui-doc-position'bottom)
+  (when (not (my/in-wsl-p))
+    (use-package lsp-ui
+  	:if (display-graphic-p)
+  	:ensure t
+  	:hook (lsp-mode . lsp-ui-mode)
+  	:config
+  	(setq lsp-ui-doc-position 'bottom)
 
-    (setq lsp-ui-sideline-enable nil)
-    (setq lsp-ui-sideline-show-hover nil)
+  	(setq lsp-ui-sideline-enable nil)
+  	(setq lsp-ui-sideline-show-hover nil)
+  	)
     )
 #+end_src
 
 *** lsp-treemacs
 #+begin_src emacs-lisp
-  (use-package lsp-treemacs
-    :ensure t
-    :after lsp
+  (when (display-graphic-p)
+    (use-package lsp-treemacs
+  	:ensure t
+  	:after lsp-mode
+  	)
     )
 #+end_src
 
 *** lsp-ivy
 #+begin_src emacs-lisp
-  ;; not work in emacs 29
-  (use-package lsp-ivy
-    :ensure t)
+  (when (not (my/in-wsl-p))
+    ;; not work in emacs 29
+    (use-package lsp-ivy
+  	:ensure t
+  	)
+    )
+
 #+end_src
 
 ** yasnippet
 #+begin_src emacs-lisp
-
   (use-package yasnippet
     :ensure t
-    :init
+    :config
     (yas-global-mode 1)
     )
 
   (use-package yasnippet-snippets
-    :ensure t)
-
+    :ensure t
+    )
 #+end_src
 
 * selection
 ** region
 *** expand region
 #+begin_src emacs-lisp
-
   (use-package expand-region
     :ensure t
-    :bind (("C-@" . er/expand-region))
+    :config
+    (when (display-graphic-p)
+  	(global-set-key (kbd "C-@") #'er/expand-region))
     )
-
 #+end_src
-** surround
+** surround or embrace
 #+begin_src emacs-lisp
+  ;; wsl : embrace
+  ;; (use-package embrace
+  ;;   :ensure t
+  ;;   :bind (("C-c e e" . embrace-commander)))
 
   (use-package emacs-surround
+    :ensure t
     :quelpa ((emacs-surround :fetcher github :repo "ganmacs/emacs-surround"))
     :config
     (global-set-key (kbd "C-c e e") 'emacs-surround)
@@ -944,7 +1101,6 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 * undo
 ** undo tree
 #+begin_src emacs-lisp
-
   (use-package undo-tree
     :ensure t
     :config
@@ -953,20 +1109,24 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
     ;; example title: EmacsConfig [1/4] | configuration.org
     (defun my-title-bar-format()
       (let* ((current-slot (eyebrowse--get 'current-slot))
-             (window-configs (eyebrowse--get 'window-configs))
-             (window-config (assoc current-slot window-configs))
-             (window-config-name (nth 2 window-config))
-             (num-slots (length window-configs)))
-        (concat window-config-name " [" (number-to-string current-slot)
-                "/" (number-to-string num-slots) "] | " "%b")))
+  		   (window-configs (eyebrowse--get 'window-configs))
+  		   (window-config (assoc current-slot window-configs))
+  		   (window-config-name (nth 2 window-config))
+  		   (num-slots (length window-configs)))
+  	  (concat window-config-name " [" (number-to-string current-slot)
+  			  "/" (number-to-string num-slots) "] | " "%b")))
     (if (display-graphic-p)
-        (progn
+  	  (progn
           (setq frame-title-format
-                '(:eval (my-title-bar-format)))))
+  			  '(:eval (my-title-bar-format)))))
     )
-
 #+end_src
-
+** vundo
+#+begin_src emacs-lisp
+  (use-package vundo
+    :ensure t
+    )
+#+end_src
 * programming
 ** json mode
 #+begin_src emacs-lisp
@@ -1009,6 +1169,7 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 ** cpp
 #+begin_src emacs-lisp
   (use-package cpp
+    :ensure t
     :config
     (setq c-default-style "linux"
           c-basic-offset 4))
@@ -1034,7 +1195,22 @@ OpenGL Shading Language
     (add-to-list 'auto-mode-alist '("\\.fxh\\'" . glsl-mode))
     )
 #+end_src
+** jlt
+Juego logic tree
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.jlt\\'" . lisp-mode))
 
+  (defun my-jlt-lisp-mode-hook ()
+    (setq-local lisp-indent-function 'common-lisp-indent-function)
+    (setq-local indent-tabs-mode nil)
+    (setq-local lisp-body-indent 4)
+    )
+
+  (add-hook 'lisp-mode-hook
+  		  (lambda ()
+  			(when (string-match "\\.jlt\\'" buffer-file-name)
+  			  (my-jlt-lisp-mode-hook))))
+#+end_src
 * help
 ** helpful
 #+begin_src emacs-lisp
@@ -1086,7 +1262,8 @@ OpenGL Shading Language
 possible run emacsclient.exe to attach existed emacs client.
 #+begin_src emacs-lisp
   (require 'server)
-  (server-start)
+  (unless (server-running-p)
+    (server-start))
 #+end_src
 ** edit server
 #+begin_src emacs-lisp
@@ -1149,11 +1326,127 @@ possible run emacsclient.exe to attach existed emacs client.
     :ensure t
     :init
     :config
-    ;; (global-centered-cursor-mode +1)
+    (global-centered-cursor-mode +1)
     )
 #+end_src
 * display file path in mode line
 * xml
 #+begin_src emacs-lisp
   (setq nxml-child-indent 4)
+#+end_src
+#+begin_src emacs-lisp
+  (defun my-attribulator-xml-env ()
+    "Set indent-tabs-mode and tab-width for XML-related environments."
+    (interactive)
+    (when (and buffer-file-name
+  			 (string-match-p "aiattribdb"
+  							 buffer-file-name))
+  	(setq-local indent-tabs-mode nil)
+  	(setq-local tab-width 2)
+  	(setq-local nxml-child-indent 2)
+  	)
+    )
+  (add-hook 'nxml-mode-hook 'my-attribulator-xml-env)
+  (add-hook 'xml-mode-hook 'my-attribulator-xml-env)
+#+end_src
+* dired expand
+** dired-open
+#+begin_src emacs-lisp
+  (use-package dired-open
+    :ensure t
+    )
+#+end_src
+* simple move to prev/next cursor position
+#+begin_src emacs-lisp
+  (use-package back-button
+    :ensure t
+    :config
+    (back-button-mode 1)
+    )
+#+end_src
+* wsl
+** clipboard
+#+begin_src emacs-lisp
+  (when (my/in-wsl-p)
+    (setq interprogram-cut-function
+          (lambda (text)
+            (let ((process-connection-type nil))
+              (start-process "clip.exe" nil "clip.exe")
+              (process-send-string "clip.exe" text)
+              (process-send-eof "clip.exe"))))
+
+    (setq interprogram-paste-function
+          (lambda ()
+            (when (executable-find "powershell.exe")
+              (string-trim
+               (shell-command-to-string
+                "powershell.exe -NoProfile -Command Get-Clipboard"))))))
+
+#+end_src
+* vterm
+#+begin_src emacs-lisp
+  (add-hook 'vterm-mode-hook (lambda ()
+     (display-line-numbers-mode -1)))
+#+end_src
+* agent-shell
+#+begin_src emacs-lisp
+  (use-package agent-shell
+    :ensure t
+    :bind (("C-c a a n s" . agent-shell-new-shell)
+           (:map agent-shell-mode-map
+                 ("C-c a a i s" . agent-shell-send-clipboard-image)))
+    :config
+    (when (eq system-type 'windows-nt)
+    (add-to-list 'agent-shell-clipboard-image-handlers
+  			   (list
+  				(cons :command "powershell")
+  				(cons :save
+  					  (lambda (file)
+  						(let* ((ps-cmd
+  								(concat
+  								 "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms') | Out-Null; "
+  								 "$img = [System.Windows.Forms.Clipboard]::GetImage(); "
+  								 "if ($img -ne $null) { $img.Save('" file "') } else { exit 1 }"))
+  							   (exit-code (call-process "powershell" nil nil nil "-command" ps-cmd)))
+  						  (unless (= exit-code 0)
+  							(error "no image in Clipboard"))))))))
+    (setq agent-shell-buffer-name-format
+          (lambda (agent-name project-name)
+            (read-string (format "Buffer name (%s Agent @ %s): " agent-name project-name)
+                         (format "%s Agent @ %s" agent-name project-name))))
+    (setq agent-shell-permission-responder-function
+          (lambda (permission)
+            (when-let (((equal (map-elt (map-elt permission :tool-call) :kind) "read"))
+                       (choice (seq-find
+                                (lambda (option)
+                                  (equal (map-elt option :kind) "allow_once"))
+                                (map-elt permission :options))))
+              (funcall (map-elt permission :respond)
+                       (map-elt choice :option-id))
+              t))))
+#+end_src
+* pandoc-mode
+#+begin_src emacs-lisp
+  (use-package pandoc-mode
+    :ensure t
+    :hook (markdown-mode . pandoc-mode)
+    :config
+    (defun my/pandoc-preview-html ()
+      "Convert current md file to HTML and open in browser or eww"
+      (interactive)
+      (let* ((src (buffer-file-name))
+             (out (concat (file-name-sans-extension (make-temp-file "pandoc-preview")) ".html")))
+        (if (not src)
+            (message "Please save the file first.")
+          (if (= 0 (call-process "pandoc" nil nil nil src "-o" out))
+              (let ((choice (read-char "Open with: (b)rowser / (e)ww ? ")))
+                (cond
+                 ((eq choice ?b) (browse-url (concat "file:///" out)))
+                 ((eq choice ?e) (eww-open-file out))
+                 (t (message "Cancelled"))))
+            (message "pandoc conversion failed")))))
+
+    (with-eval-after-load 'pandoc-mode
+      (transient-append-suffix 'pandoc-main-transient "r"
+        '("P" "Preview in browser" my/pandoc-preview-html))))
 #+end_src
