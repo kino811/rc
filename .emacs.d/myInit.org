@@ -1049,7 +1049,6 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
   	:ensure t
   	)
     )
-
 #+end_src
 
 ** yasnippet
@@ -1305,13 +1304,6 @@ possible run emacsclient.exe to attach existed emacs client.
     (deft-directory wiki-directory)
     )
 #+end_src
-* default text scale
-#+begin_src emacs-lisp
-  (use-package default-text-scale
-    :ensure t
-    :custom
-    (default-text-scale-mode t))
-#+end_src
 * syntax-subword
 #+begin_src emacs-lisp
   (use-package syntax-subword
@@ -1450,3 +1442,4 @@ possible run emacsclient.exe to attach existed emacs client.
       (transient-append-suffix 'pandoc-main-transient "r"
         '("P" "Preview in browser" my/pandoc-preview-html))))
 #+end_src
+
