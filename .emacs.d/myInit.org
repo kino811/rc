@@ -100,6 +100,25 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
   (setq-default tab-width 4)
 #+end_src
 
+** macOS clipboard in terminal
+#+begin_src emacs-lisp
+  (when (and (eq system-type 'darwin) (not (display-graphic-p)))
+    (when (executable-find "pbcopy")
+      (setq interprogram-cut-function
+            (lambda (text)
+              (let ((process-connection-type nil))
+                (let ((proc (start-process "pbcopy" nil "pbcopy")))
+                  (process-send-string proc text)
+                  (process-send-eof proc))))))
+    (when (executable-find "pbpaste")
+      (setq interprogram-paste-function
+            (lambda ()
+              (shell-command-to-string "pbpaste")))))
+#+end_src
+
+#+RESULTS:
+: #[nil ((shell-command-to-string "pbpaste")) nil]
+
 ** i want to save desktop state for emacs open after
 #+begin_src emacs-lisp
   (desktop-save-mode t)

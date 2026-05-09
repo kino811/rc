@@ -1,4 +1,5 @@
 *~
 *.swp
 *.desktop
-/.agent-shell/
+.agent-shell/
+/.config/karabiner/automatic_backups/
