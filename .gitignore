@@ -3,3 +3,4 @@
 *.desktop
 .agent-shell/
 /.config/karabiner/automatic_backups/
+*.log
