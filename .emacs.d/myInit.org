@@ -400,6 +400,15 @@ when window
     )
 
 #+end_src
+** eat
+#+begin_src emacs-lisp
+  (use-package eat
+    :ensure t
+    :config
+    (add-hook 'eshell-load-hook #'eat-eshell-mode)
+    (add-hook 'eshell-load-hook #'eat-eshell-visual-command-mode))
+#+end_src
+
 * gnuplot
 #+begin_src emacs-lisp
     (use-package gnuplot
@@ -1461,4 +1470,12 @@ possible run emacsclient.exe to attach existed emacs client.
       (transient-append-suffix 'pandoc-main-transient "r"
         '("P" "Preview in browser" my/pandoc-preview-html))))
 #+end_src
+* term
+** C-RET issue
+#+begin_src emacs-lisp
+  ;; 터미널에서 WezTerm이 보내는 C-RET 신호를 이맥스가 이해하도록 매핑
+  (unless (display-graphic-p)
+    (define-key input-decode-map "\e[13;5u" [C-return]))
+#+end_src
+
 
