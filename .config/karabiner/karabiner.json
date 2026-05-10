@@ -5,6 +5,7 @@
                 "rules": [
                     {
                         "description": "Force y/n to English in iTerm2 (Korean mode)",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
@@ -50,6 +51,7 @@
                     },
                     {
                         "description": "After Ctrl+z, force next key to English",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
@@ -125,22 +127,27 @@
                     }
                 ]
             },
-            "name": "Default profile",
-            "selected": true,
-            "simple_modifications": [
+            "devices": [
                 {
-                    "from": { "key_code": "caps_lock" },
-                    "to": [{ "key_code": "right_control" }]
-                },
-                {
-                    "from": { "key_code": "left_command" },
-                    "to": [{ "key_code": "left_option" }]
-                },
-                {
-                    "from": { "key_code": "left_option" },
-                    "to": [{ "key_code": "left_command" }]
+                    "identifiers": { "is_keyboard": true },
+                    "simple_modifications": [
+                        {
+                            "from": { "key_code": "caps_lock" },
+                            "to": [{ "key_code": "left_control" }]
+                        },
+                        {
+                            "from": { "key_code": "left_command" },
+                            "to": [{ "key_code": "left_option" }]
+                        },
+                        {
+                            "from": { "key_code": "left_option" },
+                            "to": [{ "key_code": "left_command" }]
+                        }
+                    ]
                 }
             ],
+            "name": "Default profile",
+            "selected": true,
             "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
         }
     ]
