@@ -1,4 +1,8 @@
 #+startup: overview
+* need for emacs 30 over version
+#+begin_src emacs-lisp
+(require 'files)
+#+end_src
 * default options
 ** check wsl
 #+begin_src emacs-lisp
@@ -211,8 +215,9 @@ for default encoding is best that utf-8
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
   (package-initialize)
+  (package-refresh-contents)
   (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
+    ;; (package-refresh-contents)
     (package-install 'use-package))
 
   ;; use-package basic policy
@@ -432,14 +437,14 @@ when window
     (setq org-image-max-width 'window)
     (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
-    (use-package ob-ipython
-  	:ensure t
-      :config
-      (advice-add 'ob-ipython--collect-json :before
-                  (lambda (&rest args)
-                    (when (re-search-forward "{" nil t)
-                      (backward-char))))
-      )
+    ;; (use-package ob-ipython
+    ;; 	:ensure t
+    ;;   :config
+    ;;   (advice-add 'ob-ipython--collect-json :before
+    ;;               (lambda (&rest args)
+    ;;                 (when (re-search-forward "{" nil t)
+    ;;                   (backward-char))))
+    ;;   )
     (require 'ox-confluence nil t)
     (require 'ox-md)
 
@@ -462,7 +467,7 @@ when window
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)
                                    (python . t)
-                                   (ipython . t)
+                                   ;; (ipython . t)
                                    (C . t)
                                    (plantuml . t)
                                    (shell . t)
@@ -535,7 +540,7 @@ when window
     )
 
   (use-package org-contrib
-  :ensure t)
+    :ensure t)
 #+end_src
 
 #+RESULTS:
@@ -1023,19 +1028,20 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 #+begin_src emacs-lisp
   (when (not (my/in-wsl-p))
     ;; language server protocol
-    (use-package lsp-mode
-  	:ensure t
-  	:commands (lsp lsp-deferred)
-  	:init
-  	(setq lsp-keymap-prefix "C-c l")
-  	
-  	:custom
-  	(lsp-enable-file-watchers nil)
-  	(lsp-restart 'auto-restart)
-  	:hook (lsp-mode . my/lsp-mode-setup)
-  	:config
-  	(lsp-enable-which-key-integration t)
-  	)
+    ;;(use-package lsp-mode
+  	;;  :ensure t
+    ;;  :defer t
+  	;;  :commands (lsp lsp-deferred)
+  	;;  :init
+  	;;  (setq lsp-keymap-prefix "C-c l")
+  	;;  
+  	;;  :custom
+  	;;  (lsp-enable-file-watchers nil)
+  	;;  (lsp-restart 'auto-restart)
+  	;;  :hook (lsp-mode . my/lsp-mode-setup)
+  	;;  :config
+  	;;  (lsp-enable-which-key-integration t)
+  	;;  )
 
     (defun my/lsp-mode-setup ()
   	(setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
@@ -1072,12 +1078,12 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 
 *** lsp-ivy
 #+begin_src emacs-lisp
-  (when (not (my/in-wsl-p))
-    ;; not work in emacs 29
-    (use-package lsp-ivy
-  	:ensure t
-  	)
-    )
+  ;; (when (not (my/in-wsl-p))
+  ;;   ;; not work in emacs 29
+  ;;   (use-package lsp-ivy
+  ;; 	:ensure t
+  ;; 	)
+  ;;   )
 #+end_src
 
 ** yasnippet
@@ -1112,8 +1118,9 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
   ;;   :bind (("C-c e e" . embrace-commander)))
 
   (use-package emacs-surround
-    :ensure t
+    :quelpa t
     :quelpa ((emacs-surround :fetcher github :repo "ganmacs/emacs-surround"))
+    :defer t
     :config
     (global-set-key (kbd "C-c e e") 'emacs-surround)
     (add-to-list 'emacs-surround-alist '("~" . ("~" . "~")))
@@ -1204,13 +1211,13 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
 #+end_src
 ** flycheck
 #+begin_src emacs-lisp
-  (use-package flycheck
-    :ensure t
-    ;; for org-mode sparse trees function, disable global on setting
-    ;; :init (global-flycheck-mode) 
-    :config
-    (setq flycheck-flake8-maximum-line-length 124)
-    )
+  ;; (use-package flycheck
+  ;;   :ensure t
+  ;;   ;; for org-mode sparse trees function, disable global on setting
+  ;;   ;; :init (global-flycheck-mode) 
+  ;;   :config
+  ;;   (setq flycheck-flake8-maximum-line-length 124)
+  ;;   )
 #+end_src
 * file extentsion
 ** glsl
