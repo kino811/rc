@@ -1,4 +1,4 @@
-local wezterm = require 'wezterm'
+local wezterm = require('wezterm')
 local config = {}
 
 if wezterm.config_builder then
@@ -31,15 +31,18 @@ config.keys = {
   {
     key = 'Return',
     mods = 'CTRL',
-    action = wezterm.action.SendString '\x1b[13;5u',
+    action = wezterm.action.SendString('\x1b[13;5u'),
   },
 
   -- macOS 필수 시스템 단축키 (Cmd 조합)
-  { key = 'c', mods = 'CMD', action = wezterm.action.CopyTo 'Clipboard' },
-  { key = 'v', mods = 'CMD', action = wezterm.action.PasteFrom 'Clipboard' },
-  { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentPane { confirm = true } },
-  { key = 'q', mods = 'CMD', action = wezterm.action.QuitApplication },
-  { key = 'f', mods = 'CMD', action = wezterm.action.Search { CaseInSensitiveString = '' } },
+  { key = 'c', mods = 'CMD', action = wezterm.action.CopyTo('Clipboard') },
+  { key = 'v', mods = 'CMD', action = wezterm.action.PasteFrom('Clipboard') },
+  { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentPane({ confirm = true }) },
+  { key = 'q', mods = 'CMD', action = wezterm.action.QuitApplication() },
+  { key = 'f', mods = 'CMD', action = wezterm.action.Search({ CaseInSensitiveString = '' }) },
+  {key = '=', mods = 'CMD', action = wezterm.action.IncreaseFontSize() },
+  {key = '-', mods = 'CMD', action = wezterm.action.DecreaseFontSize() },
+  {key = '0', mods = 'CMD', action = wezterm.action.ResetFontSize() },
 }
 
 -- [자동 매핑] 알파벳 a-z까지 Meta(Alt) 단축키 일괄 등록
