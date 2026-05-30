@@ -1423,7 +1423,7 @@ possible run emacsclient.exe to attach existed emacs client.
 * vterm
 #+begin_src emacs-lisp
   (add-hook 'vterm-mode-hook (lambda ()
-     (display-line-numbers-mode -1)))
+  							 (display-line-numbers-mode -1)))
 #+end_src
 * agent-shell
 #+begin_src emacs-lisp
@@ -1434,19 +1434,19 @@ possible run emacsclient.exe to attach existed emacs client.
                  ("C-c a a i s" . agent-shell-send-clipboard-image)))
     :config
     (when (eq system-type 'windows-nt)
-    (add-to-list 'agent-shell-clipboard-image-handlers
-  			   (list
-  				(cons :command "powershell")
-  				(cons :save
-  					  (lambda (file)
-  						(let* ((ps-cmd
-  								(concat
-  								 "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms') | Out-Null; "
-  								 "$img = [System.Windows.Forms.Clipboard]::GetImage(); "
-  								 "if ($img -ne $null) { $img.Save('" file "') } else { exit 1 }"))
-  							   (exit-code (call-process "powershell" nil nil nil "-command" ps-cmd)))
-  						  (unless (= exit-code 0)
-  							(error "no image in Clipboard"))))))))
+  	(add-to-list 'agent-shell-clipboard-image-handlers
+  				 (list
+  				  (cons :command "powershell")
+  				  (cons :save
+  						(lambda (file)
+  						  (let* ((ps-cmd
+  								  (concat
+  								   "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms') | Out-Null; "
+  								   "$img = [System.Windows.Forms.Clipboard]::GetImage(); "
+  								   "if ($img -ne $null) { $img.Save('" file "') } else { exit 1 }"))
+  								 (exit-code (call-process "powershell" nil nil nil "-command" ps-cmd)))
+  							(unless (= exit-code 0)
+  							  (error "no image in Clipboard"))))))))
     (setq agent-shell-buffer-name-format
           (lambda (agent-name project-name)
             (read-string (format "Buffer name (%s Agent @ %s): " agent-name project-name)
@@ -1493,4 +1493,15 @@ possible run emacsclient.exe to attach existed emacs client.
   ;; 터미널에서 WezTerm이 보내는 C-RET 신호를 이맥스가 이해하도록 매핑
   (unless (display-graphic-p)
     (define-key input-decode-map "\e[13;5u" [C-return]))
+#+end_src
+* font size
+** default text scale
+#+begin_src emacs-lisp
+  (use-package default-text-scale
+    :ensure t
+    :init
+    (default-text-scale-mode 1)
+    :bind (("C-M-=" . 'default-text-scale-increase)
+    		 ("C-M--" . 'default-text-scale-decrease)
+    		 ("C-M-0" . 'default-text-scale-reset)))
 #+end_src
