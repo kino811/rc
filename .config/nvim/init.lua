@@ -32,7 +32,7 @@ vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 
 -- turn off highlight after search
-vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>") 
+vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", {desc = "Clear search highlight"}) 
 
 
 -- lazy.nvim bootstrap
@@ -64,7 +64,7 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("nvim-tree").setup()
-      vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
+      vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", {desc = "File explorer"})
     end,
   },
   -- 퍼지 파인더
@@ -102,6 +102,14 @@ require("lazy").setup({
               case_mode = "smart_case",       -- 대소문자 구분 설정
             }
           },
+          mappings = {
+            i = {
+              ["<C-h>"] = "which_key"
+            },
+            n = {
+              ["?"] = "which_key"
+            }
+          }
         },
         pickers = {
           find_files = {
@@ -119,11 +127,14 @@ require("lazy").setup({
       telescope.load_extension("fzf")
 
       local builtin = require("telescope.builtin")
-      vim.keymap.set("n", "<leader>ff", builtin.find_files)
-      vim.keymap.set("n", "<leader>fg", builtin.live_grep)
+      vim.keymap.set("n", "<leader>ff", builtin.find_files, {desc = "Find files"})
+      vim.keymap.set("n", "<leader>fg", builtin.live_grep, {desc = "Live grep"})
+      vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, {desc = "Search current buffer"})
+      vim.keymap.set("n", "<leader>fh", builtin.help_tags, {desc="Find help"})
+      vim.keymap.set("n", "<leader>fk", builtin.keymaps, {desc="Find keymaps"})
+      vim.keymap.set("n", "<leader>fc", builtin.commands, {desc="Find commands"})
     end,
   },
-
   -- lsp
   {
     "williamboman/mason.nvim",
@@ -155,19 +166,52 @@ require("lazy").setup({
       -- LSP 키 매핑
       vim.keymap.set("n", "gd", vim.lsp.buf.definition)
       vim.keymap.set("n", "K", vim.lsp.buf.hover)
-      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename)
-      vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action)
+      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {desc="lsp rename"})
+      vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {desc="lsp code action"})
     end,
   },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {
+      preset = "modern",
+      delay = 300,
+      spec = {
+        {"<leader>f", group="find"},
+        {"<leader>b", group="build"},
+        {"<leader>l", group="lsp"},
+      },
+    },
+  },
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        lua = {"stylua"}
+      }
+    },
+    config = function ()
+      vim.keymap.set({"n", "v"}, "<leader>lf", function() 
+        require("conform").format({
+          async = true,
+          lsp_format = "fallback",
+        })
+      end, {desc = "Format buffer"})
+    end,
+  }
 })
 
 -- cpp compile
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "cpp",
   callback = function()
-    vim.keymap.set("n", "<leader>bb", ":w | !clang++ -std=c++20 -Wall -Wextra -g % -o %:r && ./%:r<CR>", {
-      buffer = true,
-      desc = "Compile and run C++",
-    })
+    vim.keymap.set(
+      "n", 
+      "<leader>bb", ":w | !clang++ -std=c++20 -Wall -Wextra -g % -o %:r && ./%:r<CR>", 
+      {
+        buffer = true,
+        desc = "Compile and run C++",
+      }
+    )
   end,
 })
