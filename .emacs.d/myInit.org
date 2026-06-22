@@ -1463,9 +1463,12 @@ possible run emacsclient.exe to attach existed emacs client.
   							(unless (= exit-code 0)
   							  (error "no image in Clipboard"))))))))
     (setq agent-shell-buffer-name-format
-          (lambda (agent-name project-name)
-            (read-string (format "Buffer name (%s Agent @ %s): " agent-name project-name)
-                         (format "%s Agent @ %s" agent-name project-name))))
+      (lambda (agent-name _project-name)
+        (let ((dir-name (file-name-nondirectory
+                         (directory-file-name default-directory))))
+          (read-string
+           (format "Buffer name (%s Agent @ %s): " agent-name dir-name)
+           (format "%s Agent @ %s" agent-name dir-name)))))
     (setq agent-shell-permission-responder-function
           (lambda (permission)
             (when-let (((equal (map-elt (map-elt permission :tool-call) :kind) "read"))
@@ -1475,7 +1478,20 @@ possible run emacsclient.exe to attach existed emacs client.
                                 (map-elt permission :options))))
               (funcall (map-elt permission :respond)
                        (map-elt choice :option-id))
-              t))))
+              t)))
+    (setq agent-shell-cwd-function
+  		(lambda ()
+  		  default-directory))
+    (defun my/agent-shell-refresh-after-font-change ()
+      (dolist (buf (buffer-list))
+        (with-current-buffer buf
+          (when (derived-mode-p 'agent-shell-mode)
+            (setq agent-shell--header-cache nil)
+            (agent-shell--update-header-and-mode-line)
+            (force-window-update buf)))))
+    (add-hook 'after-setting-font-hook
+              #'my/agent-shell-refresh-after-font-change)
+    )
 #+end_src
 * pandoc-mode
 #+begin_src emacs-lisp
