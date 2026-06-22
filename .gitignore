@@ -4,3 +4,5 @@
 .agent-shell/
 /.config/karabiner/automatic_backups/
 *.log
+*.org_archive
+*.lua#
