@@ -1482,6 +1482,14 @@ possible run emacsclient.exe to attach existed emacs client.
     (setq agent-shell-cwd-function
   		(lambda ()
   		  default-directory))
+    (defun my/agent-shell-follow-after-submit (&rest _)
+      "Keep agent-shell following output after submitting input."
+      (when (derived-mode-p 'agent-shell-mode)
+        (goto-char (point-max))
+        (dolist (window (get-buffer-window-list (current-buffer) nil t))
+          (set-window-point window (point-max)))))
+    (advice-remove 'shell-maker-submit #'my/agent-shell-follow-after-submit)
+    (advice-add 'shell-maker-submit :after #'my/agent-shell-follow-after-submit)
     (defun my/agent-shell-refresh-after-font-change ()
       (dolist (buf (buffer-list))
         (with-current-buffer buf
