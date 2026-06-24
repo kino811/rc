@@ -797,7 +797,7 @@ undo, redo window layout.
 
   (use-package counsel
     :ensure t
-    :bind (("C-c g" . counsel-grep)
+    :bind (("C-c f g" . counsel-rg)
   		 ("C-c f f" . 'counsel-file-jump))
     :config
     (counsel-mode t)
@@ -1444,6 +1444,8 @@ possible run emacsclient.exe to attach existed emacs client.
 #+begin_src emacs-lisp
   (use-package agent-shell
     :ensure t
+    :hook (agent-shell-mode . (lambda ()
+                                (display-line-numbers-mode -1)))
     :bind (("C-c a a n s" . agent-shell-new-shell)
            (:map agent-shell-mode-map
                  ("C-c a a i s" . agent-shell-send-clipboard-image)))
@@ -1490,6 +1492,55 @@ possible run emacsclient.exe to attach existed emacs client.
           (set-window-point window (point-max)))))
     (advice-remove 'shell-maker-submit #'my/agent-shell-follow-after-submit)
     (advice-add 'shell-maker-submit :after #'my/agent-shell-follow-after-submit)
+    (defun my/agent-shell-permission-command-for-key (key)
+      "Return the latest agent-shell permission command bound to KEY."
+      (unless (and (derived-mode-p 'agent-shell-mode)
+                   (agent-shell--permission-pending-p))
+        (user-error "No pending agent-shell permission"))
+      (unless (agent-shell-jump-to-latest-permission-button-row)
+        (user-error "No agent-shell permission button found"))
+      (let* ((keymap (get-text-property (point) 'keymap))
+             (command (and keymap (lookup-key keymap (char-to-string key)))))
+        (when (commandp command)
+          command)))
+
+    (defun my/agent-shell-permission-allow ()
+      "Trigger the latest agent-shell permission Allow action."
+      (interactive)
+      (let ((command (my/agent-shell-permission-command-for-key ?y)))
+        (unless command
+          (user-error "No Allow action found"))
+        (call-interactively command)))
+
+    (defvar-local my/agent-shell-original-input-method-function nil)
+
+    (defun my/agent-shell-input-method-wrapper (key)
+      "Handle Korean input-method KEY for agent-shell permissions."
+      (if (and (derived-mode-p 'agent-shell-mode)
+               (agent-shell--permission-pending-p))
+          (if-let ((command (my/agent-shell-permission-command-for-key key)))
+              (progn
+                (call-interactively command)
+                nil)
+            (funcall my/agent-shell-original-input-method-function key))
+        (funcall my/agent-shell-original-input-method-function key)))
+
+    (defun my/agent-shell-wrap-input-method ()
+      "Wrap current input method for agent-shell permission keys."
+      (when (and input-method-function
+                 (not (eq input-method-function
+                          #'my/agent-shell-input-method-wrapper)))
+        (setq-local my/agent-shell-original-input-method-function
+                    input-method-function)
+        (setq-local input-method-function
+                    #'my/agent-shell-input-method-wrapper)))
+
+    (add-hook 'agent-shell-mode-hook
+              #'my/agent-shell-wrap-input-method)
+    (add-hook 'input-method-activate-hook
+              (lambda ()
+                (when (derived-mode-p 'agent-shell-mode)
+                  (my/agent-shell-wrap-input-method))))
     (defun my/agent-shell-refresh-after-font-change ()
       (dolist (buf (buffer-list))
         (with-current-buffer buf
