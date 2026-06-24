@@ -1484,6 +1484,23 @@ possible run emacsclient.exe to attach existed emacs client.
     (setq agent-shell-cwd-function
   		(lambda ()
   		  default-directory))
+    (with-eval-after-load 'agent-shell-openai
+      (defun my/agent-shell-openai-codex-config-auth-methods (config)
+        "Use Codex ACP authentication method IDs expected by codex-acp."
+        (setf (alist-get :authenticate-request-maker config)
+              (lambda ()
+                (cond ((map-elt agent-shell-openai-authentication :api-key)
+                       (acp-make-authenticate-request :method-id "api-key"))
+                      ((map-elt agent-shell-openai-authentication :codex-api-key)
+                       (acp-make-authenticate-request :method-id "api-key"))
+                      (t
+                       (acp-make-authenticate-request :method-id "chat-gpt")))))
+        config)
+      (advice-remove 'agent-shell-openai-make-codex-config
+                     #'my/agent-shell-openai-codex-config-auth-methods)
+      (advice-add 'agent-shell-openai-make-codex-config
+                  :filter-return
+                  #'my/agent-shell-openai-codex-config-auth-methods))
     (defun my/agent-shell-follow-after-submit (&rest _)
       "Keep agent-shell following output after submitting input."
       (when (derived-mode-p 'agent-shell-mode)
