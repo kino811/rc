@@ -407,13 +407,18 @@ when window
 ** eshell toggle
 #+begin_src emacs-lisp
 
+  (defconst my/eat-pty-win-directory
+    (expand-file-name "site-lisp/eat-pty-win" user-emacs-directory))
+
   (defun my/pty-terminal (&optional arg)
     "Open the platform PTY terminal.
 
 On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
     (interactive "P")
     (if (eq system-type 'windows-nt)
-        (eat-pty-win arg)
+        (if (fboundp 'eat-pty-win)
+            (eat-pty-win arg)
+          (user-error "eat-pty-win is not installed under %s" my/eat-pty-win-directory))
       (vterm)))
 
   (use-package eshell-toggle
@@ -436,10 +441,15 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
 #+end_src
 ** eat-pty-win
 #+begin_src emacs-lisp
+  ;; Install example:
+  ;; git clone https://github.com/kino811/eat-pty-win.git ~/.emacs.d/site-lisp/eat-pty-win
+  (when (file-directory-p my/eat-pty-win-directory)
+    (add-to-list 'load-path my/eat-pty-win-directory))
+
   (use-package eat-pty-win
-    :if (eq system-type 'windows-nt)
+    :if (and (eq system-type 'windows-nt)
+             (file-directory-p my/eat-pty-win-directory))
     :ensure nil
-    :load-path "~/.emacs.d/site-lisp/eat-pty-win"
     :commands (eat-pty-win))
 #+end_src
 
@@ -1638,16 +1648,36 @@ possible run emacsclient.exe to attach existed emacs client.
 * EAF
 #+begin_src emacs-lisp
   ;; EAF core test setup. Do not start EAF at Emacs startup.
-  (use-package eaf
-    :load-path "~/.emacs.d/site-lisp/emacs-application-framework/"
-    :custom
-    (eaf-python-command
-     (expand-file-name "~/.emacs.d/site-lisp/emacs-application-framework/.venv/Scripts/python.exe"))
-    (eaf-start-python-process-when-require nil))
+  ;; Install examples:
+  ;; git clone --depth=1 -b master https://github.com/emacs-eaf/emacs-application-framework.git ~/.emacs.d/site-lisp/emacs-application-framework
+  ;; cd ~/.emacs.d/site-lisp/emacs-application-framework
+  ;; python install-eaf.py --install browser pyqterminal
+  (defconst my/eaf-directory
+    (expand-file-name "site-lisp/emacs-application-framework" user-emacs-directory))
+  (defconst my/eaf-browser-directory
+    (expand-file-name "app/browser" my/eaf-directory))
+  (defconst my/eaf-pyqterminal-directory
+    (expand-file-name "app/pyqterminal" my/eaf-directory))
 
-  (use-package eaf-browser
-    :after eaf)
+  (when (file-directory-p my/eaf-directory)
+    (add-to-list 'load-path my/eaf-directory)
 
-  (use-package eaf-pyqterminal
-    :after eaf)
+    (use-package eaf
+      :ensure nil
+      :custom
+      (eaf-python-command
+       (expand-file-name ".venv/Scripts/python.exe" my/eaf-directory))
+      (eaf-start-python-process-when-require nil))
+
+    (when (file-exists-p (expand-file-name "eaf-browser.el" my/eaf-browser-directory))
+      (add-to-list 'load-path my/eaf-browser-directory)
+      (use-package eaf-browser
+        :ensure nil
+        :after eaf))
+
+    (when (file-exists-p (expand-file-name "eaf-pyqterminal.el" my/eaf-pyqterminal-directory))
+      (add-to-list 'load-path my/eaf-pyqterminal-directory)
+      (use-package eaf-pyqterminal
+        :ensure nil
+        :after eaf)))
 #+end_src
