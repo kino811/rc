@@ -258,6 +258,13 @@ try apply package for temp package that not download
   (add-to-list 'load-path "~/.emacs.d/lisp")
 #+end_src
 
+** project-x
+#+begin_src emacs-lisp
+  (use-package project-x
+    :load-path "~/.emacs.d/site-lisp/project-x"
+    :bind-keymap ("C-c p x" . project-x-map))
+#+end_src
+
 * interface package
 ** highlight indent  guides
 #+begin_src emacs-lisp
@@ -290,6 +297,10 @@ customizing mode line
     ;; :if (display-graphic-p)
     :ensure t
     :config
+    (defun my/powerline-hide-minor-modes (&rest _)
+      "Hide minor mode lighters from powerline."
+      "")
+    (defalias 'powerline-minor-modes #'my/powerline-hide-minor-modes)
     (powerline-default-theme)
 
     ;; ;; change file name to path
@@ -1090,8 +1101,9 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
   	)
 
     (defun my/lsp-mode-setup ()
-  	(setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  	(lsp-headerline-breadcrumb-mode)
+  	(setq lsp-headerline-breadcrumb-segments '(file symbols))
+  	(when (fboundp 'lsp-headerline-breadcrumb-mode)
+  	      (lsp-headerline-breadcrumb-mode 1))
   	)
     )
 #+end_src
