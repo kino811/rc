@@ -439,7 +439,7 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
   (use-package eat-pty-win
     :if (eq system-type 'windows-nt)
     :ensure nil
-    :load-path "~/.emacs.d/eat-pty-win"
+    :load-path "~/.emacs.d/site-lisp/eat-pty-win"
     :commands (eat-pty-win))
 #+end_src
 
@@ -1634,4 +1634,20 @@ possible run emacsclient.exe to attach existed emacs client.
     :bind (("C-M-=" . 'default-text-scale-increase)
     		 ("C-M--" . 'default-text-scale-decrease)
     		 ("C-M-0" . 'default-text-scale-reset)))
+#+end_src
+* EAF
+#+begin_src emacs-lisp
+  ;; EAF core test setup. Do not start EAF at Emacs startup.
+  (use-package eaf
+    :load-path "~/.emacs.d/site-lisp/emacs-application-framework/"
+    :custom
+    (eaf-python-command
+     (expand-file-name "~/.emacs.d/site-lisp/emacs-application-framework/.venv/Scripts/python.exe"))
+    (eaf-start-python-process-when-require nil))
+
+  (use-package eaf-browser
+    :after eaf)
+
+  (use-package eaf-pyqterminal
+    :after eaf)
 #+end_src
