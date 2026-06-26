@@ -957,6 +957,8 @@ possible multi edit
     :bind-keymap ("C-c p p" . projectile-command-map)
     :config
     (add-to-list 'projectile-project-root-files-bottom-up ".projectile")
+    (setq projectile-enable-caching 'persistent)
+    (setq projectile-files-cache-expire nil)
     (setq projectile-auto-update-cache nil)
     (setq projectile-track-known-projects-automatically nil)
     )
