@@ -684,6 +684,13 @@ Named blocks show their name; unnamed blocks show heading + index."
     (org-display-inline-images)
     )
 
+  (defun my/insert-screenshot-or-agent-shell-image ()
+    "Insert a clipboard image using the command appropriate for the current buffer."
+    (interactive)
+    (if (derived-mode-p 'agent-shell-mode)
+        (call-interactively #'agent-shell-send-clipboard-image)
+      (call-interactively #'my-org-screenshot-w32)))
+
 #+end_src
 
 #+begin_src emacs-lisp
@@ -697,7 +704,7 @@ Named blocks show their name; unnamed blocks show heading + index."
      ((eq system-type 'windows-nt)
       (progn
   	(setq org-download-screenshot-method "imagemagick/convert")
-  	(global-set-key (kbd "C-c i s") 'my-org-screenshot-w32)))
+  	(global-set-key (kbd "C-c i s") 'my/insert-screenshot-or-agent-shell-image)))
      ((eq system-type 'darwin)
       (progn
   	(setq-default org-download-heading-lvl nil)
@@ -1494,8 +1501,7 @@ possible run emacsclient.exe to attach existed emacs client.
     :hook (agent-shell-mode . (lambda ()
                                 (display-line-numbers-mode -1)))
     :bind (("C-c a a n s" . agent-shell-new-shell)
-           (:map agent-shell-mode-map
-                 ("C-c a a i s" . agent-shell-send-clipboard-image)))
+           )
     :config
     (when (eq system-type 'windows-nt)
   	(add-to-list 'agent-shell-clipboard-image-handlers
