@@ -120,12 +120,48 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
               (shell-command-to-string "pbpaste")))))
 #+end_src
 
+** secondary browser
+#+begin_src emacs-lisp
+  (defun my/browse-url-eaf-browser (url &optional _new-window)
+    "Open URL with EAF browser."
+    (require 'eaf-browser)
+    (eaf-open-browser url))
+
+  (defvar my/browse-url-third-browser-function #'my/browse-url-eaf-browser
+    "Browser function used by `my/browse-url-of-dired-file' with double prefix.")
+
+  (defun my/browse-url-of-dired-file (&optional arg)
+    "Open the current Dired file with default, secondary, or third browser.
+
+No prefix uses `browse-url-browser-function'.
+Single prefix uses `browse-url-secondary-browser-function'.
+Double prefix uses `my/browse-url-third-browser-function'."
+    (interactive "P")
+    (let ((tem (dired-get-filename t t))
+          (browse-url-browser-function
+           (cond
+            ((equal arg '(16)) my/browse-url-third-browser-function)
+            (arg browse-url-secondary-browser-function)
+            (t browse-url-browser-function)))
+          (browse-url-default-handlers nil))
+      (if tem
+          (browse-url-of-file (expand-file-name tem))
+        (error "No file on this line"))))
+
+  (setq browse-url-secondary-browser-function #'eww-browse-url)
+
+  (with-eval-after-load 'dired
+    (define-key dired-mode-map (kbd "W") #'my/browse-url-of-dired-file))
+#+end_src
+
 #+RESULTS:
 : #[nil ((shell-command-to-string "pbpaste")) nil]
 
 ** i want to save desktop state for emacs open after
 #+begin_src emacs-lisp
-  (desktop-save-mode t)
+  ;;(desktop-save-mode t)
+  (setq desktop-auto-save-timeout 300)
+  (add-hook 'kill-emacs-hook #'desktop-save-in-desktop-dir)
 #+end_src
 
 ** trail whitespace
@@ -192,14 +228,35 @@ for default encoding is best that utf-8
     (insert (buffer-name (window-buffer (minibuffer-selected-window))))
     )
 
-  (defun current-buffer-file-name()
-    "get current buffer name."
+  (defun my/current-buffer-file-or-directory ()
+    "Return the current file path, or the current directory with a trailing slash."
+    (or buffer-file-name
+        (file-name-as-directory (expand-file-name default-directory))))
+
+  (defun my/insert-current-buffer-file-or-directory ()
+    "Insert the current file path, or the current directory."
     (interactive)
-    (insert (buffer-file-name (window-buffer (minibuffer-selected-window))))
-    )
+    (insert (my/current-buffer-file-or-directory)))
+
+  (defun my/copy-current-buffer-file-path ()
+    "Copy the current file path, or the current directory, to the kill ring."
+    (interactive)
+    (require 'copyit)
+    (let ((path (my/current-buffer-file-or-directory)))
+      (copyit-file-pathname path)
+      (message "Copied path: %s" path)))
+
+  (defun my/copy-path ()
+    "Copy the path for the current context."
+    (interactive)
+    (if (and (derived-mode-p 'org-mode)
+             (org-at-heading-p))
+        (my/org-copy-heading-path)
+      (my/copy-current-buffer-file-path)))
 
   (global-set-key (kbd "C-c i b n") 'current-buffer-name)
-  (global-set-key (kbd "C-c i b p") 'current-buffer-file-name)
+  (global-set-key (kbd "C-c i b p") 'my/insert-current-buffer-file-or-directory)
+  (global-set-key (kbd "C-c c p") 'my/copy-path)
 
 #+end_src
 
@@ -487,6 +544,7 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
     (setq org-image-max-width 'window)
     (setq org-hide-emphasis-markers t)
     (setq org-image-actual-width nil)
+    (setf (alist-get 'file org-link-frame-setup) #'find-file)
     ;; (use-package ob-ipython
     ;; 	:ensure t
     ;;   :config
@@ -497,22 +555,73 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
     ;;   )
     (require 'ox-confluence nil t)
     (require 'ox-md)
+    (require 'subr-x)
 
-    ;; For confluence wiki file link format.
+    (defun my/org-copy-heading-path ()
+      "Copy the current Org heading path to the kill ring."
+      (interactive)
+      (unless (derived-mode-p 'org-mode)
+        (user-error "Not in org-mode"))
+      (when (org-before-first-heading-p)
+        (user-error "Not in a heading"))
+      (let* ((path-elements (org-get-outline-path t))
+             (path (string-join
+                    (mapcar (lambda (heading)
+                              (format "`%s`"
+                                      (substring-no-properties heading)))
+                            path-elements)
+                    " / ")))
+        (kill-new path)
+        (message "Copied heading path: %s" path)))
+
+    (defun my/org-confluence-plain-inline-code (output)
+      "Convert Confluence inline code markup in OUTPUT to plain text."
+      (replace-regexp-in-string
+       "{{[^}\n]*}}"
+       (lambda (match)
+         (save-match-data
+           (string-replace "~" "" (substring match 2 -2))))
+       output
+       t
+       t))
+
+    (defun my/org-confluence-plain-raw-code (output)
+      "Convert unparsed Org code markup in OUTPUT to plain text."
+      (let ((literal-tilde-token "@@ORG_LITERAL_TILDE@@"))
+        (setq output
+              (replace-regexp-in-string
+               "\\([0-9]\\)~\\([0-9]\\)"
+               (concat "\\1" literal-tilde-token "\\2")
+               output))
+      (setq output
+            (replace-regexp-in-string
+             "~[^~[:space:]]+~"
+             (lambda (match)
+               (save-match-data
+                 (substring match 1 -1)))
+             output
+             t
+             t))
+        (string-replace literal-tilde-token "~" output)))
+
+    (defun my/org-confluence-final-output-filter (output backend _info)
+      "Apply local Confluence formatting fixes to OUTPUT for BACKEND."
+      (if (org-export-derived-backend-p backend 'confluence)
+          (progn
+            (setq output
+                  (replace-regexp-in-string "\\[file:[^]]*?\\([^/ ]*?\\w\\.png\\)\\]"
+                                            "!\\1!"
+                                            output))
+            (setq output
+                  (replace-regexp-in-string "\\[\\([^]]*|?\\)file:\\([^[]*\\)\\]"
+                                            "[\\1^\\2]"
+                                            output))
+            (setq output (my/org-confluence-plain-inline-code output))
+            (my/org-confluence-plain-raw-code output))
+        output))
+
     (add-to-list 'org-export-filter-final-output-functions
-                 (lambda (output backend info)
-                   (if (org-export-derived-backend-p backend 'confluence)
-                       (progn
-                         (setq output
-                               (replace-regexp-in-string "\\[file:[^]]*?\\([^/ ]*?\\w\\.png\\)\\]"
-                                                         "!\\1!"
-                                                         output))
-                         (setq output
-                               (replace-regexp-in-string "\\[\\([^]]*|?\\)file:\\([^[]*\\)\\]"
-                                                         "[\\1^\\2]"
-                                                         output))
-                         output)
-                     output)))
+                 #'my/org-confluence-final-output-filter)
 
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)
@@ -1496,11 +1605,82 @@ possible run emacsclient.exe to attach existed emacs client.
 #+end_src
 * agent-shell
 #+begin_src emacs-lisp
+  (defun my/agent-shell-send-file-or-region-to ()
+    "Send a Dired file or active region to a selected agent-shell buffer."
+    (interactive)
+    (require 'agent-shell)
+    (if (and (derived-mode-p 'dired-mode)
+             (not (use-region-p)))
+        (call-interactively #'agent-shell-send-file-to)
+      (call-interactively #'agent-shell-send-region-to)))
+
+  (defun my/agent-shell-resolve-link-file (url)
+    "Return the local file and optional line number represented by URL."
+    (when (string-match
+           "\\`\\(.+?\\)\\(?:#L\\([0-9]+\\)\\)?\\'" url)
+      (let ((path (match-string 1 url))
+            (line (and (match-string 2 url)
+                       (string-to-number (match-string 2 url)))))
+        (unless (string-match-p
+                 "\\`[[:alpha:]][[:alnum:]+.-]*://" path)
+          (let ((directory (file-name-as-directory default-directory))
+                file)
+            (while (and directory (not file))
+              (let ((candidate (expand-file-name path directory)))
+                (when (file-exists-p candidate)
+                  (setq file candidate)))
+              (let ((parent
+                     (file-name-directory (directory-file-name directory))))
+                (setq directory
+                      (unless (or (null parent) (equal parent directory))
+                        parent))))
+            (when file
+              (cons file line)))))))
+
+  (defun my/agent-shell-ffap-string-at-point (original &rest args)
+    "Return a resolved rendered agent-shell link before normal FFAP lookup."
+    (if (derived-mode-p 'agent-shell-mode)
+        (if-let ((url (agent-shell-markdown-link-url-at-point)))
+            (if-let ((link (my/agent-shell-resolve-link-file url)))
+                (car link)
+              url)
+          (apply original args))
+      (apply original args)))
+
+  (defun my/agent-shell-find-file-at-point (original &optional filename)
+    "Open a rendered agent-shell file link and move to its linked line."
+    (if-let* (((derived-mode-p 'agent-shell-mode))
+              ((not filename))
+              ((not current-prefix-arg))
+              (url (agent-shell-markdown-link-url-at-point))
+              (link (my/agent-shell-resolve-link-file url)))
+        (progn
+          (find-file (car link))
+          (when-let ((line (cdr link)))
+            (goto-char (point-min))
+            (forward-line (1- line))))
+      (funcall original filename)))
+
+  (defun my/agent-shell-enable-ffap-links ()
+    "Enable FFAP resolution for rendered Markdown links in agent-shell buffers."
+    (require 'ffap)
+    (unless (advice-member-p #'my/agent-shell-ffap-string-at-point
+                             'ffap-string-at-point)
+      (advice-add 'ffap-string-at-point :around
+                  #'my/agent-shell-ffap-string-at-point))
+    (unless (advice-member-p #'my/agent-shell-find-file-at-point
+                             'find-file-at-point)
+      (advice-add 'find-file-at-point :around
+                  #'my/agent-shell-find-file-at-point)))
+
   (use-package agent-shell
     :ensure t
-    :hook (agent-shell-mode . (lambda ()
-                                (display-line-numbers-mode -1)))
-    :bind (("C-c a a n s" . agent-shell-new-shell)
+    :hook ((agent-shell-mode . (lambda ()
+                                 (display-line-numbers-mode -1)))
+           (agent-shell-mode . my/agent-shell-enable-ffap-links))
+    :bind (("C-c a a o" . agent-shell)
+           ("C-c a a s" . my/agent-shell-send-file-or-region-to)
+           ("C-c a a c l" . agent-shell-copy-link-url-at-point)
            )
     :config
     (when (eq system-type 'windows-nt)
@@ -1620,6 +1800,8 @@ possible run emacsclient.exe to attach existed emacs client.
             (force-window-update buf)))))
     (add-hook 'after-setting-font-hook
               #'my/agent-shell-refresh-after-font-change)
+    (add-hook 'agent-shell-mode-hook
+            #'agent-recall-track-sessions)
     )
 #+end_src
 * pandoc-mode
