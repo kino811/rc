@@ -429,6 +429,182 @@ brings up some help
 #+end_src
 
 * shell
+** half-page scrolling
+#+begin_src emacs-lisp
+  (defun my/scroll-half-page-down ()
+    "Scroll down by half the selected window height."
+    (interactive)
+    (if (bound-and-true-p centered-cursor-mode)
+        (let* ((lines (max 1 (/ (ccm-visible-text-lines) 2)))
+               (current-image
+                (and (derived-mode-p 'org-mode)
+                     (my/org-inline-image-on-current-line)))
+               (target
+                (save-excursion
+                  (vertical-motion lines)
+                  (point)))
+               (next-image
+                (and (derived-mode-p 'org-mode)
+                     (car (my/org-inline-images-between
+                           (min (point-max) (1+ (line-end-position)))
+                           target)))))
+          (cond
+           (current-image
+            (my/ccm-show-org-image-boundary
+             (my/org-line-after-inline-image current-image)))
+           (next-image
+            (my/ccm-show-org-image-boundary
+             (my/org-inline-image-line-beginning next-image)))
+           (t
+            (goto-char target)
+            (ccm-position-cursor))))
+      (scroll-up-command (max 1 (/ (window-body-height) 2)))))
+
+  (defun my/scroll-half-page-up ()
+    "Scroll up by half the selected window height."
+    (interactive)
+    (if (bound-and-true-p centered-cursor-mode)
+        (let* ((lines (max 1 (/ (ccm-visible-text-lines) 2)))
+               (current-image
+                (and (derived-mode-p 'org-mode)
+                     (my/org-inline-image-on-current-line)))
+               (target
+                (save-excursion
+                  (vertical-motion (- lines))
+                  (point)))
+               (previous-image
+                (and (derived-mode-p 'org-mode)
+                     (car
+                      (last
+                       (my/org-inline-images-between
+                        (save-excursion
+                          (goto-char target)
+                          (forward-line -1)
+                          (line-beginning-position))
+                        (point)))))))
+          (cond
+           (current-image
+            (goto-char
+             (my/org-line-before-inline-image current-image))
+            (ccm-position-cursor))
+           (previous-image
+            (let ((after-image
+                   (my/org-line-after-inline-image previous-image)))
+              (my/ccm-show-org-image-boundary
+               (if (= (line-beginning-position) after-image)
+                   (my/org-inline-image-line-beginning previous-image)
+                 after-image))))
+           (t
+            (goto-char target)
+            (ccm-position-cursor))))
+      (scroll-down-command (max 1 (/ (window-body-height) 2)))))
+
+  (global-set-key (kbd "C-v") #'my/scroll-half-page-down)
+  (global-set-key (kbd "M-v") #'my/scroll-half-page-up)
+
+  (defvar-local my/ccm-inhibit-centering-once nil)
+
+  (defun my/org-inline-images-between (begin end)
+    "Return Org inline-image overlays between BEGIN and END."
+    (when (< begin end)
+      (sort
+       (seq-filter
+        (lambda (overlay)
+          (overlay-get overlay 'org-image-overlay))
+        (overlays-in begin end))
+       (lambda (left right)
+         (< (overlay-start left) (overlay-start right))))))
+
+  (defun my/org-inline-image-on-current-line ()
+    "Return the Org inline-image overlay on the current line."
+    (car (my/org-inline-images-between
+          (line-beginning-position)
+          (min (point-max) (1+ (line-end-position))))))
+
+  (defun my/org-inline-image-line-beginning (overlay)
+    "Return the beginning of the line displaying OVERLAY."
+    (save-excursion
+      (goto-char (overlay-start overlay))
+      (line-beginning-position)))
+
+  (defun my/org-line-after-inline-image (overlay)
+    "Return the beginning of the line after OVERLAY."
+    (save-excursion
+      (goto-char (overlay-end overlay))
+      (forward-line 1)
+      (line-beginning-position)))
+
+  (defun my/org-line-before-inline-image (overlay)
+    "Return the beginning of the line before OVERLAY."
+    (save-excursion
+      (goto-char (overlay-start overlay))
+      (forward-line -1)
+      (line-beginning-position)))
+
+  (defun my/ccm-show-org-image-boundary (position)
+    "Show POSITION without recentering across a large Org image."
+    (goto-char position)
+    (set-window-point (selected-window) position)
+    (set-window-start (selected-window) position t)
+    (setq my/ccm-inhibit-centering-once t))
+
+  (defun my/org-recent-inline-image-overlay ()
+    "Return a recent Org inline-image overlay before or at point."
+    (and (derived-mode-p 'org-mode)
+         (let ((end (min (point-max) (1+ (line-end-position)))))
+           (save-excursion
+             (forward-line (- (max 1 (/ (window-body-height) 2))))
+             (car
+              (sort
+               (seq-filter
+                (lambda (overlay)
+                  (overlay-get overlay 'org-image-overlay))
+                (overlays-in (line-beginning-position) end))
+               (lambda (left right)
+                 (> (overlay-start left) (overlay-start right)))))))))
+
+  (defun my/ccm-inhibit-near-org-inline-image-p ()
+    "Inhibit centering just after a displayed Org inline image."
+    (or (when my/ccm-inhibit-centering-once
+          (setq my/ccm-inhibit-centering-once nil)
+          t)
+        (and (memq this-command
+                   '(my/next-line-handle-org-inline-image
+                     my/previous-line-handle-org-inline-image))
+             (bound-and-true-p centered-cursor-mode)
+             (my/org-recent-inline-image-overlay))))
+
+  (defun my/ccm-adjust-window-near-org-inline-image ()
+    "Keep point visible while moving near a large Org inline image."
+    (when-let ((overlay (my/org-recent-inline-image-overlay)))
+      (set-window-start
+       (selected-window)
+       (if (<= (line-beginning-position)
+               (overlay-start overlay)
+               (line-end-position))
+           (line-beginning-position)
+         (save-excursion
+           (goto-char (overlay-end overlay))
+           (forward-line 1)
+           (line-beginning-position)))
+       t)))
+
+  (defun my/next-line-handle-org-inline-image (&optional arg)
+    "Move down without recentering across a large Org inline image."
+    (interactive "^p")
+    (next-line arg)
+    (when (and (> (or arg 1) 0)
+               (bound-and-true-p centered-cursor-mode))
+      (my/ccm-adjust-window-near-org-inline-image)))
+
+  (defun my/previous-line-handle-org-inline-image (&optional arg)
+    "Move up without recentering across a large Org inline image."
+    (interactive "^p")
+    (previous-line arg)
+    (when (and (> (or arg 1) 0)
+               (bound-and-true-p centered-cursor-mode))
+      (my/ccm-adjust-window-near-org-inline-image)))
+#+end_src
 ** encoding
 #+begin_src emacs-lisp
   (add-hook 'shell-mode-hook
@@ -478,6 +654,8 @@ when window
   (defconst my/eat-pty-win-directory
     (expand-file-name "site-lisp/eat-pty-win" user-emacs-directory))
 
+  (require 'seq)
+
   (defun my/pty-terminal (&optional arg)
     "Open the platform PTY terminal.
 
@@ -489,12 +667,60 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
           (user-error "eat-pty-win is not installed under %s" my/eat-pty-win-directory))
       (vterm)))
 
+  (defun my/shell-here ()
+    "Open a shell for the current directory in the selected window."
+    (interactive)
+    (let* ((directory (file-name-as-directory
+                       (expand-file-name default-directory)))
+           (normalized-directory
+            (if (eq system-type 'windows-nt)
+                (downcase directory)
+              directory))
+           (shell-buffer
+            (seq-find
+             (lambda (buffer)
+               (with-current-buffer buffer
+                 (and (derived-mode-p 'shell-mode)
+                      (comint-check-proc buffer)
+                      (equal
+                       (if (eq system-type 'windows-nt)
+                           (downcase
+                            (file-name-as-directory
+                             (expand-file-name default-directory)))
+                         (file-name-as-directory
+                          (expand-file-name default-directory)))
+                       normalized-directory))))
+             (buffer-list))))
+      (if shell-buffer
+          (switch-to-buffer shell-buffer)
+        (let ((default-directory directory))
+          (shell
+           (generate-new-buffer-name
+            (format "*shell: %s*"
+                    (file-name-nondirectory
+                     (directory-file-name directory)))))))))
+
+  (defun my/eshell-toggle-current-window (&optional keep-visible)
+    "Toggle the directory Eshell buffer in the selected window.
+
+If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
+    (interactive)
+    (require 'eshell-toggle)
+    (if eshell-toggle--toggle-buffer-p
+        (unless keep-visible
+          (switch-to-prev-buffer))
+      (let ((buffer-name (eshell-toggle--make-buffer-name)))
+        (if (get-buffer buffer-name)
+            (switch-to-buffer buffer-name)
+          (eshell-toggle--new-buffer buffer-name)
+          (switch-to-buffer buffer-name)))))
+
   (use-package eshell-toggle
     :ensure t
-    :bind (("C-c o s e" . eshell-toggle)
-  		 ("C-c o s s" . shell)
-  		 ("C-c o s p" . my/pty-terminal)
-  		 ("C-c o s a" . 'agent-shell-toggle))
+    :bind (("C-c o s e" . my/eshell-toggle-current-window)
+           ("C-c o s s" . my/shell-here)
+           ("C-c o s p" . my/pty-terminal)
+           ("C-c o s a" . 'agent-shell-toggle))
     :config
     )
 
@@ -604,6 +830,41 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
              t))
         (string-replace literal-tilde-token "~" output)))
 
+    (defun my/org-confluence-plain-parent-file-links (output)
+      "Convert parent-relative Confluence file links in OUTPUT to plain text."
+      (replace-regexp-in-string
+       "\\[\\([^]|]+\\)|\\^\\.\\./[^]]+\\]"
+       "\\1"
+       output))
+
+    (defun my/org-confluence-headline-with-tags
+        (original headline contents info)
+      "Append HEADLINE tags to the Confluence output from ORIGINAL."
+      (let* ((output (funcall original headline contents info))
+             (tags (and (plist-get info :with-tags)
+                        (org-export-get-tags headline info))))
+        (if (and tags
+                 (string-match "^h[0-9]+\\. [^\n]*" output))
+            (concat (substring output 0 (match-end 0))
+                    (format " :%s:" (string-join tags ":"))
+                    (substring output (match-end 0)))
+          output)))
+
+    (defun my/org-confluence-enable-headline-tags (function)
+      "Add Confluence headline tag export advice to FUNCTION."
+      (unless (advice-member-p #'my/org-confluence-headline-with-tags
+                               function)
+        (advice-add function :around
+                    #'my/org-confluence-headline-with-tags)))
+
+    (with-eval-after-load 'ox-confluence
+      (my/org-confluence-enable-headline-tags
+       'org-confluence-headline))
+
+    (with-eval-after-load 'ox-confluence-en
+      (my/org-confluence-enable-headline-tags
+       'ox-confluence-en-headline))
+
     (defun my/org-confluence-final-output-filter (output backend _info)
       "Apply local Confluence formatting fixes to OUTPUT for BACKEND."
       (if (org-export-derived-backend-p backend 'confluence)
@@ -616,6 +877,8 @@ On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
                   (replace-regexp-in-string "\\[\\([^]]*|?\\)file:\\([^[]*\\)\\]"
                                             "[\\1^\\2]"
                                             output))
+            (setq output
+                  (my/org-confluence-plain-parent-file-links output))
             (setq output (my/org-confluence-plain-inline-code output))
             (my/org-confluence-plain-raw-code output))
         output))
@@ -1455,11 +1718,17 @@ Juego logic tree
 * translate
 ** google
 #+begin_src emacs-lisp
+  (defun my/google-translate-smooth-translate-popup ()
+    "Run smooth translation and show the result in a popup."
+    (interactive)
+    (let ((google-translate-output-destination 'popup))
+      (call-interactively #'google-translate-smooth-translate)))
+
   (use-package google-translate
     :ensure t
     :bind (("C-c t t a" . google-translate-at-point)
            ("C-c t t q" . google-translate-query-translate)
-           ("C-c t t t" . google-translate-smooth-translate))
+           ("C-c t t t" . my/google-translate-smooth-translate-popup))
     :config
     (require 'google-translate-smooth-ui)
     )
@@ -1536,8 +1805,23 @@ possible run emacsclient.exe to attach existed emacs client.
     :ensure t
     :init
     :config
+    (setq-default ccm-recenter-at-end-of-file t)
+    (add-to-list 'ccm-inhibit-centering-when
+                 #'my/ccm-inhibit-near-org-inline-image-p)
+    (define-key ccm-map (kbd "C-v") #'my/scroll-half-page-down)
+    (define-key ccm-map (kbd "M-v") #'my/scroll-half-page-up)
     (global-centered-cursor-mode +1)
     )
+
+  (with-eval-after-load 'org
+    (define-key org-mode-map [down]
+      #'my/next-line-handle-org-inline-image)
+    (define-key org-mode-map (kbd "C-n")
+      #'my/next-line-handle-org-inline-image)
+    (define-key org-mode-map [up]
+      #'my/previous-line-handle-org-inline-image)
+    (define-key org-mode-map (kbd "C-p")
+      #'my/previous-line-handle-org-inline-image))
 #+end_src
 * display file path in mode line
 * xml
@@ -1606,13 +1890,16 @@ possible run emacsclient.exe to attach existed emacs client.
 * agent-shell
 #+begin_src emacs-lisp
   (defun my/agent-shell-send-file-or-region-to ()
-    "Send a Dired file or active region to a selected agent-shell buffer."
+    "Send files or an active region to a selected agent-shell buffer."
     (interactive)
     (require 'agent-shell)
-    (if (and (derived-mode-p 'dired-mode)
-             (not (use-region-p)))
-        (call-interactively #'agent-shell-send-file-to)
-      (call-interactively #'agent-shell-send-region-to)))
+    (cond
+     ((derived-mode-p 'dired-mode)
+      (call-interactively #'agent-shell-send-file-to))
+     ((use-region-p)
+      (call-interactively #'agent-shell-send-region-to))
+     (t
+      (call-interactively #'agent-shell-send-file-to))))
 
   (defun my/agent-shell-resolve-link-file (url)
     "Return the local file and optional line number represented by URL."
