@@ -2415,6 +2415,42 @@ conversation usually starts from the bottom."
     (define-key agent-shell-mode-map (kbd "M-g m") #'my/agent-shell-jump-to-me)
     )
 #+end_src
+* shrface
+Org-like faces, folding and headline navigation for =shr= / =eww= buffers.
+Combined with =markdown-live-preview-mode= (=C-c C-c l= ) this gives an
+in-Emacs markdown preview, since this build has no xwidget support.
+#+begin_src emacs-lisp
+  (use-package shrface
+    :ensure t
+    :after eww
+    :hook ((eww-after-render . shrface-mode)
+           (shrface-mode . my/shrface-use-outline-regexp))
+    :config
+    (setq shrface-href-versatile t)
+    (shrface-basic)
+    (shrface-trial)
+
+    ;; The package runs its `define-key' calls at top level, outside the
+    ;; `defvar' for the map, so a lazily loaded shrface can end up with an
+    ;; empty keymap.  Define the bindings here instead.
+    (define-key shrface-mode-map (kbd "TAB") #'shrface-outline-cycle)
+    (define-key shrface-mode-map (kbd "<backtab>") #'shrface-outline-cycle-buffer)
+    (define-key shrface-mode-map (kbd "C-j") #'shrface-next-headline)
+    (define-key shrface-mode-map (kbd "C-k") #'shrface-previous-headline)
+    (define-key shrface-mode-map (kbd "M-l") #'shrface-links-counsel)
+    (define-key shrface-mode-map (kbd "M-h") #'shrface-headline-counsel))
+
+  ;; Emacs 30's `shr' sets `outline-search-function' to `shr-outline-search',
+  ;; and outline ignores `outline-regexp' entirely once that is set.  shrface
+  ;; points `outline-regexp' at its own bullet headings, so the two disagree:
+  ;; `outline-on-heading-p' never matches and TAB/S-TAB fail with
+  ;; `outline-before-first-heading'.  (`shrface-next-headline' and
+  ;; `shrface-previous-headline' search by regexp themselves, which is why they
+  ;; work regardless.)  Clearing the search function lets shrface's regexp win.
+  (defun my/shrface-use-outline-regexp ()
+    "Let shrface's `outline-regexp' drive outline in this buffer."
+    (setq-local outline-search-function nil))
+#+end_src
 * pandoc-mode
 #+begin_src emacs-lisp
   (use-package pandoc-mode
