@@ -2287,6 +2287,93 @@ is unused; paths just skip anything already frozen."
 
     (add-hook 'agent-shell-markdown-render-functions
               #'my/agent-shell-freeze-windows-paths)
+
+    ;; A swiper-style "Me list" navigator.  `imenu' is a poor fit here:
+    ;; its `imenu-generic-expression' matches the literal prompt text
+    ;; anywhere in the buffer, so a conversation that discusses the
+    ;; prompt string itself (e.g. "Copilot> ") produces false-positive
+    ;; entries.  This instead walks `agent-shell-chat--prompt-runs'
+    ;; (font-lock-face based, so only real rendered prompts count), and
+    ;; live-scrolls the source buffer as candidates are highlighted in
+    ;; the ivy minibuffer, the same way `swiper' does via `:update-fn'.
+    (defun my/agent-shell--me-candidates ()
+      "Return a list of (LABEL . MARKER) for each Me prompt run in buffer."
+      (let ((runs (agent-shell-chat--prompt-runs))
+            (n 0)
+            candidates)
+        (dolist (run runs)
+          (setq n (1+ n))
+          (let* ((end (cdr run))
+                 (line-start end)
+                 (line-end (save-excursion
+                             ;; comint's `field' property makes
+                             ;; `line-end-position' stop at the
+                             ;; input/output boundary; ignore it here.
+                             (let ((inhibit-field-text-motion t))
+                               (goto-char end)
+                               (skip-chars-forward "\n")
+                               (setq line-start (point))
+                               (line-end-position))))
+                 (text (string-trim
+                        (buffer-substring-no-properties line-start line-end)))
+                 (text (if (string-empty-p text) "(empty)" text))
+                 (label (format "%2d: %s" n
+                                (if (> (length text) 80)
+                                    (concat (substring text 0 80) "...")
+                                  text))))
+            (push (cons label (copy-marker line-start)) candidates)))
+        (nreverse candidates)))
+
+    (defvar my/agent-shell--me-jump-wnd-conf nil)
+    (defvar my/agent-shell--me-jump-buffer nil)
+    (defvar my/agent-shell--me-jump-candidates nil)
+
+    (defun my/agent-shell--me-jump-update-fn ()
+      "Scroll the source buffer to the currently selected candidate."
+      (when (window-live-p (active-minibuffer-window))
+        (let* ((current (ivy-state-current ivy-last))
+               (cell (assoc current my/agent-shell--me-jump-candidates)))
+          (when (and cell (buffer-live-p my/agent-shell--me-jump-buffer))
+            (with-selected-window (get-buffer-window my/agent-shell--me-jump-buffer)
+              (with-current-buffer my/agent-shell--me-jump-buffer
+                (goto-char (cdr cell))
+                (recenter)))))))
+
+    (defun my/agent-shell--me-jump-unwind ()
+      "Restore the window configuration on cancel."
+      (when my/agent-shell--me-jump-wnd-conf
+        (set-window-configuration my/agent-shell--me-jump-wnd-conf))
+      (setq my/agent-shell--me-jump-wnd-conf nil
+            my/agent-shell--me-jump-buffer nil
+            my/agent-shell--me-jump-candidates nil))
+
+    (defun my/agent-shell-jump-to-me ()
+      "Browse this buffer's Me prompts with live preview, like `swiper'.
+Selects the last (most recent) prompt initially, since reviewing a
+conversation usually starts from the bottom."
+      (interactive)
+      (unless (derived-mode-p 'agent-shell-mode)
+        (user-error "Not in an agent-shell buffer"))
+      (let ((candidates (my/agent-shell--me-candidates)))
+        (unless candidates
+          (user-error "No Me prompts found in this buffer"))
+        (setq my/agent-shell--me-jump-wnd-conf (current-window-configuration)
+              my/agent-shell--me-jump-buffer (current-buffer)
+              my/agent-shell--me-jump-candidates candidates)
+        (ivy-read "Me: " candidates
+                  :require-match t
+                  :preselect (1- (length candidates))
+                  :update-fn #'my/agent-shell--me-jump-update-fn
+                  :unwind #'my/agent-shell--me-jump-unwind
+                  :action (lambda (cand)
+                            (let ((cell (assoc cand candidates)))
+                              (when cell
+                                (switch-to-buffer my/agent-shell--me-jump-buffer)
+                                (goto-char (cdr cell))
+                                (recenter))))
+                  :caller 'my/agent-shell-jump-to-me)))
+
+    (define-key agent-shell-mode-map (kbd "M-g m") #'my/agent-shell-jump-to-me)
     )
 #+end_src
 * pandoc-mode
