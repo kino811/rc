@@ -254,9 +254,17 @@ for default encoding is best that utf-8
         (my/org-copy-heading-path)
       (my/copy-current-buffer-file-path)))
 
+  (defun my/copy-current-buffer-name ()
+    "Copy the current buffer's name to the kill ring."
+    (interactive)
+    (let ((name (buffer-name)))
+      (kill-new name)
+      (message "Copied buffer name: %s" name)))
+
   (global-set-key (kbd "C-c i b n") 'current-buffer-name)
   (global-set-key (kbd "C-c i b p") 'my/insert-current-buffer-file-or-directory)
   (global-set-key (kbd "C-c c p") 'my/copy-path)
+  (global-set-key (kbd "C-c c n") 'my/copy-current-buffer-name)
 
 #+end_src
 
@@ -501,6 +509,8 @@ brings up some help
 
   (global-set-key (kbd "C-v") #'my/scroll-half-page-down)
   (global-set-key (kbd "M-v") #'my/scroll-half-page-up)
+  (global-set-key [next] #'my/scroll-half-page-down)
+  (global-set-key [prior] #'my/scroll-half-page-up)
 
   (defvar-local my/ccm-inhibit-centering-once nil)
 
@@ -934,7 +944,7 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
   			   '("p" . "src python :results file :dir . :exports both"))
 
     (when (eq system-type 'windows-nt)
-      (progn (set-face-attribute 'default nil :family "Consolas")
+      (progn (set-face-attribute 'default nil :family "Cascadia Code")
              (set-face-attribute 'default nil :height 100)
              (set-fontset-font t 'hangul (font-spec :name "NanumBarunGothic"))
              (set-fontset-font t 'emoji (font-spec :name "Segoe UI Emoji") nil 'prepend)
@@ -1738,8 +1748,43 @@ Juego logic tree
 * server
 ** emacs server
 possible run emacsclient.exe to attach existed emacs client.
+
+`server-running-p' only checks whether the server file exists (especially
+in TCP mode), not whether the process that created it is still alive.
+If a previous Emacs was killed abnormally (crash, force-kill, etc.),
+the stale server file survives and fools `server-running-p' into
+believing a server is already up, so a fresh Emacs never starts its own
+server. To avoid hijacking a genuinely running daemon's server while
+still recovering from stale files, check the PID recorded in the server
+file with `process-attributes' (works the same way on Windows and
+macOS/Linux) before deciding whether to delete it and start fresh.
 #+begin_src emacs-lisp
   (require 'server)
+
+  (defun my/server-file-path ()
+    "Return the path to the current server's server file."
+    (expand-file-name server-name
+                       (or server-socket-dir
+                           (locate-user-emacs-file "server"))))
+
+  (defun my/server-file-stale-p ()
+    "Return non-nil if this server's server file exists but its owning
+  process is no longer alive (works cross-platform via `process-attributes')."
+    (let ((file (my/server-file-path)))
+      (and (file-exists-p file)
+           (with-temp-buffer
+             (insert-file-contents file)
+             (goto-char (point-min))
+             (let* ((first-line (buffer-substring (line-beginning-position)
+                                                   (line-end-position)))
+                    (pid (car (last (split-string first-line)))))
+               (and pid
+                    (string-match-p "\\`[0-9]+\\'" pid)
+                    (not (process-attributes (string-to-number pid)))))))))
+
+  (when (my/server-file-stale-p)
+    (delete-file (my/server-file-path)))
+
   (unless (server-running-p)
     (server-start))
 #+end_src
@@ -1810,6 +1855,8 @@ possible run emacsclient.exe to attach existed emacs client.
                  #'my/ccm-inhibit-near-org-inline-image-p)
     (define-key ccm-map (kbd "C-v") #'my/scroll-half-page-down)
     (define-key ccm-map (kbd "M-v") #'my/scroll-half-page-up)
+    (define-key ccm-map [next] #'my/scroll-half-page-down)
+    (define-key ccm-map [prior] #'my/scroll-half-page-up)
     (global-centered-cursor-mode +1)
     )
 
@@ -2089,6 +2136,157 @@ possible run emacsclient.exe to attach existed emacs client.
               #'my/agent-shell-refresh-after-font-change)
     (add-hook 'agent-shell-mode-hook
             #'agent-recall-track-sessions)
+
+    ;; Show the "Me" prompt relevant to the window's current scroll
+    ;; position as an extra line below agent-shell's own header, without
+    ;; touching agent-shell's own rendering/caching.  A new SVG canvas
+    ;; embeds the original header image whole and draws the extra text
+    ;; below it, so agent-shell's own header logic stays untouched.
+    (defvar-local my/agent-shell--me-line-cache nil
+      "Cons of (RESULT ME-LINE WINDOW-WIDTH) -> COMPOSED-RESULT, memoized per buffer.")
+
+    (defun my/agent-shell--visible-input-first-line ()
+      "Return the first line of the `Me' input relevant to the window's
+current scroll position (the input whose `Me' label is at or just above
+`window-start'), or nil if none."
+      (when (fboundp 'agent-shell-chat--prompt-runs)
+        (let* ((runs (agent-shell-chat--prompt-runs))
+               (win (car (get-buffer-window-list (current-buffer) nil t)))
+               (wstart (if win (window-start win) (point-max)))
+               (relevant (car (last (seq-take-while (lambda (r) (<= (car r) wstart)) runs)))))
+          (when relevant
+            (let* ((idx (seq-position runs relevant))
+                   (next-run (nth (1+ idx) runs))
+                   (input-start (cdr relevant))
+                   (input-limit (if next-run (car next-run) (point-max)))
+                   (marker-pos (save-excursion
+                                 (goto-char input-start)
+                                 (when (re-search-forward
+                                        "<shell-maker-end-of-prompt>" input-limit t)
+                                   (match-beginning 0))))
+                   (input-end (or marker-pos input-limit))
+                   (text (string-trim (buffer-substring-no-properties input-start input-end))))
+              (unless (string-empty-p text)
+                (car (split-string text "\n"))))))))
+
+    (defun my/agent-shell--escape-xml (s)
+      "Minimal XML-escape S for embedding in an SVG text node."
+      (replace-regexp-in-string
+       "&" "&amp;"
+       (replace-regexp-in-string
+        "<" "&lt;"
+        (replace-regexp-in-string ">" "&gt;" s))))
+
+    (defun my/agent-shell--text-font-family (text)
+      "Return a font-family usable for TEXT in SVG rendering.
+librsvg does not follow Emacs fontset fallback rules, so Hangul needs an
+explicit CJK-capable font."
+      (if (string-match-p "[\uAC00-\uD7A3\u3131-\u318E]" text)
+          "NanumBarunGothic"
+        (face-attribute 'default :family)))
+
+    (defun my/agent-shell--truncate-to-width (text max-width)
+      "Truncate TEXT with an ellipsis so its pixel width fits within MAX-WIDTH."
+      (if (<= (string-pixel-width text) max-width)
+          text
+        (let ((lo 0) (hi (length text)) (ellipsis "..."))
+          (while (< lo hi)
+            (let* ((mid (/ (+ lo hi 1) 2))
+                   (candidate (concat (substring text 0 mid) ellipsis)))
+              (if (<= (string-pixel-width candidate) max-width)
+                  (setq lo mid)
+                (setq hi (1- mid)))))
+          (if (> lo 0) (concat (substring text 0 lo) ellipsis) ellipsis))))
+
+    (defun my/agent-shell--append-me-line (result)
+      "Append the Me input relevant to the current scroll position below
+RESULT's rendered header.  Sizes/widens to the buffer's current window
+width via `agent-shell--header-width'.  Memoized per buffer on
+\(RESULT . me-line . window-width)."
+      (if-let* (((stringp result))
+                (idx (cl-position-if (lambda (i) (get-text-property i 'display result))
+                                      (number-sequence 0 (1- (length result)))))
+                (display (get-text-property idx 'display result))
+                ((eq (car display) 'image))
+                ((eq (plist-get (cdr display) :type) 'svg))
+                (data (plist-get (cdr display) :data))
+                (me-line (my/agent-shell--visible-input-first-line))
+                ((not (string-empty-p me-line))))
+          (let* ((window-width (agent-shell--header-width (current-buffer)))
+                 (cache-key (list result me-line window-width)))
+            (if (and my/agent-shell--me-line-cache
+                     (equal (car my/agent-shell--me-line-cache) cache-key))
+                (cdr my/agent-shell--me-line-cache)
+              (let* ((orig-width (and (string-match "width=\"\\([0-9]+\\)\"" data)
+                                       (string-to-number (match-string 1 data))))
+                     (height (and (string-match "height=\"\\([0-9]+\\)\"" data)
+                                  (string-to-number (match-string 1 data))))
+                     (new-width (max orig-width (- window-width 4)))
+                     (font-size (frame-char-height))
+                     (extra-height (+ font-size 6))
+                     (new-height (+ height extra-height))
+                     (label "Me: ")
+                     (max-text-width (max 0 (- new-width 6 (string-pixel-width label))))
+                     (truncated-line (my/agent-shell--truncate-to-width me-line max-text-width))
+                     (new-data (format "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">%s<text x=\"6\" y=\"%d\" font-size=\"%d\" font-family=\"%s\"><tspan fill=\"#888888\">%s</tspan><tspan fill=\"#cccccc\">%s</tspan></text></svg>"
+                                        new-width new-height data
+                                        (+ height font-size -2)
+                                        font-size
+                                        (my/agent-shell--text-font-family truncated-line)
+                                        label
+                                        (my/agent-shell--escape-xml truncated-line)))
+                     (composed (propertize " " 'display (list 'image :type 'svg :data new-data :scale 'default))))
+                (setq my/agent-shell--me-line-cache (cons cache-key composed))
+                composed)))
+        result))
+
+    (advice-add 'agent-shell--render-header-model :filter-return
+                #'my/agent-shell--append-me-line)
+
+    (defun my/agent-shell--maybe-resync-header-on-scroll ()
+      "Re-render the header when the visible Me line may have changed.
+Cheap: the me-line lookup and the SVG composition are both memoized (see
+`my/agent-shell--me-line-cache'), so an unchanged scroll position is a
+cache hit and skips the actual rebuild."
+      (when (derived-mode-p 'agent-shell-mode)
+        (agent-shell--update-header-and-mode-line :cache-enabled nil)))
+
+    (add-hook 'agent-shell-mode-hook
+              (lambda ()
+                (add-hook 'post-command-hook
+                          #'my/agent-shell--maybe-resync-header-on-scroll nil t)))
+
+    ;; A Windows path like "C:\Users\foo\.copilot\bar" loses its
+    ;; backslashes when rendered: CommonMark treats `\.' (backslash
+    ;; before ASCII punctuation) as an escape and drops the backslash.
+    ;; Freeze path spans before the built-in escape/emphasis passes run,
+    ;; via the same extension point a LaTeX-math renderer would use, so
+    ;; agent-shell's markdown renderer leaves them untouched and displays
+    ;; them as inline code instead.
+    (defconst my/agent-shell--windows-path-regexp
+      (rx (group (any "A-Za-z") ":\\"
+                 (+ (or (+ (not (any " \t\n\\\"'<>|*?"))) "\\"))))
+      "Matches a Windows-style absolute path, e.g. C:\\Users\\foo\\bar.txt.")
+
+    (defun my/agent-shell-freeze-windows-paths (context)
+      "Freeze Windows path spans so built-in passes (escape/emphasis/etc.)
+leave them alone.  For `agent-shell-markdown-render-functions'.  CONTEXT
+is unused; paths just skip anything already frozen."
+      (ignore context)
+      (goto-char (point-min))
+      (while (re-search-forward my/agent-shell--windows-path-regexp nil t)
+        (let ((start (match-beginning 0))
+              (end (match-end 0)))
+          (unless (get-text-property start 'agent-shell-markdown-frozen)
+            (add-text-properties
+             start end
+             (list 'agent-shell-markdown-frozen t
+                   'agent-shell-markdown-source (buffer-substring-no-properties start end)
+                   'face 'markdown-inline-code-face)))))
+      nil)
+
+    (add-hook 'agent-shell-markdown-render-functions
+              #'my/agent-shell-freeze-windows-paths)
     )
 #+end_src
 * pandoc-mode
