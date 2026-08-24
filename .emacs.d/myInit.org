@@ -1728,11 +1728,50 @@ Juego logic tree
 * translate
 ** google
 #+begin_src emacs-lisp
+  ;; `google-translate-smooth-translate' picks its direction from
+  ;; `google-translate-last-translation-direction', an index into
+  ;; `google-translate-translation-directions-alist'. Setting that index before
+  ;; the call switches the direction to match the text, while leaving the
+  ;; minibuffer's own C-n/C-p direction cycling intact.
+  (defun my/translate--count-matches (regexp text)
+    "Return how many characters in TEXT match REGEXP."
+    (let ((count 0)
+          (start 0))
+      (while (string-match regexp text start)
+        (setq count (1+ count))
+        (setq start (match-end 0)))
+      count))
+
+  (defun my/translate--korean-p (text)
+    "Return non-nil when TEXT holds more Hangul than Latin characters."
+    (> (my/translate--count-matches "[가-힣ㄱ-ㅎㅏ-ㅣ]" text)
+       (my/translate--count-matches "[A-Za-z]" text)))
+
+  (defun my/translate--target-text ()
+    "Return the text `google-translate-smooth-translate' would translate."
+    (if (use-region-p)
+        (buffer-substring-no-properties (region-beginning) (region-end))
+      (or (current-word t t) "")))
+
+  (defun my/translate--direction-index (source target)
+    "Return the index of SOURCE to TARGET in the directions alist, or nil."
+    (seq-position google-translate-translation-directions-alist
+                  (cons source target)
+                  (lambda (item want)
+                    (and (equal (car item) (car want))
+                         (equal (cdr item) (cdr want))))))
+
   (defun my/google-translate-smooth-translate-popup ()
-    "Run smooth translation and show the result in a popup."
+    "Run smooth translation in a popup, picking the direction from the text."
     (interactive)
-    (let ((google-translate-output-destination 'popup))
-      (call-interactively #'google-translate-smooth-translate)))
+    (let* ((text (my/translate--target-text))
+           (index (if (my/translate--korean-p text)
+                      (my/translate--direction-index "ko" "en")
+                    (my/translate--direction-index "en" "ko"))))
+      (when index
+        (setq google-translate-last-translation-direction index))
+      (let ((google-translate-output-destination 'popup))
+        (call-interactively #'google-translate-smooth-translate))))
 
   (use-package google-translate
     :ensure t
