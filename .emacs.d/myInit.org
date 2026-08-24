@@ -2415,6 +2415,25 @@ conversation usually starts from the bottom."
     (define-key agent-shell-mode-map (kbd "M-g m") #'my/agent-shell-jump-to-me)
     )
 #+end_src
+* markdown-mode
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :config
+    ;; markdown-mode puts subtree editing on C-c <arrow>, which shadows the
+    ;; global winner-undo/redo on C-c <left>/<right> inside markdown buffers.
+    ;; Move the commands to the arrow keys org-mode uses and hand C-c <arrow>
+    ;; back.  Each command is context aware: it acts on the heading subtree, the
+    ;; list item, or the table cell at point.
+    (define-key markdown-mode-map (kbd "M-<left>") #'markdown-promote)
+    (define-key markdown-mode-map (kbd "M-<right>") #'markdown-demote)
+    (define-key markdown-mode-map (kbd "M-<up>") #'markdown-move-up)
+    (define-key markdown-mode-map (kbd "M-<down>") #'markdown-move-down)
+    (define-key markdown-mode-map (kbd "C-c <left>") nil)
+    (define-key markdown-mode-map (kbd "C-c <right>") nil)
+    (define-key markdown-mode-map (kbd "C-c <up>") nil)
+    (define-key markdown-mode-map (kbd "C-c <down>") nil))
+#+end_src
 * shrface
 Org-like faces, folding and headline navigation for =shr= / =eww= buffers.
 Combined with =markdown-live-preview-mode= (=C-c C-c l= ) this gives an
