@@ -1897,6 +1897,16 @@ macOS/Linux) before deciding whether to delete it and start fresh.
     (define-key ccm-map [next] #'my/scroll-half-page-down)
     (define-key ccm-map [prior] #'my/scroll-half-page-up)
     (global-centered-cursor-mode +1)
+
+    ;; `global-centered-cursor-mode' also turns itself on in the minibuffer,
+    ;; whose `ccm-map' then shadows `ivy-minibuffer-map': C-v/M-v run the
+    ;; half-page scroll commands against the one-line minibuffer instead of
+    ;; paging the ivy candidate list (e.g. in `counsel-M-x'). Centering means
+    ;; nothing in a minibuffer, so turn it off there.
+    (defun my/ccm-disable-in-minibuffer ()
+      "Turn `centered-cursor-mode' off in the minibuffer."
+      (centered-cursor-mode -1))
+    (add-hook 'minibuffer-setup-hook #'my/ccm-disable-in-minibuffer)
     )
 
   (with-eval-after-load 'org
