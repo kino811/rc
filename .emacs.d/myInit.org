@@ -2422,7 +2422,261 @@ conversation usually starts from the bottom."
                                 (recenter))))
                   :caller 'my/agent-shell-jump-to-me)))
 
-    (define-key agent-shell-mode-map (kbd "M-g m") #'my/agent-shell-jump-to-me)
+    ;; -----------------------------------------------------------------
+    ;; Branch (side Q&A) conversations
+    ;;
+    ;; `agent-shell-branch-ask' (C-c C-b) lets you ask a side-branch
+    ;; question about the selected region (or point) without polluting
+    ;; the main conversation.  It reuses one persistent, visible branch
+    ;; agent-shell session per main buffer (created lazily, in its own
+    ;; dedicated .agent-shell/branches/<id>/ working directory so its
+    ;; transcript never collides with the main project), and lets
+    ;; agent-shell manage that session's own transcript file.  A tiny
+    ;; `[Q]' tag is inserted at point; resting the cursor on it shows
+    ;; the original question as a transient tooltip, and RET/mouse-1
+    ;; opens the transcript file at the exact line this turn begins.
+    ;; Depth is limited to 1: branch sessions can't start their own
+    ;; branches.  `C-c C-j' jumps to the live branch session buffer to
+    ;; continue chatting directly; `C-c C-S-b' explicitly closes it
+    ;; (the transcript file is preserved either way).
+    (defvar-local agent-shell-branch--disabled nil
+      "Non-nil in a branch shell buffer to prevent nested branching.")
+
+    (defvar-local agent-shell-branch--session-buffer nil
+      "Live branch agent-shell buffer for this (main) buffer, or nil.")
+
+    (defun agent-shell-branch--dir ()
+      "Return (and ensure) the .agent-shell/branches directory for current buffer."
+      (agent-shell--dot-subdir "branches"))
+
+    (defun agent-shell-branch--summary (text max)
+      "Return a single-line, truncated summary of TEXT for the inline tooltip."
+      (let ((one-line (replace-regexp-in-string "[\n\t ]+" " " (string-trim (or text "")))))
+        (if (> (length one-line) max)
+            (concat (substring one-line 0 max) "...")
+          one-line)))
+
+    (defun agent-shell-branch--line-count (file)
+      "Return the number of lines currently in FILE, or 0 if it doesn't exist."
+      (if (file-exists-p file)
+          (with-temp-buffer
+            (insert-file-contents file)
+            (max (count-lines (point-min) (point-max)) 0))
+        0))
+
+    (defun agent-shell-branch--read-question (prompt)
+      "Read a branch question with PROMPT, preserving the current input method."
+      (let ((im current-input-method))
+        (minibuffer-with-setup-hook
+            (lambda ()
+              (when im (activate-input-method im)))
+          (read-string prompt))))
+
+    (defun agent-shell-branch--ensure-session (main-buffer config)
+      "Return a live branch agent-shell buffer for MAIN-BUFFER, creating if needed."
+      (with-current-buffer main-buffer
+        (if (and agent-shell-branch--session-buffer
+                 (buffer-live-p agent-shell-branch--session-buffer))
+            agent-shell-branch--session-buffer
+          (let* ((main-id (or (buffer-file-name main-buffer)
+                              (buffer-name main-buffer)))
+                 (slug (substring (secure-hash 'md5 main-id) 0 8))
+                 (workdir (expand-file-name
+                           (format "branches/%s" slug)
+                           (agent-shell-branch--dir)))
+                 (transcript-path (expand-file-name "transcript.md" workdir)))
+            (make-directory workdir t)
+            (let* ((agent-shell-buffer-name-format 'default) ;; skip interactive naming prompt
+                   (agent-shell-transcript-file-path-function
+                    (lambda () transcript-path))
+                   ;; Use `agent-shell--new-shell' (not
+                   ;; `agent-shell-new-temp-shell') so the session's
+                   ;; working directory is OUR dedicated, persistent
+                   ;; branch folder rather than a throwaway temp dir
+                   ;; that agent-shell would trash on kill.
+                   (buf (agent-shell--new-shell :location workdir
+                                                :config config
+                                                :no-display t)))
+              (with-current-buffer buf
+                (setq-local agent-shell-branch--disabled t))
+              (setq-local agent-shell-branch--session-buffer buf)
+              buf)))))
+
+    (cl-defun agent-shell-branch-ask ()
+      "Ask a side-branch question about the selected region (or point).
+
+Reuses (or lazily creates) one persistent branch agent-shell session
+per main buffer.  Inserts a clickable `[Q]' tag at point immediately,
+linking to the exact line in the branch session's own transcript file
+where this turn begins.  agent-shell manages that transcript file
+itself (this code never writes to it), so answers are saved
+automatically as soon as the agent responds, and nothing is lost if
+the branch buffer is later killed and revisited.
+
+Depth-1: refuses to run inside a branch shell buffer."
+      (interactive)
+      (unless (derived-mode-p 'agent-shell-mode)
+        (user-error "Not in an agent-shell buffer"))
+      (when agent-shell-branch--disabled
+        (user-error "Branching is disabled inside a branch shell (depth-1 limit)"))
+      ;; `cursor-sensor-functions' (used to show/hide the tooltip as point
+      ;; enters/leaves the [Q] tag) only fires when `cursor-sensor-mode' is
+      ;; enabled in the buffer.
+      (unless cursor-sensor-mode
+        (cursor-sensor-mode 1))
+      (let* ((main-buffer (current-buffer))
+             (region-text (when (region-active-p)
+                            (buffer-substring-no-properties (region-beginning) (region-end))))
+             (insert-point (if (region-active-p) (region-end) (point)))
+             (question (agent-shell-branch--read-question "Branch question: "))
+             (config (map-elt (agent-shell--state) :agent-config))
+             (quoted (if region-text
+                         (format "Regarding this excerpt:\n\n```\n%s\n```\n\n%s" region-text question)
+                       question)))
+        (when (region-active-p) (deactivate-mark))
+        (let* ((branch-buffer (agent-shell-branch--ensure-session main-buffer config))
+               (transcript-path (buffer-local-value 'agent-shell--transcript-file branch-buffer))
+               (start-line (max 1 (1+ (agent-shell-branch--line-count transcript-path)))))
+          (with-current-buffer main-buffer
+            (save-excursion
+              (goto-char insert-point)
+              ;; Snap to the end of the current line before inserting the
+              ;; tag, so we never splice into existing text/words.
+              (end-of-line)
+              (agent-shell-branch--insert-tag
+               :question question
+               :file transcript-path
+               :line start-line)))
+          (message "agent-shell-branch: asking...")
+          (agent-shell-insert :text quoted :submit t :no-focus t :shell-buffer branch-buffer))))
+
+    (defun agent-shell-branch-close ()
+      "Explicitly close this main buffer's persistent branch session.
+
+Its transcript file is preserved.  The next `agent-shell-branch-ask'
+call lazily starts a fresh branch session and keeps appending to the
+same transcript file, so history reads continuously."
+      (interactive)
+      (unless (derived-mode-p 'agent-shell-mode)
+        (user-error "Not in an agent-shell buffer"))
+      (if (and agent-shell-branch--session-buffer
+               (buffer-live-p agent-shell-branch--session-buffer))
+          (progn
+            (agent-shell-branch--kill-buffer-retry agent-shell-branch--session-buffer)
+            (setq-local agent-shell-branch--session-buffer nil)
+            (message "agent-shell-branch: session closed"))
+        (message "agent-shell-branch: no active session")))
+
+    (defun agent-shell-branch-jump ()
+      "Switch to this main buffer's live branch agent-shell session, if any."
+      (interactive)
+      (unless (derived-mode-p 'agent-shell-mode)
+        (user-error "Not in an agent-shell buffer"))
+      (if (and agent-shell-branch--session-buffer
+               (buffer-live-p agent-shell-branch--session-buffer))
+          (pop-to-buffer agent-shell-branch--session-buffer)
+        (user-error "No active branch session for this buffer")))
+
+    (defun agent-shell-branch--kill-buffer-retry (buffer &optional attempt)
+      "Kill BUFFER, deferring its temp directory removal to avoid Windows locks.
+
+`agent-shell--clean-up' shuts down the ACP subprocess asynchronously
+\(via `acp-shutdown'), but tries to delete the shell's temp working
+directory synchronously within the same `kill-buffer' call.  On
+Windows, the OS may still hold a lock on files inside that directory
+for a brief moment after the process is signalled to exit, so that
+delete fails with permission-denied -- and because it errors from a
+`kill-buffer-hook', it can abort the kill itself, leaving BUFFER
+alive.
+
+Work around this by taking over the cleanup ourselves: clear
+`agent-shell--pending-directory-cleanup' so agent-shell's own hook
+does not attempt (and fail at) the delete, kill the buffer, then
+retry deleting the directory ourselves on a timer until it succeeds
+or ATTEMPT is exhausted."
+      (let* ((attempt (or attempt 0))
+             (dir (buffer-local-value 'agent-shell--pending-directory-cleanup buffer)))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer
+            (setq-local agent-shell--pending-directory-cleanup nil))
+          (kill-buffer buffer))
+        (when (and dir (file-directory-p dir))
+          (agent-shell-branch--delete-dir-retry dir attempt))))
+
+    (defun agent-shell-branch--delete-dir-retry (dir attempt)
+      "Delete DIR, retrying a few times if the OS still has it locked."
+      (condition-case err
+          (when (file-directory-p dir)
+            (delete-directory dir t t))
+        (error
+         (if (< attempt 10)
+             (run-at-time 0.3 nil #'agent-shell-branch--delete-dir-retry
+                          dir (1+ attempt))
+           (message "agent-shell-branch: giving up removing %s: %S" dir err)))))
+
+    (defvar agent-shell-branch--tooltip-overlay nil
+      "The currently displayed branch question tooltip overlay, if any.")
+
+    (defun agent-shell-branch--hide-tooltip ()
+      "Remove the branch question tooltip overlay, if displayed."
+      (when (overlayp agent-shell-branch--tooltip-overlay)
+        (delete-overlay agent-shell-branch--tooltip-overlay)
+        (setq agent-shell-branch--tooltip-overlay nil)))
+
+    (defun agent-shell-branch--show-tooltip (question)
+      "Show QUESTION as a small overlay tooltip after point."
+      (agent-shell-branch--hide-tooltip)
+      (save-excursion
+        (let* ((ov (make-overlay (point) (point) (current-buffer) nil nil)))
+          (overlay-put ov 'after-string
+                       (propertize (format " %s" question)
+                                  'face 'tooltip))
+          (overlay-put ov 'agent-shell-branch-tooltip t)
+          (setq agent-shell-branch--tooltip-overlay ov))))
+
+    (cl-defun agent-shell-branch--insert-tag (&key question file line)
+      "Insert a minimal `[Q]' tag at point that opens FILE at LINE.
+
+The tag is real (but tiny) buffer text -- just \"Q\" in a box -- so it
+can hold real point/cursor and be opened with RET like any other
+agent-shell link, without splicing into or disturbing surrounding
+text.  While point rests on the tag, QUESTION is shown as a transient
+tooltip overlay (a purely visual annotation, removed again once point
+leaves), so the full question text never has to live in the buffer
+itself."
+      (let* ((tag (agent-shell--make-button
+                  :text "Q"
+                  :boxed t
+                  :action (lambda ()
+                            (interactive)
+                            (agent-shell-branch--visit file line))
+                  :properties (list 'font-lock-face 'agent-shell-link
+                                    'face 'agent-shell-link
+                                    'cursor-sensor-functions
+                                    (list (lambda (_window _old-pos action)
+                                            (if (eq action 'entered)
+                                                (agent-shell-branch--show-tooltip question)
+                                              (agent-shell-branch--hide-tooltip)))))))
+             (inhibit-read-only t))
+        (insert " " tag)))
+
+    (defun agent-shell-branch--visit (file line)
+      "Open FILE (reusing a window already showing it) and move point to LINE."
+      (if (not (file-exists-p file))
+          (user-error "Branch transcript missing: %s" file)
+        (let* ((buffer (find-file-noselect file))
+               (window (or (get-buffer-window buffer t)
+                          (display-buffer buffer))))
+          (with-selected-window window
+            (with-current-buffer buffer
+              (revert-buffer t t t)
+              (goto-char (point-min))
+              (forward-line (1- line))
+              (recenter))))))
+
+    (define-key agent-shell-mode-map (kbd "C-c C-b") #'agent-shell-branch-ask)
+    (define-key agent-shell-mode-map (kbd "C-c C-S-b") #'agent-shell-branch-close)
+    (define-key agent-shell-mode-map (kbd "C-c C-j") #'agent-shell-branch-jump)
     )
 #+end_src
 * markdown-mode
