@@ -2422,6 +2422,8 @@ conversation usually starts from the bottom."
                                 (recenter))))
                   :caller 'my/agent-shell-jump-to-me)))
 
+    (define-key agent-shell-mode-map (kbd "M-g m") #'my/agent-shell-jump-to-me)
+
     ;; -----------------------------------------------------------------
     ;; Branch (side Q&A) conversations
     ;;
@@ -2445,9 +2447,40 @@ conversation usually starts from the bottom."
     (defvar-local agent-shell-branch--session-buffer nil
       "Live branch agent-shell buffer for this (main) buffer, or nil.")
 
+    (defvar-local agent-shell-branch--restore-subscriptions nil
+      "Event subscriptions used to restore branch tags in this buffer.")
+
+    (defvar-local agent-shell-branch--restore-timer nil
+      "Pending timer for restoring branch tags in this buffer.")
+
+    (defvar agent-shell-branch--tooltip-overlay nil
+      "The currently displayed branch question tooltip overlay, if any.")
+
+    (defvar agent-shell-branch--creating-branch-session nil
+      "Non-nil while creating a branch agent-shell session.")
+
     (defun agent-shell-branch--dir ()
       "Return (and ensure) the .agent-shell/branches directory for current buffer."
       (agent-shell--dot-subdir "branches"))
+
+    (defun agent-shell-branch--main-key (&optional buffer)
+      "Return a stable key for BUFFER's main agent-shell session."
+      (with-current-buffer (or buffer (current-buffer))
+        (or (map-nested-elt (agent-shell--state) '(:session :id))
+            (map-elt (agent-shell--state) :resume-session-id)
+            (buffer-file-name)
+            (buffer-name))))
+
+    (defun agent-shell-branch--workdir (&optional buffer)
+      "Return the branch metadata/work directory for BUFFER."
+      (with-current-buffer (or buffer (current-buffer))
+        (expand-file-name
+         (substring (secure-hash 'sha1 (agent-shell-branch--main-key)) 0 12)
+         (agent-shell-branch--dir))))
+
+    (defun agent-shell-branch--anchors-file (&optional buffer)
+      "Return BUFFER's sidecar branch anchor metadata file."
+      (expand-file-name "anchors.el" (agent-shell-branch--workdir buffer)))
 
     (defun agent-shell-branch--summary (text max)
       "Return a single-line, truncated summary of TEXT for the inline tooltip."
@@ -2464,6 +2497,141 @@ conversation usually starts from the bottom."
             (max (count-lines (point-min) (point-max)) 0))
         0))
 
+    (defun agent-shell-branch--read-anchors (&optional buffer)
+      "Read BUFFER's sidecar branch anchors."
+      (let ((file (agent-shell-branch--anchors-file buffer)))
+        (if (file-exists-p file)
+            (condition-case err
+                (with-temp-buffer
+                  (insert-file-contents file)
+                  (read (current-buffer)))
+              (error
+               (message "agent-shell-branch: failed to read %s: %S" file err)
+               nil))
+          nil)))
+
+    (defun agent-shell-branch--write-anchors (anchors &optional buffer)
+      "Write ANCHORS to BUFFER's sidecar branch metadata file."
+      (let ((file (agent-shell-branch--anchors-file buffer)))
+        (make-directory (file-name-directory file) t)
+        (with-temp-file file
+          (let ((print-length nil)
+                (print-level nil))
+            (prin1 anchors (current-buffer))))))
+
+    (defun agent-shell-branch--line-text-at-point ()
+      "Return current line text, excluding branch tag display metadata."
+      (let ((start (line-beginning-position))
+            (end (line-end-position))
+            (pos (line-beginning-position))
+            parts)
+        (while (< pos end)
+          (let ((next (or (next-single-property-change pos 'agent-shell-branch-tag nil end)
+                          end)))
+            (unless (get-text-property pos 'agent-shell-branch-tag)
+              (push (buffer-substring-no-properties pos next) parts))
+            (setq pos next)))
+        (string-trim-right (apply #'concat (nreverse parts)))))
+
+    (defun agent-shell-branch--line-occurrence-before-point (line-text)
+      "Return occurrence number of LINE-TEXT up to the current line."
+      (let ((target-line (line-number-at-pos))
+            (count 0))
+        (save-excursion
+          (goto-char (point-min))
+          (dotimes (_ target-line)
+            (when (string= (agent-shell-branch--line-text-at-point) line-text)
+              (setq count (1+ count)))
+            (forward-line 1)))
+        count))
+
+    (defun agent-shell-branch--save-anchor (anchor)
+      "Append ANCHOR plist to this buffer's sidecar metadata."
+      (let ((anchors (agent-shell-branch--read-anchors)))
+        (agent-shell-branch--write-anchors
+         (append anchors (list anchor)))))
+
+    (defun agent-shell-branch--find-anchor-position (anchor)
+      "Return buffer position for ANCHOR, or nil if it cannot be found."
+      (let ((line-text (plist-get anchor :line-text))
+            (occurrence (plist-get anchor :occurrence))
+            (count 0)
+            found)
+        (save-excursion
+          (goto-char (point-min))
+          (while (and (not found) (< (point) (point-max)))
+            (when (string= (agent-shell-branch--line-text-at-point) line-text)
+              (setq count (1+ count))
+              (when (= count occurrence)
+                (setq found (copy-marker (line-end-position) t))))
+            (forward-line 1)))
+        found))
+
+    (defun agent-shell-branch--delete-tags ()
+      "Remove branch `[Q]' tags previously inserted into the current buffer."
+      (let ((inhibit-read-only t)
+            (pos (point-min)))
+        (while (< pos (point-max))
+          (let ((next (next-single-property-change pos 'agent-shell-branch-tag nil (point-max))))
+            (if (get-text-property pos 'agent-shell-branch-tag)
+                (delete-region pos next)
+              (setq pos next))))))
+
+    (defun agent-shell-branch--restore-anchors (&optional buffer)
+      "Restore sidecar branch tags into BUFFER's rendered agent-shell view."
+      (when (buffer-live-p (or buffer (current-buffer)))
+        (with-current-buffer (or buffer (current-buffer))
+          (when (and (derived-mode-p 'agent-shell-mode)
+                     (not agent-shell-branch--disabled))
+            (unless cursor-sensor-mode
+              (cursor-sensor-mode 1))
+            (let* ((anchors (agent-shell-branch--read-anchors))
+                   positions)
+              (save-excursion
+                (agent-shell-branch--delete-tags)
+                (dolist (anchor anchors)
+                  (when-let ((pos (agent-shell-branch--find-anchor-position anchor)))
+                    (push (cons pos anchor) positions)))
+                (dolist (cell (nreverse positions))
+                  (goto-char (car cell))
+                  (agent-shell-branch--insert-tag
+                   :question (plist-get (cdr cell) :question)
+                   :file (plist-get (cdr cell) :file)
+                   :line (plist-get (cdr cell) :line)))))))))
+
+    (defun agent-shell-branch--schedule-restore (&optional event)
+      "Schedule branch tag restoration for the current buffer.
+EVENT is ignored; it allows use as an agent-shell event callback."
+      (let ((buffer (current-buffer)))
+        (when (timerp agent-shell-branch--restore-timer)
+          (cancel-timer agent-shell-branch--restore-timer))
+        (setq-local agent-shell-branch--restore-timer
+                    (run-at-time 0.2 nil #'agent-shell-branch--restore-anchors buffer))))
+
+    (defun agent-shell-branch--setup-restore ()
+      "Install branch anchor restoration hooks in the current agent-shell buffer."
+      (when (and (derived-mode-p 'agent-shell-mode)
+                 (not agent-shell-branch--disabled)
+                 (not agent-shell-branch--creating-branch-session))
+        (dolist (subscription agent-shell-branch--restore-subscriptions)
+          (ignore-errors
+            (agent-shell-unsubscribe :subscription subscription)))
+        (setq-local agent-shell-branch--restore-subscriptions
+                    (list
+                     (agent-shell-subscribe-to
+                      :shell-buffer (current-buffer)
+                      :event 'session-restored
+                      :on-event #'agent-shell-branch--schedule-restore)
+                     (agent-shell-subscribe-to
+                      :shell-buffer (current-buffer)
+                      :event 'turn-complete
+                      :on-event #'agent-shell-branch--schedule-restore)
+                     (agent-shell-subscribe-to
+                      :shell-buffer (current-buffer)
+                      :event 'init-finished
+                      :on-event #'agent-shell-branch--schedule-restore)))
+        (agent-shell-branch--schedule-restore)))
+
     (defun agent-shell-branch--read-question (prompt)
       "Read a branch question with PROMPT, preserving the current input method."
       (let ((im current-input-method))
@@ -2478,12 +2646,7 @@ conversation usually starts from the bottom."
         (if (and agent-shell-branch--session-buffer
                  (buffer-live-p agent-shell-branch--session-buffer))
             agent-shell-branch--session-buffer
-          (let* ((main-id (or (buffer-file-name main-buffer)
-                              (buffer-name main-buffer)))
-                 (slug (substring (secure-hash 'md5 main-id) 0 8))
-                 (workdir (expand-file-name
-                           (format "branches/%s" slug)
-                           (agent-shell-branch--dir)))
+          (let* ((workdir (agent-shell-branch--workdir main-buffer))
                  (transcript-path (expand-file-name "transcript.md" workdir)))
             (make-directory workdir t)
             (let* ((agent-shell-buffer-name-format 'default) ;; skip interactive naming prompt
@@ -2494,9 +2657,10 @@ conversation usually starts from the bottom."
                    ;; working directory is OUR dedicated, persistent
                    ;; branch folder rather than a throwaway temp dir
                    ;; that agent-shell would trash on kill.
-                   (buf (agent-shell--new-shell :location workdir
-                                                :config config
-                                                :no-display t)))
+                   (buf (let ((agent-shell-branch--creating-branch-session t))
+                          (agent-shell--new-shell :location workdir
+                                                 :config config
+                                                 :no-display t))))
               (with-current-buffer buf
                 (setq-local agent-shell-branch--disabled t))
               (setq-local agent-shell-branch--session-buffer buf)
@@ -2536,17 +2700,30 @@ Depth-1: refuses to run inside a branch shell buffer."
         (when (region-active-p) (deactivate-mark))
         (let* ((branch-buffer (agent-shell-branch--ensure-session main-buffer config))
                (transcript-path (buffer-local-value 'agent-shell--transcript-file branch-buffer))
-               (start-line (max 1 (1+ (agent-shell-branch--line-count transcript-path)))))
+               (start-line (max 1 (1+ (agent-shell-branch--line-count transcript-path))))
+               anchor)
           (with-current-buffer main-buffer
             (save-excursion
               (goto-char insert-point)
               ;; Snap to the end of the current line before inserting the
               ;; tag, so we never splice into existing text/words.
               (end-of-line)
+              (let ((line-text (agent-shell-branch--line-text-at-point)))
+                (setq anchor
+                      (list :id (format "%s-%06x"
+                                        (format-time-string "%Y%m%d%H%M%S")
+                                        (random #x1000000))
+                            :line-text line-text
+                            :occurrence (agent-shell-branch--line-occurrence-before-point line-text)
+                            :question question
+                            :file transcript-path
+                            :line start-line
+                            :created (current-time-string))))
               (agent-shell-branch--insert-tag
                :question question
                :file transcript-path
-               :line start-line)))
+               :line start-line)
+              (agent-shell-branch--save-anchor anchor)))
           (message "agent-shell-branch: asking...")
           (agent-shell-insert :text quoted :submit t :no-focus t :shell-buffer branch-buffer))))
 
@@ -2634,6 +2811,24 @@ or ATTEMPT is exhausted."
           (overlay-put ov 'agent-shell-branch-tooltip t)
           (setq agent-shell-branch--tooltip-overlay ov))))
 
+    (defun agent-shell-branch--tag-action ()
+      "Open the branch transcript referenced by the `[Q]' tag at point."
+      (interactive)
+      (when (mouse-event-p last-input-event)
+        (mouse-set-point last-input-event))
+      (let ((file (get-text-property (point) 'agent-shell-branch-file))
+            (line (get-text-property (point) 'agent-shell-branch-line)))
+        (unless (and file line)
+          (user-error "No branch anchor at point"))
+        (agent-shell-branch--visit file line)))
+
+    (defun agent-shell-branch--tag-cursor-sensor (_window _old-pos action)
+      "Show or hide the branch question tooltip for cursor ACTION."
+      (if (eq action 'entered)
+          (agent-shell-branch--show-tooltip
+           (or (get-text-property (point) 'agent-shell-branch-question) ""))
+        (agent-shell-branch--hide-tooltip)))
+
     (cl-defun agent-shell-branch--insert-tag (&key question file line)
       "Insert a minimal `[Q]' tag at point that opens FILE at LINE.
 
@@ -2647,18 +2842,17 @@ itself."
       (let* ((tag (agent-shell--make-button
                   :text "Q"
                   :boxed t
-                  :action (lambda ()
-                            (interactive)
-                            (agent-shell-branch--visit file line))
+                  :action #'agent-shell-branch--tag-action
                   :properties (list 'font-lock-face 'agent-shell-link
                                     'face 'agent-shell-link
+                                    'agent-shell-branch-tag t
+                                    'agent-shell-branch-question question
+                                    'agent-shell-branch-file file
+                                    'agent-shell-branch-line line
                                     'cursor-sensor-functions
-                                    (list (lambda (_window _old-pos action)
-                                            (if (eq action 'entered)
-                                                (agent-shell-branch--show-tooltip question)
-                                              (agent-shell-branch--hide-tooltip)))))))
+                                    (list #'agent-shell-branch--tag-cursor-sensor))))
              (inhibit-read-only t))
-        (insert " " tag)))
+        (insert (propertize " " 'agent-shell-branch-tag t) tag)))
 
     (defun agent-shell-branch--visit (file line)
       "Open FILE (reusing a window already showing it) and move point to LINE."
@@ -2677,6 +2871,11 @@ itself."
     (define-key agent-shell-mode-map (kbd "C-c C-b") #'agent-shell-branch-ask)
     (define-key agent-shell-mode-map (kbd "C-c C-S-b") #'agent-shell-branch-close)
     (define-key agent-shell-mode-map (kbd "C-c C-j") #'agent-shell-branch-jump)
+    (add-hook 'agent-shell-mode-hook #'agent-shell-branch--setup-restore)
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (derived-mode-p 'agent-shell-mode)
+          (agent-shell-branch--setup-restore))))
     )
 #+end_src
 * markdown-mode
