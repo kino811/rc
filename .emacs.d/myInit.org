@@ -366,6 +366,27 @@ customizing mode line
       "Hide minor mode lighters from powerline."
       "")
     (defalias 'powerline-minor-modes #'my/powerline-hide-minor-modes)
+
+    (defun my/powerline-eat-pty-win-directory (original &optional face pad)
+      "Append the current eat-pty-win directory to the Powerline buffer ID."
+      (let ((segment (funcall original face pad)))
+        (if (bound-and-true-p eat-pty-win-mode)
+            (let* ((directory (expand-file-name default-directory))
+                   (name (file-name-nondirectory
+                          (directory-file-name directory))))
+              (concat segment
+                      (powerline-raw
+                       (format " [epw:%s]"
+                               (if (string-empty-p name)
+                                   (abbreviate-file-name directory)
+                                 name))
+                       face 'r)))
+          segment)))
+    (advice-remove 'powerline-buffer-id
+                   #'my/powerline-eat-pty-win-directory)
+    (advice-add 'powerline-buffer-id :around
+                #'my/powerline-eat-pty-win-directory)
+
     (powerline-default-theme)
 
     ;; ;; change file name to path
@@ -671,10 +692,15 @@ when window
 
 On Windows, use `eat-pty-win'.  On other platforms, use `vterm'."
     (interactive "P")
+    ;; EAF PyQterminal was used temporarily while eat-pty-win TUI rendering
+    ;; issues were being fixed.
+    ;; (require 'eaf-pyqterminal)
+    ;; (eaf-open-pyqterminal)
     (if (eq system-type 'windows-nt)
         (if (fboundp 'eat-pty-win)
             (eat-pty-win arg)
-          (user-error "eat-pty-win is not installed under %s" my/eat-pty-win-directory))
+          (user-error "eat-pty-win is not installed under %s"
+                      my/eat-pty-win-directory))
       (vterm)))
 
   (defun my/shell-here ()
@@ -754,6 +780,11 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
     :if (and (eq system-type 'windows-nt)
              (file-directory-p my/eat-pty-win-directory))
     :ensure nil
+    :custom
+    (eat-pty-win-diagnostic-file
+     (expand-file-name
+      ".diagnostics/eat-pty-win-stalled-output.log"
+      my/eat-pty-win-directory))
     :commands (eat-pty-win))
 #+end_src
 
@@ -791,7 +822,86 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
     ;;   )
     (require 'ox-confluence nil t)
     (require 'ox-md)
+    (require 'org-tempo)
     (require 'subr-x)
+
+    (use-package ob-mermaid
+      :ensure t
+      :config
+      (defun my/mermaid-cli-path ()
+        "Return the Mermaid CLI executable path."
+        (or (executable-find "mmdc.cmd")
+            (executable-find "mmdc")
+            (let ((npm-mmdc (and (getenv "APPDATA")
+                                 (expand-file-name "npm/mmdc.cmd"
+                                                   (getenv "APPDATA")))))
+              (when (and npm-mmdc (file-executable-p npm-mmdc))
+                npm-mmdc))
+            "mmdc"))
+      (setq ob-mermaid-cli-path (my/mermaid-cli-path)
+            ob-mermaid-default-config-file
+            (expand-file-name "~/.emacs.d/mermaid-config.json"))
+
+      (defun my/mermaid-add-svg-background (file)
+        "Normalize Mermaid SVG FILE for Emacs and Confluence rendering."
+        (when (and (string-equal (downcase (or (file-name-extension file) ""))
+                                 "svg")
+                   (file-exists-p file))
+          (with-temp-buffer
+            (insert-file-contents file)
+            (let ((has-background
+                   (search-forward "data-org-babel-background=\"true\"" nil t)))
+              (goto-char (point-min))
+              (unless (re-search-forward "<svg[^>]*>" nil t)
+                (error "Mermaid SVG has no root <svg> element: %s" file))
+              (let* ((root-start (match-beginning 0))
+                     (root-end (match-end 0))
+                     (root (match-string-no-properties 0)))
+                (unless (string-match
+                         "viewBox=\"0[[:space:]]+0[[:space:]]+\\([0-9.]+\\)[[:space:]]+\\([0-9.]+\\)\""
+                         root)
+                  (error "Mermaid SVG has no usable viewBox: %s" file))
+                (let ((width (match-string 1 root))
+                      (height (match-string 2 root)))
+                  (setq root
+                        (replace-regexp-in-string
+                         "[[:space:]]+width=\"[^\"]*\"" "" root))
+                  (setq root
+                        (replace-regexp-in-string
+                         "[[:space:]]+height=\"[^\"]*\"" "" root))
+                  (setq root
+                        (replace-regexp-in-string
+                         "[[:space:]]+style=\"[^\"]*\"" "" root))
+                  (setq root
+                        (replace-regexp-in-string
+                         "<svg"
+                         (format "<svg width=\"%s\" height=\"%s\""
+                                 width height)
+                         root))
+                  (delete-region root-start root-end)
+                  (goto-char root-start)
+                  (insert root)
+                  (unless has-background
+                    (insert
+                     "\n<rect width=\"100%\" height=\"100%\" fill=\"white\""
+                     " data-org-babel-background=\"true\"/>"))
+                  (let ((coding-system-for-write buffer-file-coding-system))
+                    (write-region (point-min) (point-max) file nil 'silent))))))))
+
+      (defun my/org-babel-execute-mermaid-with-background (original body params)
+        "Render Mermaid with ORIGINAL and add an SVG background when requested."
+        (let ((result (funcall original body params))
+              (file (cdr (assq :file params))))
+          (when file
+            (my/mermaid-add-svg-background
+             (expand-file-name file default-directory)))
+          result))
+
+      (unless (advice-member-p
+               #'my/org-babel-execute-mermaid-with-background
+               'org-babel-execute:mermaid)
+        (advice-add 'org-babel-execute:mermaid :around
+                    #'my/org-babel-execute-mermaid-with-background)))
 
     (defun my/org-copy-heading-path ()
       "Copy the current Org heading path to the kill ring."
@@ -880,7 +990,7 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
       (if (org-export-derived-backend-p backend 'confluence)
           (progn
             (setq output
-                  (replace-regexp-in-string "\\[file:[^]]*?\\([^/ ]*?\\w\\.png\\)\\]"
+                  (replace-regexp-in-string "\\[file:[^]]*?\\([^/ ]*?\\.\\(?:png\\|svg\\)\\)\\]"
                                             "!\\1!"
                                             output))
             (setq output
@@ -902,6 +1012,7 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
                                    ;; (ipython . t)
                                    (C . t)
                                    (plantuml . t)
+                                   (mermaid . t)
                                    (shell . t)
                                    (ditaa . t)
                                    (eshell . t)
@@ -940,8 +1051,11 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
             (expand-file-name "~/.emacs.d/plantuml.jar")))
 
     (add-to-list 'org-structure-template-alist
-                 '("u" . "src plantuml :file .png :exports both")
-  			   '("p" . "src python :results file :dir . :exports both"))
+                 '("u" . "src plantuml :file .png :exports both"))
+    (add-to-list 'org-structure-template-alist
+                 '("m" . "src mermaid :file diagram.svg :exports both"))
+    (add-to-list 'org-structure-template-alist
+                 '("p" . "src python :results file :dir . :exports both"))
 
     (when (eq system-type 'windows-nt)
       (progn (set-face-attribute 'default nil :family "Cascadia Code")
@@ -1984,6 +2098,19 @@ macOS/Linux) before deciding whether to delete it and start fresh.
   							 (display-line-numbers-mode -1)))
 #+end_src
 * agent-shell
+The pricing header must get its model ID from
+=(agent-shell--current-model-id (agent-shell--state))= . Copilot ACP's
+config-options path updates the model option's =current-value= , which is the
+authoritative value after a model change.
+
+Do not use =(:session :model-id)= or =agent-shell--header-last-model= for
+pricing. They retain the legacy session model ID and can remain stale when ACP
+config-options are available. agent-shell refreshes its header after a
+successful model change, so the pricing extension must rely only on this
+in-memory accessor and must not add polling or I/O to rendering. Pricing and
+prior-day comparisons are loaded into memory by the refresh timer; SVG
+rendering uses only those cached values.
+
 #+begin_src emacs-lisp
   (defun my/agent-shell-send-file-or-region-to ()
     "Send files or an active region to a selected agent-shell buffer."
@@ -2186,13 +2313,13 @@ macOS/Linux) before deciding whether to delete it and start fresh.
     (add-hook 'agent-shell-mode-hook
             #'agent-recall-track-sessions)
 
-    ;; Show the "Me" prompt relevant to the window's current scroll
-    ;; position as an extra line below agent-shell's own header, without
-    ;; touching agent-shell's own rendering/caching.  A new SVG canvas
-    ;; embeds the original header image whole and draws the extra text
+    ;; Show cached pricing, budget, and the "Me" prompt relevant to the
+    ;; window's current scroll position below agent-shell's own header,
+    ;; without touching agent-shell's own rendering/caching.  A new SVG canvas
+    ;; embeds the original header image whole and draws the extra lines
     ;; below it, so agent-shell's own header logic stays untouched.
     (defvar-local my/agent-shell--me-line-cache nil
-      "Cons of (RESULT ME-LINE WINDOW-WIDTH) -> COMPOSED-RESULT, memoized per buffer.")
+      "Cached composed header result for the current budget, Me line, and width.")
 
     (defun my/agent-shell--visible-input-first-line ()
       "Return the first line of the `Me' input relevant to the window's
@@ -2247,22 +2374,254 @@ explicit CJK-capable font."
                 (setq hi (1- mid)))))
           (if (> lo 0) (concat (substring text 0 lo) ellipsis) ellipsis))))
 
+    (defconst my/agent-shell-budget-file
+      (expand-file-name "~/.copilot/budget.json")
+      "Local cache containing the current monthly budget information.")
+
+    (defconst my/agent-shell-pricing-directory
+      (expand-file-name "~/.copilot/pricing/")
+      "Directory containing daily local Copilot model-pricing snapshots.")
+
+    (require 'json)
+
+    (defvar my/agent-shell--budget-file-mtime nil)
+    (defvar my/agent-shell--budget-display "Budget: --")
+    (defvar my/agent-shell--pricing-file-keys nil)
+    (defvar my/agent-shell--pricing-models nil)
+    (defvar my/agent-shell--previous-pricing-models nil)
+    (defvar my/agent-shell--pricing-previous-date nil)
+    (defvar my/agent-shell--budget-refresh-timer nil)
+
+    (defun my/agent-shell--read-budget-cache ()
+      "Refresh the in-memory budget display when its cache file changes."
+      (let ((attributes (and (file-readable-p my/agent-shell-budget-file)
+                             (file-attributes my/agent-shell-budget-file))))
+        (if attributes
+            (let ((mtime (file-attribute-modification-time attributes)))
+              (unless (equal mtime my/agent-shell--budget-file-mtime)
+                (let* ((data (with-temp-buffer
+                               (insert-file-contents my/agent-shell-budget-file)
+                               (json-parse-buffer :object-type 'alist)))
+                       (spend (cdr (assoc-string
+                                    "amount"
+                                    (cdr (assoc-string
+                                          "currentPeriodSpend" data)))))
+                       (limit (cdr (assoc-string
+                                    "amount"
+                                    (cdr (assoc-string "budget" data))))))
+                  (setq my/agent-shell--budget-file-mtime mtime)
+                  (setq my/agent-shell--budget-display
+                        (if (and (numberp spend) (numberp limit))
+                            (format "Budget $%.2f/$%.2f" spend limit)
+                          "Budget: --"))
+                  t)))
+          (unless (null my/agent-shell--budget-file-mtime)
+            (setq my/agent-shell--budget-file-mtime nil)
+            (setq my/agent-shell--budget-display "Budget: --")
+            t))))
+
+    (defun my/agent-shell--pricing-file (time)
+      "Return the local Copilot pricing snapshot path for TIME."
+      (expand-file-name
+       (concat (format-time-string "%Y-%m-%d" time) ".json")
+       my/agent-shell-pricing-directory))
+
+    (defun my/agent-shell--pricing-file-state (time)
+      "Return the path and mtime cache key for the pricing snapshot at TIME."
+      (let* ((file (my/agent-shell--pricing-file time))
+             (attributes (and (file-readable-p file)
+                              (file-attributes file))))
+        (cons file (and attributes
+                        (file-attribute-modification-time attributes)))))
+
+    (defun my/agent-shell--read-pricing-models (file)
+      "Read FILE and return its model price alist, or nil when FILE is absent."
+      (when (file-readable-p file)
+        (cdr (assoc-string
+              "models"
+              (with-temp-buffer
+                (insert-file-contents file)
+                (json-parse-buffer :object-type 'alist))))))
+
+    (defun my/agent-shell--format-price (price)
+      "Return PRICE as a compact USD amount, or a placeholder."
+      (if (numberp price)
+          (format "$%.3g" (float price))
+        "-"))
+
+    (defun my/agent-shell--read-pricing-cache ()
+      "Refresh in-memory pricing only after current or prior snapshot changes."
+      (let* ((now (current-time))
+             (previous-time (time-subtract now (days-to-time 1)))
+             (current-state (my/agent-shell--pricing-file-state now))
+             (previous-state (my/agent-shell--pricing-file-state previous-time))
+             (keys (list current-state previous-state)))
+        (unless (equal keys my/agent-shell--pricing-file-keys)
+          (setq my/agent-shell--pricing-file-keys keys
+                my/agent-shell--pricing-models
+                (my/agent-shell--read-pricing-models (car current-state))
+                my/agent-shell--previous-pricing-models
+                (my/agent-shell--read-pricing-models (car previous-state))
+                my/agent-shell--pricing-previous-date
+                (format-time-string "%b %d" previous-time))
+          t)))
+
+    (defun my/agent-shell--model-default-price (models model-id)
+      "Return MODEL-ID's default-tier price from MODELS."
+      (when-let* ((model-prices (and model-id
+                                     (cdr (assoc-string model-id models)))))
+        (cdr (assoc-string "default" model-prices))))
+
+    (defun my/agent-shell--price-change (current previous)
+      "Return the price change state and compact text from CURRENT to PREVIOUS."
+      (if (not (and current previous))
+          (cons 'unknown "no prior-day price")
+        (let ((changes nil)
+              (has-increase nil)
+              (has-decrease nil))
+          (dolist (field '((input . "I")
+                           (cachedInput . "C")
+                           (cacheWrite . "W")
+                           (output . "O")))
+            (let ((current-value (cdr (assoc-string (symbol-name (car field)) current)))
+                  (previous-value (cdr (assoc-string (symbol-name (car field)) previous))))
+              (when (and (numberp current-value)
+                         (numberp previous-value)
+                         (not (zerop previous-value))
+                         (/= current-value previous-value))
+                (let ((percent (* 100.0
+                                  (/ (- current-value previous-value)
+                                     previous-value))))
+                  (push (format "%s %+.1f%%" (cdr field) percent) changes)
+                  (if (> percent 0)
+                      (setq has-increase t)
+                    (setq has-decrease t))))))
+          (cond
+           ((null changes) (cons 'unchanged "unchanged"))
+           (has-increase (cons 'increase (string-join (nreverse changes) ", ")))
+           (has-decrease (cons 'decrease (string-join (nreverse changes) ", ")))
+           (t (cons 'unknown "no prior-day price"))))))
+
+    (defun my/agent-shell--price-info ()
+      "Return cached current pricing and prior-day comparison for this buffer."
+      (let* ((model-id (agent-shell--current-model-id (agent-shell--state)))
+             (current (my/agent-shell--model-default-price
+                       my/agent-shell--pricing-models model-id))
+             (previous (my/agent-shell--model-default-price
+                        my/agent-shell--previous-pricing-models model-id)))
+        (if current
+            (let ((change (my/agent-shell--price-change current previous)))
+              (list :price
+                    (format "Price I %s | O %s | C %s | W %s / 1M"
+                            (my/agent-shell--format-price
+                             (cdr (assoc-string "input" current)))
+                            (my/agent-shell--format-price
+                             (cdr (assoc-string "output" current)))
+                            (my/agent-shell--format-price
+                             (cdr (assoc-string "cachedInput" current)))
+                            (my/agent-shell--format-price
+                             (cdr (assoc-string "cacheWrite" current))))
+                    :comparison
+                    (format "vs %s: %s"
+                            (or my/agent-shell--pricing-previous-date "--")
+                            (cdr change))
+                    :change-state (car change)))
+          (list :price (if model-id
+                           (format "Price: unavailable for %s" model-id)
+                         "Price: --")
+                :comparison nil
+                :change-state 'unknown))))
+
+    (defun my/agent-shell--price-display ()
+      "Return the default-tier price line for the current agent-shell model."
+      (plist-get (my/agent-shell--price-info) :price))
+
+    (defun my/agent-shell--fit-price-summary (price comparison budget max-width)
+      "Fit PRICE, COMPARISON, and BUDGET in MAX-WIDTH, preserving BUDGET."
+      (let* ((separator " | ")
+             (base (concat price separator budget))
+             (full (if comparison
+                       (concat price separator comparison separator budget)
+                     base)))
+        (cond
+         ((<= (string-pixel-width full) max-width)
+          (list :price price :comparison comparison :budget budget))
+         ((<= (string-pixel-width base) max-width)
+          (let ((comparison-width
+                 (- max-width (string-pixel-width base)
+                    (string-pixel-width separator))))
+            (list :price price
+                  :comparison (and (> comparison-width 0)
+                                   (my/agent-shell--truncate-to-width
+                                    comparison comparison-width))
+                  :budget budget)))
+         (t
+          (let ((price-width
+                 (- max-width (string-pixel-width budget)
+                    (string-pixel-width separator))))
+            (list :price (my/agent-shell--truncate-to-width
+                          price (max 0 price-width))
+                  :comparison nil
+                  :budget budget))))))
+
+    (defun my/agent-shell--price-change-color (state)
+      "Return the SVG color associated with prior-day price STATE."
+      (pcase state
+        ('increase "#bf616a")
+        ('decrease "#5e81ac")
+        (_ "#88c0d0")))
+
+    (defun my/agent-shell--price-summary-svg (price comparison state budget)
+      "Return SVG tspans for PRICE, COMPARISON, and BUDGET."
+      (concat
+       (format "<tspan fill=\"#88c0d0\">%s</tspan>"
+               (my/agent-shell--escape-xml price))
+       (when comparison
+         (format "<tspan fill=\"#88c0d0\"> | </tspan><tspan fill=\"%s\">%s</tspan>"
+                 (my/agent-shell--price-change-color state)
+                 (my/agent-shell--escape-xml comparison)))
+       (format "<tspan fill=\"#88c0d0\"> | %s</tspan>"
+               (my/agent-shell--escape-xml budget))))
+
+    (defun my/agent-shell--refresh-budget-header ()
+      "Refresh agent-shell headers after a local cache changes."
+      (when (or (my/agent-shell--read-budget-cache)
+                (my/agent-shell--read-pricing-cache))
+        (dolist (buffer (buffer-list))
+          (with-current-buffer buffer
+            (when (derived-mode-p 'agent-shell-mode)
+              (setq my/agent-shell--me-line-cache nil)
+              (agent-shell--update-header-and-mode-line :cache-enabled nil)
+              (force-window-update buffer))))))
+
+    (defun my/agent-shell--start-budget-refresh ()
+      "Start the lightweight local budget cache refresh timer."
+      (unless (timerp my/agent-shell--budget-refresh-timer)
+        (setq my/agent-shell--budget-refresh-timer
+              (run-at-time 0 60 #'my/agent-shell--refresh-budget-header))))
+
+    (my/agent-shell--start-budget-refresh)
+
     (defun my/agent-shell--append-me-line (result)
-      "Append the Me input relevant to the current scroll position below
-RESULT's rendered header.  Sizes/widens to the buffer's current window
-width via `agent-shell--header-width'.  Memoized per buffer on
-\(RESULT . me-line . window-width)."
+      "Append cached price, budget, and relevant Me input below RESULT's header.
+The two extra lines use a slightly smaller font and are memoized per buffer."
       (if-let* (((stringp result))
                 (idx (cl-position-if (lambda (i) (get-text-property i 'display result))
                                       (number-sequence 0 (1- (length result)))))
                 (display (get-text-property idx 'display result))
                 ((eq (car display) 'image))
                 ((eq (plist-get (cdr display) :type) 'svg))
-                (data (plist-get (cdr display) :data))
-                (me-line (my/agent-shell--visible-input-first-line))
-                ((not (string-empty-p me-line))))
-          (let* ((window-width (agent-shell--header-width (current-buffer)))
-                 (cache-key (list result me-line window-width)))
+                (data (plist-get (cdr display) :data)))
+          (let* ((me-line (or (my/agent-shell--visible-input-first-line) ""))
+                 (budget my/agent-shell--budget-display)
+                 (price-info (my/agent-shell--price-info))
+                 (price (plist-get price-info :price))
+                 (comparison (plist-get price-info :comparison))
+                 (change-state (plist-get price-info :change-state))
+                 (me-label "Me: ")
+                 (window-width (agent-shell--header-width (current-buffer)))
+                 (cache-key (list result price comparison change-state budget
+                                  me-line window-width)))
             (if (and my/agent-shell--me-line-cache
                      (equal (car my/agent-shell--me-line-cache) cache-key))
                 (cdr my/agent-shell--me-line-cache)
@@ -2271,18 +2630,34 @@ width via `agent-shell--header-width'.  Memoized per buffer on
                      (height (and (string-match "height=\"\\([0-9]+\\)\"" data)
                                   (string-to-number (match-string 1 data))))
                      (new-width (max orig-width (- window-width 4)))
-                     (font-size (frame-char-height))
-                     (extra-height (+ font-size 6))
+                     (font-size (max 10 (floor (* (frame-char-height) 0.85))))
+                     (extra-height (+ (* 2 font-size) 8))
                      (new-height (+ height extra-height))
-                     (label "Me: ")
-                     (max-text-width (max 0 (- new-width 6 (string-pixel-width label))))
+                     (max-summary-width (max 0 (- new-width 12)))
+                     (summary (my/agent-shell--fit-price-summary
+                               price comparison budget max-summary-width))
+                     (summary-price (plist-get summary :price))
+                     (summary-comparison (plist-get summary :comparison))
+                     (summary-budget (plist-get summary :budget))
+                     (summary-svg
+                      (my/agent-shell--price-summary-svg
+                       summary-price summary-comparison change-state summary-budget))
+                     (max-text-width (max 0 (- new-width 6
+                                                (string-pixel-width me-label))))
                      (truncated-line (my/agent-shell--truncate-to-width me-line max-text-width))
-                     (new-data (format "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">%s<text x=\"6\" y=\"%d\" font-size=\"%d\" font-family=\"%s\"><tspan fill=\"#888888\">%s</tspan><tspan fill=\"#cccccc\">%s</tspan></text></svg>"
+                     (new-data (format "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">%s<text x=\"6\" y=\"%d\" font-size=\"%d\" font-family=\"%s\"><tspan fill=\"#88c0d0\">%s</tspan></text><text x=\"6\" y=\"%d\" font-size=\"%d\" font-family=\"%s\"><tspan fill=\"#888888\">%s</tspan><tspan fill=\"#cccccc\">%s</tspan></text></svg>"
                                         new-width new-height data
-                                        (+ height font-size -2)
+                                        (+ height font-size -3)
+                                        font-size
+                                        (my/agent-shell--text-font-family
+                                         (concat summary-price
+                                                 (or summary-comparison "")
+                                                 summary-budget))
+                                        summary-svg
+                                        (+ height (* 2 font-size) 1)
                                         font-size
                                         (my/agent-shell--text-font-family truncated-line)
-                                        label
+                                        (my/agent-shell--escape-xml me-label)
                                         (my/agent-shell--escape-xml truncated-line)))
                      (composed (propertize " " 'display (list 'image :type 'svg :data new-data :scale 'default))))
                 (setq my/agent-shell--me-line-cache (cons cache-key composed))
@@ -2990,6 +3365,155 @@ in-Emacs markdown preview, since this build has no xwidget support.
   (defconst my/eaf-pyqterminal-directory
     (expand-file-name "app/pyqterminal" my/eaf-directory))
 
+  (defun my/eaf-pyqterminal-paste-clipboard ()
+    "Ask the terminal application to paste the Windows clipboard."
+    (interactive)
+    (unless (and (boundp 'eaf--buffer-app-name)
+                 (equal eaf--buffer-app-name "pyqterminal"))
+      (user-error "Not in an EAF pyqterminal buffer"))
+    (eaf-call-async
+     "send_key_sequence"
+     eaf--buffer-id
+     "C-v"))
+
+  (defun my/eaf-pyqterminal-send-key ()
+    "Send the character produced by the Emacs input method to pyqterminal."
+    (interactive)
+    (eaf-call-async
+     "eval_function"
+     eaf--buffer-id
+     "send_text_base64"
+     (eaf--encode-string
+      (if (characterp last-command-event)
+          (char-to-string last-command-event)
+        (key-description (this-command-keys-vector))))))
+
+  (defun my/eaf-pyqterminal-send-text (text)
+    "Send TEXT to pyqterminal without EPC Unicode loss."
+    (unless (string-empty-p text)
+      (eaf-call-async
+       "eval_function"
+       eaf--buffer-id
+       "send_text_base64"
+       (eaf--encode-string text))))
+
+  (defvar-local my/eaf-pyqterminal-hangul-buffer nil)
+  (defvar-local my/eaf-pyqterminal-hangul-displayed "")
+
+  (defun my/eaf-pyqterminal-hangul-buffer ()
+    "Return the persistent Hangul composition buffer."
+    (unless (buffer-live-p my/eaf-pyqterminal-hangul-buffer)
+      (setq-local
+       my/eaf-pyqterminal-hangul-buffer
+       (generate-new-buffer " *eaf-pyqterminal-hangul*"))
+      (with-current-buffer my/eaf-pyqterminal-hangul-buffer
+        (require 'hangul)
+        (setq-local hangul-queue (make-vector 6 0))
+        (quail-setup-overlays nil)))
+    my/eaf-pyqterminal-hangul-buffer)
+
+  (defun my/eaf-pyqterminal-update-hangul (text)
+    "Replace the displayed Hangul composition with TEXT."
+    (let* ((old my/eaf-pyqterminal-hangul-displayed)
+           (limit (min (length old) (length text)))
+           (prefix 0))
+      (while (and (< prefix limit)
+                  (= (aref old prefix) (aref text prefix)))
+        (setq prefix (1+ prefix)))
+      (my/eaf-pyqterminal-send-text
+       (concat
+        (make-string (- (length old) prefix) ?\177)
+        (substring text prefix)))
+      (setq-local my/eaf-pyqterminal-hangul-displayed text)))
+
+  (defun my/eaf-pyqterminal-reset-hangul ()
+    "Commit and reset the internal Hangul composition state."
+    (when (buffer-live-p my/eaf-pyqterminal-hangul-buffer)
+      (with-current-buffer my/eaf-pyqterminal-hangul-buffer
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (setq-local hangul-queue (make-vector 6 0))
+          (quail-setup-overlays nil))))
+    (setq-local my/eaf-pyqterminal-hangul-displayed ""))
+
+  (defun my/eaf-pyqterminal-send-del ()
+    "Delete one Hangul Jaso or send a normal terminal Backspace."
+    (interactive)
+    (if (and (equal current-input-method "korean-hangul")
+             (not (string-empty-p my/eaf-pyqterminal-hangul-displayed)))
+        (let ((text
+               (with-current-buffer
+                   (my/eaf-pyqterminal-hangul-buffer)
+                 (hangul-delete-backward-char)
+                 (buffer-string))))
+          (my/eaf-pyqterminal-update-hangul text))
+      (eaf-send-key)))
+
+  (defun my/eaf-pyqterminal-commit-and-send-key ()
+    "Commit Hangul composition and send the invoking key."
+    (interactive)
+    (my/eaf-pyqterminal-reset-hangul)
+    (eaf-send-key))
+
+  (defun my/eaf-pyqterminal-enable-input-method ()
+    "Forward composed input-method characters to pyqterminal."
+    (define-key eaf-mode-map
+                [remap self-insert-command]
+                #'my/eaf-pyqterminal-send-key)
+    (add-hook 'kill-buffer-hook
+              (lambda ()
+                (when (buffer-live-p my/eaf-pyqterminal-hangul-buffer)
+                  (kill-buffer my/eaf-pyqterminal-hangul-buffer)))
+              nil t)
+    (my/eaf-pyqterminal-wrap-input-method))
+
+  (defvar-local my/eaf-pyqterminal-original-input-method-function nil)
+
+  (defun my/eaf-pyqterminal-input-method-wrapper (key)
+    "Incrementally compose and display Emacs Hangul input."
+    (if (and (equal current-input-method "korean-hangul")
+             (hangul-alphabetp key))
+        (let ((text
+               (with-current-buffer
+                   (my/eaf-pyqterminal-hangul-buffer)
+                 (let ((input-method-function nil))
+                   (hangul2-input-method-internal key))
+                 (buffer-string))))
+          (my/eaf-pyqterminal-update-hangul text)
+          nil)
+      (my/eaf-pyqterminal-reset-hangul)
+      (list key)))
+
+  (defun my/eaf-pyqterminal-wrap-input-method ()
+    "Wrap the active Emacs input method in pyqterminal buffers."
+    (when (and (equal eaf--buffer-app-name "pyqterminal")
+               current-input-method
+               input-method-function
+               (not (eq input-method-function
+                        #'my/eaf-pyqterminal-input-method-wrapper)))
+      (setq-local my/eaf-pyqterminal-original-input-method-function
+                  input-method-function)
+      (setq-local input-method-function
+                  #'my/eaf-pyqterminal-input-method-wrapper)))
+
+  (defvar-local my/eaf-pyqterminal-input-method-before-cursor nil)
+
+  (defun my/eaf-pyqterminal-cursor-input-method-advice (original status)
+    "Disable the input method in Cursor Move Mode and restore it on exit."
+    (if status
+        (progn
+          (unless my/eaf-pyqterminal-input-method-before-cursor
+            (setq-local my/eaf-pyqterminal-input-method-before-cursor
+                        current-input-method))
+          (when current-input-method
+            (deactivate-input-method))
+          (funcall original status))
+      (funcall original status)
+      (when my/eaf-pyqterminal-input-method-before-cursor
+        (activate-input-method
+         my/eaf-pyqterminal-input-method-before-cursor)
+        (setq-local my/eaf-pyqterminal-input-method-before-cursor nil))))
+
   (when (file-directory-p my/eaf-directory)
     (add-to-list 'load-path my/eaf-directory)
 
@@ -3010,5 +3534,50 @@ in-Emacs markdown preview, since this build has no xwidget support.
       (add-to-list 'load-path my/eaf-pyqterminal-directory)
       (use-package eaf-pyqterminal
         :ensure nil
-        :after eaf)))
+        :after eaf
+        :custom
+        (eaf-pyqterminal-font-family "GulimChe")
+        :config
+        (setq eaf-pyqterminal-module-path
+              (expand-file-name
+               "site-lisp/eaf-overrides/pyqterminal_unicode.py"
+               user-emacs-directory))
+        (add-hook 'eaf-pyqterminal-hook
+                  #'my/eaf-pyqterminal-enable-input-method)
+        (add-hook 'input-method-activate-hook
+                  (lambda ()
+                    (when (and (derived-mode-p 'eaf-mode)
+                               (equal eaf--buffer-app-name "pyqterminal"))
+                      (my/eaf-pyqterminal-wrap-input-method))))
+        (advice-remove
+         'eaf--toggle-cursor-move-mode
+         #'my/eaf-pyqterminal-cursor-input-method-advice)
+        (advice-add
+         'eaf--toggle-cursor-move-mode
+         :around
+         #'my/eaf-pyqterminal-cursor-input-method-advice)
+        (setf (alist-get "C-v"
+                         eaf-pyqterminal-keybinding
+                         nil nil #'string=)
+              "scroll_down_page")
+        (setf (alist-get "C-y"
+                         eaf-pyqterminal-keybinding
+                         nil nil #'string=)
+              "yank_text")
+        (setf (alist-get "DEL"
+                         eaf-pyqterminal-keybinding
+                         nil nil #'string=)
+              #'my/eaf-pyqterminal-send-del)
+        (setf (alist-get "<backspace>"
+                         eaf-pyqterminal-keybinding
+                         nil nil #'string=)
+              #'my/eaf-pyqterminal-send-del)
+        (setf (alist-get "SPC"
+                         eaf-pyqterminal-keybinding
+                         nil nil #'string=)
+              #'my/eaf-pyqterminal-commit-and-send-key)
+        (setf (alist-get "RET"
+                         eaf-pyqterminal-keybinding
+                         nil nil #'string=)
+              #'my/eaf-pyqterminal-commit-and-send-key))))
 #+end_src
