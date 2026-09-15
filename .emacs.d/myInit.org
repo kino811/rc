@@ -528,10 +528,12 @@ brings up some help
             (ccm-position-cursor))))
       (scroll-down-command (max 1 (/ (window-body-height) 2)))))
 
-  (global-set-key (kbd "C-v") #'my/scroll-half-page-down)
-  (global-set-key (kbd "M-v") #'my/scroll-half-page-up)
-  (global-set-key [next] #'my/scroll-half-page-down)
-  (global-set-key [prior] #'my/scroll-half-page-up)
+  ;; Keep standard scrolling globally.  `ccm-map' overrides these bindings
+  ;; with half-page movement only while centered-cursor-mode is active.
+  (global-set-key (kbd "C-v") #'scroll-up-command)
+  (global-set-key (kbd "M-v") #'scroll-down-command)
+  (global-set-key [next] #'scroll-up-command)
+  (global-set-key [prior] #'scroll-down-command)
 
   (defvar-local my/ccm-inhibit-centering-once nil)
 
@@ -2111,6 +2113,10 @@ in-memory accessor and must not add polling or I/O to rendering. Pricing and
 prior-day comparisons are loaded into memory by the refresh timer; SVG
 rendering uses only those cached values.
 
+Both model pickers show compact prices from this same in-memory cache.
+Candidate filtering and ACP model selection continue to use the original
+agent-shell implementation.
+
 #+begin_src emacs-lisp
   (defun my/agent-shell-send-file-or-region-to ()
     "Send files or an active region to a selected agent-shell buffer."
@@ -2535,6 +2541,119 @@ explicit CJK-capable font."
     (defun my/agent-shell--price-display ()
       "Return the default-tier price line for the current agent-shell model."
       (plist-get (my/agent-shell--price-info) :price))
+
+    (defvar my/agent-shell--model-picker-price-context nil)
+    (defvar my/agent-shell--config-option-picker-price-context nil)
+
+    (defun my/agent-shell--model-picker-price-label (model)
+      "Return a compact cached price label for MODEL."
+      (let ((price (my/agent-shell--model-default-price
+                    my/agent-shell--pricing-models
+                    (map-elt model :model-id))))
+        (if price
+            (format "I %s  O %s  C %s  W %s / 1M"
+                    (my/agent-shell--format-price
+                     (cdr (assoc-string "input" price)))
+                    (my/agent-shell--format-price
+                     (cdr (assoc-string "output" price)))
+                    (my/agent-shell--format-price
+                     (cdr (assoc-string "cachedInput" price)))
+                    (my/agent-shell--format-price
+                     (cdr (assoc-string "cacheWrite" price))))
+          "Price unavailable")))
+
+    (defun my/agent-shell--append-model-picker-prices (original &rest args)
+      "Append cached prices only while the model picker builds its candidates."
+      (let ((rows (apply original args))
+            (data (plist-get args :data)))
+        (if (and my/agent-shell--model-picker-price-context
+                 (listp rows)
+                 (listp data))
+            (seq-mapn (lambda (row model)
+                        (concat row "  "
+                                (my/agent-shell--model-picker-price-label model)))
+                      rows data)
+          rows)))
+
+    (defun my/agent-shell--model-picker-with-prices (original &optional on-success)
+      "Run ORIGINAL model picker with cached price candidate labels enabled."
+      (let ((my/agent-shell--model-picker-price-context t))
+        (funcall original on-success)))
+
+    (defun my/agent-shell--model-config-value-table-p (collection predicate)
+      "Return non-nil when COLLECTION contains exactly the active model names."
+      (when (derived-mode-p 'agent-shell-mode)
+        (let* ((candidate-names (sort (copy-sequence
+                                       (all-completions "" collection predicate))
+                                      #'string<))
+               (model-names (sort (mapcar (lambda (model) (map-elt model :name))
+                                          (agent-shell--get-available-models
+                                           (agent-shell--state)))
+                                  #'string<)))
+          (equal candidate-names model-names))))
+
+    (defun my/agent-shell--model-config-price-annotation (original state name)
+      "Append cached model pricing to ORIGINAL completion annotation for NAME."
+      (let* ((model (seq-find (lambda (entry)
+                                (string= name (map-elt entry :name)))
+                              (agent-shell--get-available-models state)))
+             (base (if original (funcall original name) "")))
+        (concat base
+                (when model
+                  (concat " "
+                          (my/agent-shell--model-picker-price-label model))))))
+
+    (defun my/agent-shell--config-option-completing-read-with-prices
+        (original prompt collection &optional predicate require-match
+                  initial-input hist def inherit-input-method)
+      "Add cached prices only to agent-shell's model config value completion."
+      (if (and my/agent-shell--config-option-picker-price-context
+               (equal prompt "Set value: ")
+               (my/agent-shell--model-config-value-table-p collection predicate))
+          (let* ((metadata (completion-metadata "" collection predicate))
+                 (annotation (completion-metadata-get metadata 'annotation-function))
+                 (state (agent-shell--state))
+                 (annotated-collection
+                  (lambda (string table-predicate action)
+                    (if (eq action 'metadata)
+                        (cons 'metadata
+                              (cons
+                               (cons
+                                'annotation-function
+                                (lambda (name)
+                                  (my/agent-shell--model-config-price-annotation
+                                   annotation state name)))
+                               (assq-delete-all
+                                'annotation-function
+                                (copy-sequence (cdr metadata)))))
+                      (complete-with-action action collection string table-predicate)))))
+            (funcall original prompt annotated-collection predicate require-match
+                     initial-input hist def inherit-input-method))
+        (funcall original prompt collection predicate require-match initial-input
+                 hist def inherit-input-method)))
+
+    (defun my/agent-shell--config-option-picker-with-prices (original &optional on-success)
+      "Run ORIGINAL config option picker with model price annotations enabled."
+      (let ((my/agent-shell--config-option-picker-price-context t))
+        (funcall original on-success)))
+
+    (unless (advice-member-p #'my/agent-shell--append-model-picker-prices
+                             'agent-shell--align-alist)
+      (advice-add 'agent-shell--align-alist :around
+                  #'my/agent-shell--append-model-picker-prices))
+    (unless (advice-member-p #'my/agent-shell--model-picker-with-prices
+                             'agent-shell-set-session-model)
+      (advice-add 'agent-shell-set-session-model :around
+                  #'my/agent-shell--model-picker-with-prices))
+    (unless (advice-member-p
+             #'my/agent-shell--config-option-completing-read-with-prices
+             'completing-read)
+      (advice-add 'completing-read :around
+                  #'my/agent-shell--config-option-completing-read-with-prices))
+    (unless (advice-member-p #'my/agent-shell--config-option-picker-with-prices
+                             'agent-shell-set-session-config-option)
+      (advice-add 'agent-shell-set-session-config-option :around
+                  #'my/agent-shell--config-option-picker-with-prices))
 
     (defun my/agent-shell--fit-price-summary (price comparison budget max-width)
       "Fit PRICE, COMPARISON, and BUDGET in MAX-WIDTH, preserving BUDGET."
