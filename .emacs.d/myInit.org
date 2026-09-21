@@ -1008,6 +1008,19 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
     (add-to-list 'org-export-filter-final-output-functions
                  #'my/org-confluence-final-output-filter)
 
+    (defun my/org-export-html-default-options (original backend &rest args)
+      "Use literal subscripts and preserve line breaks for HTML exports."
+      (if (org-export-derived-backend-p backend 'html)
+          (let ((org-export-with-sub-superscripts nil)
+                (org-export-preserve-breaks t))
+            (apply original backend args))
+        (apply original backend args)))
+
+    (unless (advice-member-p #'my/org-export-html-default-options
+                             'org-export-as)
+      (advice-add 'org-export-as :around
+                  #'my/org-export-html-default-options))
+
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)
                                    (python . t)
@@ -2486,7 +2499,7 @@ explicit CJK-capable font."
               (has-increase nil)
               (has-decrease nil))
           (dolist (field '((input . "I")
-                           (cachedInput . "C")
+                           (cachedInput . "R")
                            (cacheWrite . "W")
                            (output . "O")))
             (let ((current-value (cdr (assoc-string (symbol-name (car field)) current)))
@@ -2518,7 +2531,7 @@ explicit CJK-capable font."
         (if current
             (let ((change (my/agent-shell--price-change current previous)))
               (list :price
-                    (format "Price I %s | O %s | C %s | W %s / 1M"
+                    (format "Price I %s | O %s | R %s | W %s / 1M"
                             (my/agent-shell--format-price
                              (cdr (assoc-string "input" current)))
                             (my/agent-shell--format-price
@@ -2551,7 +2564,7 @@ explicit CJK-capable font."
                     my/agent-shell--pricing-models
                     (map-elt model :model-id))))
         (if price
-            (format "I %s  O %s  C %s  W %s / 1M"
+            (format "I %s  O %s  R %s  W %s / 1M"
                     (my/agent-shell--format-price
                      (cdr (assoc-string "input" price)))
                     (my/agent-shell--format-price
