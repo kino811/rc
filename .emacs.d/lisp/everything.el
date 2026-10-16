@@ -1,4 +1,4 @@
-;;; everything.el --- Bridge to MS Windows desktop-search engine Everything
+;;; everything.el --- Bridge to MS Windows desktop-search engine Everything  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 Martin Weinig
 
@@ -179,7 +179,7 @@ See `everything-post-process-hook' to post-process this buffer.")
 (defvar everything-log nil "Switch to enable log buffer.")
 
 
-(require 'cl)  ; find
+(require 'cl-lib)  ; cl-find, cl-search, cl-typep
 
 ;;;; User Interface
 
@@ -206,7 +206,7 @@ the current directory and its sub-directories."
 										(format "%s " (expand-file-name default-directory))
 										))
 				)))
-    (unless (if (typep query 'string) (string= query ""))
+    (unless (if (cl-typep query 'string) (string= query ""))
       (everything-select query))))
 
 
@@ -238,7 +238,7 @@ the current directory and its sub-directories."
 (defun everything-select (query)
   "Run the query query and return the chosen file.
 If query is already an existing file, return it without running a query."
-  (if (and (typep query 'string) (file-exists-p query))
+  (if (and (cl-typep query 'string) (file-exists-p query))
       query
     (let ((files (everything-locate query)))
       (cond ((eq (length files) 0)
@@ -285,18 +285,23 @@ otherwise."
 ;; -p full path
 ;; -n N result limit
 ;; -s sort by full path
+(defun everything--args-add (args elt)
+  "Return ARGS with ELT appended unless it is already a member.
+This is `add-to-list' with APPEND non-nil, but it works on a lexical variable."
+  (if (member elt args) args (append args (list elt))))
+
 (defun everything-cmd-query (query maxfiles matchcase matchwholeword matchpath)
   (when (not (file-exists-p everything-cmd)) (error (concat everything-cmd " not found")))
   (let ((args nil))
-    (when matchcase (add-to-list 'args "-i" t))
-    (when matchwholeword (add-to-list 'args "-w" t))
-    (when matchpath (add-to-list 'args "-p" t))
-    (add-to-list 'args "-n" t)
-    (add-to-list 'args (number-to-string maxfiles) t)
+    (when matchcase (setq args (everything--args-add args "-i")))
+    (when matchwholeword (setq args (everything--args-add args "-w")))
+    (when matchpath (setq args (everything--args-add args "-p")))
+    (setq args (everything--args-add args "-n"))
+    (setq args (everything--args-add args (number-to-string maxfiles)))
     ;; (add-to-list 'args "-r"  t)
-	(if (typep query 'list)
+	(if (cl-typep query 'list)
 		(setq args (append args query))
-	  (add-to-list 'args query t))
+	  (setq args (everything--args-add args query)))
     (when (get-buffer everything-result-buffer)
       (kill-buffer everything-result-buffer))
     (apply #'call-process everything-cmd nil (get-buffer-create everything-result-buffer) nil args)
@@ -305,7 +310,7 @@ otherwise."
 
 (defun everything-is-running ()
   "Check if Everything is running."
-  (find "Everything.exe"
+  (cl-find "Everything.exe"
 	(mapcar (lambda (p) (cdr (assoc 'comm (process-attributes p))))
 		(list-system-processes))
 	:test 'string=))
@@ -343,11 +348,11 @@ otherwise."
 
 (defun files-response-handler (response responsecounter)
   (when (= responsecounter 1)
-    (let* ((sep (search "\n" response))
+    (let* ((sep (cl-search "\n" response))
 	   (statusline (substring response 0 sep)))
       (everything-log (concat statusline "\n"))
       (everything-savenumfiles statusline)
-      (setq response (substring response (1+ (search "\n" response))))))    ;; delete status line
+      (setq response (substring response (1+ (cl-search "\n" response))))))    ;; delete status line
   (let ((numlines (save-excursion
 		    (set-buffer (get-buffer-create everything-result-buffer))
 		    (insert response)

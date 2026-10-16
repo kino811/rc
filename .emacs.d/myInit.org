@@ -1,6 +1,7 @@
 #+startup: overview
 * need for emacs 30 over version
 #+begin_src emacs-lisp
+;;; -*- lexical-binding: t -*-
 (require 'files)
 #+end_src
 * default options
@@ -87,6 +88,11 @@ e.g.   GtkWindow          =>  "Gtk" and "Window"
 ** tune off sound bell and use visible bell
 #+begin_src emacs-lisp
   (setq visible-bell t)
+
+  ;; `visible-bell' does not silence the bell in a Windows console Emacs
+  ;; (emacs -nw), so disable the bell entirely there. GUI keeps its bell.
+  (when (and (eq system-type 'windows-nt) (not (display-graphic-p)))
+    (setq ring-bell-function 'ignore))
 #+end_src
 
 ** delete selection when type
@@ -161,7 +167,16 @@ Double prefix uses `my/browse-url-third-browser-function'."
 #+begin_src emacs-lisp
   ;;(desktop-save-mode t)
   (setq desktop-auto-save-timeout 300)
-  (add-hook 'kill-emacs-hook #'desktop-save-in-desktop-dir)
+
+  (defun my/desktop-save-ask ()
+    "Ask whether to save the desktop when Emacs exits.
+Answer n for a temporary Emacs so it does not overwrite the saved desktop.
+Never prompt in batch mode."
+    (when (and (not noninteractive)
+               (y-or-n-p "Save desktop? "))
+      (desktop-save-in-desktop-dir)))
+
+  (add-hook 'kill-emacs-hook #'my/desktop-save-ask)
 #+end_src
 
 ** trail whitespace
@@ -201,6 +216,23 @@ for default encoding is best that utf-8
   (prefer-coding-system 'utf-8)
 
   (setq default-process-coding-system '(utf-8 . utf-8))
+
+  ;; In a Windows console Emacs (emacs -nw) the console code page is 437, so
+  ;; Hangul and powerline glyphs are shown as \uXXXX. `chcp 65001' does not
+  ;; change the output code page that Emacs reads, so switch the console to
+  ;; UTF-8 here. This must run after `set-locale-environment' above, which
+  ;; resets the terminal coding system to cp1252.
+  (defun my/w32-tty-use-utf-8 ()
+    "Switch a Windows console Emacs (emacs -nw) to UTF-8 input and output."
+    (when (and (eq system-type 'windows-nt)
+               (not (display-graphic-p))
+               (fboundp 'w32-set-console-output-codepage))
+      (w32-set-console-codepage 65001)
+      (w32-set-console-output-codepage 65001)
+      (set-terminal-coding-system 'utf-8)
+      (set-keyboard-coding-system 'utf-8)))
+
+  (my/w32-tty-use-utf-8)
 #+end_src
 
 * my custom function
@@ -353,6 +385,14 @@ try apply package for temp package that not download
     :init
     (global-hl-line-mode t)
     )
+
+  ;; A 16-color terminal (Windows console Emacs) maps the default hl-line
+  ;; color "darkolivegreen" to bright green, which hides the text on the
+  ;; current line.  Use ANSI black there (subtle, depends on the palette).
+  (when (and (not (display-graphic-p))
+             (< (display-color-cells) 256))
+    (custom-set-faces
+     '(hl-line ((t (:background "black"))))))
 #+end_src
 ** mode line
 *** powerline
@@ -368,24 +408,50 @@ customizing mode line
     (defalias 'powerline-minor-modes #'my/powerline-hide-minor-modes)
 
     (defun my/powerline-eat-pty-win-directory (original &optional face pad)
-      "Append the current eat-pty-win directory to the Powerline buffer ID."
+      "Append current Project-X and eat-pty-win details to the buffer ID."
       (let ((segment (funcall original face pad)))
-        (if (bound-and-true-p eat-pty-win-mode)
-            (let* ((directory (expand-file-name default-directory))
-                   (name (file-name-nondirectory
-                          (directory-file-name directory))))
-              (concat segment
-                      (powerline-raw
-                       (format " [epw:%s]"
-                               (if (string-empty-p name)
-                                   (abbreviate-file-name directory)
-                                 name))
-                       face 'r)))
-          segment)))
+        (when-let* ((project (and (boundp 'project-x-buffer-project)
+                                  project-x-buffer-project))
+                    ((fboundp 'project-x-name)))
+          (setq segment
+                (concat segment
+                        (powerline-raw
+                         (format " [ProjX:%s]" (project-x-name project))
+                         face 'r))))
+        (when (bound-and-true-p eat-pty-win-mode)
+          (let* ((directory (expand-file-name default-directory))
+                 (name (file-name-nondirectory
+                        (directory-file-name directory))))
+            (setq segment
+                  (concat segment
+                          (powerline-raw
+                           (format " [epw:%s]"
+                                   (if (string-empty-p name)
+                                       (abbreviate-file-name directory)
+                                     name))
+                           face 'r)))))
+        segment))
     (advice-remove 'powerline-buffer-id
                    #'my/powerline-eat-pty-win-directory)
     (advice-add 'powerline-buffer-id :around
                 #'my/powerline-eat-pty-win-directory)
+
+    ;; In a Windows console Emacs (emacs -nw) with the console switched to
+    ;; UTF-8, the private-use glyphs powerline draws (U+E0B0, U+E0B2 and the
+    ;; U+E0A1 line icon) make the console write fail ("Failed writing console
+    ;; characters: 87") and corrupt the mode line.  Use ordinary glyphs there.
+    (when (and (eq system-type 'windows-nt) (not (display-graphic-p)))
+      (setq powerline-utf-8-separator-left #x25BA
+            powerline-utf-8-separator-right #x25C4)
+      (defun my/powerline-replace-pua-glyphs (args)
+        "Replace the U+E0A1 line icon in powerline-raw's text argument."
+        (if (and (stringp (car args)) (string-match-p "\ue0a1" (car args)))
+            (cons (replace-regexp-in-string "\ue0a1" "L" (car args))
+                  (cdr args))
+          args))
+      (advice-remove 'powerline-raw #'my/powerline-replace-pua-glyphs)
+      (advice-add 'powerline-raw :filter-args
+                  #'my/powerline-replace-pua-glyphs))
 
     (powerline-default-theme)
 
@@ -609,7 +675,7 @@ brings up some help
 
   (defun my/ccm-adjust-window-near-org-inline-image ()
     "Keep point visible while moving near a large Org inline image."
-    (when-let ((overlay (my/org-recent-inline-image-overlay)))
+    (when-let* ((overlay (my/org-recent-inline-image-overlay)))
       (set-window-start
        (selected-window)
        (if (<= (line-beginning-position)
@@ -1007,6 +1073,11 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
 
     (add-to-list 'org-export-filter-final-output-functions
                  #'my/org-confluence-final-output-filter)
+
+    ;; Org export options that are `let'-bound below.  Declare them special so the
+    ;; bindings stay dynamic under lexical-binding.
+    (defvar org-export-with-sub-superscripts)
+    (defvar org-export-preserve-breaks)
 
     (defun my/org-export-html-default-options (original backend &rest args)
       "Use literal subscripts and preserve line breaks for HTML exports."
@@ -1594,9 +1665,16 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
     :ensure t)
 
   ;; 선택: 터미널에서 사용
+  ;; Emacs 31 has its own terminal popup, but on the Windows console it blanks
+  ;; the whole screen, so corfu-terminal is still needed there.  Hide the
+  ;; "corfu-terminal is not needed on Emacs 31" warning it prints on load.
   (use-package corfu-terminal
     :if (not (display-graphic-p))
     :ensure t
+    :init
+    (require 'warnings)
+    (add-to-list 'warning-suppress-types '(corfu))
+    (add-to-list 'warning-suppress-log-types '(corfu))
     :config (corfu-terminal-mode 1))
 #+end_src
 ** lsp
@@ -1684,6 +1762,11 @@ https://www.reddit.com/r/emacs/comments/o7aktl/autocomplete_vs_companymode_in_20
     :config
     (when (display-graphic-p)
   	(global-set-key (kbd "C-@") #'er/expand-region))
+
+    ;; Windows console Emacs: Ctrl+Shift+2 loses its Ctrl there, and C-@ cannot be told
+    ;; apart from C-SPC anyway.  wezterm.lua sends Ctrl+Shift+2 as C-S-<f6> instead.
+    (when (and (eq system-type 'windows-nt) (not (display-graphic-p)))
+      (global-set-key (kbd "<C-S-f6>") #'er/expand-region))
     )
 #+end_src
 ** surround or embrace
@@ -1890,6 +1973,11 @@ Juego logic tree
                     (and (equal (car item) (car want))
                          (equal (cdr item) (cdr want))))))
 
+  ;; google-translate defines this variable, but only after this function has
+  ;; `let'-bound it (the package loads on first use).  Declare it special so the
+  ;; binding stays dynamic under lexical-binding.
+  (defvar google-translate-output-destination)
+
   (defun my/google-translate-smooth-translate-popup ()
     "Run smooth translation in a popup, picking the direction from the text."
     (interactive)
@@ -1950,11 +2038,59 @@ macOS/Linux) before deciding whether to delete it and start fresh.
                     (string-match-p "\\`[0-9]+\\'" pid)
                     (not (process-attributes (string-to-number pid)))))))))
 
-  (when (my/server-file-stale-p)
-    (delete-file (my/server-file-path)))
+  (defun my/server-default-name ()
+    "Return the server name this Emacs should use at startup.
+A terminal Emacs on Windows (emacs -nw) uses \"term\" so that it does not
+collide with the GUI Emacs, which owns the default name \"server\"."
+    (if (and (eq system-type 'windows-nt) (not (display-graphic-p)))
+        "term"
+      "server"))
 
-  (unless (server-running-p)
-    (server-start))
+  (defun my/server-running-here-p ()
+    "Return non-nil if this Emacs is currently serving emacsclient."
+    (and (boundp 'server-process)
+         (processp server-process)
+         (process-live-p server-process)))
+
+  (defun my/server-start-if-free ()
+    "Start the server named `server-name' unless one is already running.
+A stale server file left by a dead Emacs is removed first."
+    (when (my/server-file-stale-p)
+      (delete-file (my/server-file-path)))
+    (unless (server-running-p)
+      (server-start)))
+
+  ;; Startup: GUI (and non-Windows) use the default name, a Windows terminal
+  ;; uses "term". In both cases do nothing if that server is already running.
+  (setq server-name (my/server-default-name))
+  (my/server-start-if-free)
+
+  (defun my/server-start-named ()
+    "Report this Emacs's server name, or ask for a name and start a server.
+If this Emacs already serves emacsclient, only report the server name and
+how to connect.  Otherwise read a name; an empty name selects the default
+server name \"server\".  Refuse if that server runs in another Emacs."
+    (interactive)
+    (if (my/server-running-here-p)
+        (message "This Emacs serves \"%s\" (connect with: %s)"
+                 server-name
+                 (if (equal server-name "server")
+                     "emacsclient FILE"
+                   (format "emacsclient --server-file=%s FILE" server-name)))
+      (let* ((input (string-trim
+                     (read-string "Server name (empty = default \"server\"): ")))
+             (name (if (string-empty-p input) "server" input)))
+        (setq server-name name)
+        (when (my/server-file-stale-p)
+          (delete-file (my/server-file-path)))
+        (if (server-running-p)
+            (user-error "Server \"%s\" is already running in another Emacs" name)
+          (server-start)
+          (message "Started server \"%s\" (connect with: %s)"
+                   name
+                   (if (equal name "server")
+                       "emacsclient FILE"
+                     (format "emacsclient --server-file=%s FILE" name)))))))
 #+end_src
 ** edit server
 #+begin_src emacs-lisp
@@ -2169,8 +2305,8 @@ agent-shell implementation.
   (defun my/agent-shell-ffap-string-at-point (original &rest args)
     "Return a resolved rendered agent-shell link before normal FFAP lookup."
     (if (derived-mode-p 'agent-shell-mode)
-        (if-let ((url (agent-shell-markdown-link-url-at-point)))
-            (if-let ((link (my/agent-shell-resolve-link-file url)))
+        (if-let* ((url (agent-shell-markdown-link-url-at-point)))
+            (if-let* ((link (my/agent-shell-resolve-link-file url)))
                 (car link)
               url)
           (apply original args))
@@ -2185,7 +2321,7 @@ agent-shell implementation.
               (link (my/agent-shell-resolve-link-file url)))
         (progn
           (find-file (car link))
-          (when-let ((line (cdr link)))
+          (when-let* ((line (cdr link)))
             (goto-char (point-min))
             (forward-line (1- line))))
       (funcall original filename)))
@@ -2202,6 +2338,27 @@ agent-shell implementation.
       (advice-add 'find-file-at-point :around
                   #'my/agent-shell-find-file-at-point)))
 
+  (defun my/agent-shell-parse-windows-link (original url)
+    "Let ORIGINAL parse Windows file links containing backslashes."
+    (funcall original
+             (if (and (eq system-type 'windows-nt)
+                      (string-match-p "\\`[[:alpha:]]:\\\\" url))
+                 (subst-char-in-string ?\\ ?/ url)
+               url)))
+
+  (defvar agent-shell-markdown-open-file-function)
+
+  (defun my/agent-shell-open-link-other-window (original url)
+    "Open local URL in another window with `C-u RET' in agent-shell."
+    (if (and (derived-mode-p 'agent-shell-mode)
+             (equal current-prefix-arg '(4)))
+        (let ((agent-shell-markdown-open-file-function
+               (lambda (file)
+                 (find-file-other-window file)
+                 (selected-window))))
+          (funcall original url))
+      (funcall original url)))
+
   (use-package agent-shell
     :ensure t
     :hook ((agent-shell-mode . (lambda ()
@@ -2212,6 +2369,14 @@ agent-shell implementation.
            ("C-c a a c l" . agent-shell-copy-link-url-at-point)
            )
     :config
+    (unless (advice-member-p #'my/agent-shell-parse-windows-link
+                             'agent-shell-markdown--parse-local-link)
+      (advice-add 'agent-shell-markdown--parse-local-link :around
+                  #'my/agent-shell-parse-windows-link))
+    (unless (advice-member-p #'my/agent-shell-open-link-other-window
+                             'agent-shell-markdown--open-link)
+      (advice-add 'agent-shell-markdown--open-link :around
+                  #'my/agent-shell-open-link-other-window))
     (when (eq system-type 'windows-nt)
   	(add-to-list 'agent-shell-clipboard-image-handlers
   				 (list
@@ -2235,7 +2400,7 @@ agent-shell implementation.
            (format "%s Agent @ %s" agent-name dir-name)))))
     (setq agent-shell-permission-responder-function
           (lambda (permission)
-            (when-let (((equal (map-elt (map-elt permission :tool-call) :kind) "read"))
+            (when-let* (((equal (map-elt (map-elt permission :tool-call) :kind) "read"))
                        (choice (seq-find
                                 (lambda (option)
                                   (equal (map-elt option :kind) "allow_once"))
@@ -2297,7 +2462,7 @@ agent-shell implementation.
       "Handle Korean input-method KEY for agent-shell permissions."
       (if (and (derived-mode-p 'agent-shell-mode)
                (agent-shell--permission-pending-p))
-          (if-let ((command (my/agent-shell-permission-command-for-key key)))
+          (if-let* ((command (my/agent-shell-permission-command-for-key key)))
               (progn
                 (call-interactively command)
                 nil)
@@ -2405,6 +2570,7 @@ explicit CJK-capable font."
 
     (defvar my/agent-shell--budget-file-mtime nil)
     (defvar my/agent-shell--budget-display "Budget: --")
+    (defvar my/agent-shell--product-spend nil)
     (defvar my/agent-shell--pricing-file-keys nil)
     (defvar my/agent-shell--pricing-models nil)
     (defvar my/agent-shell--previous-pricing-models nil)
@@ -2427,8 +2593,10 @@ explicit CJK-capable font."
                                           "currentPeriodSpend" data)))))
                        (limit (cdr (assoc-string
                                     "amount"
-                                    (cdr (assoc-string "budget" data))))))
+                                    (cdr (assoc-string "budget" data)))))
+                       (products (cdr (assoc-string "productSpend" data))))
                   (setq my/agent-shell--budget-file-mtime mtime)
+                  (setq my/agent-shell--product-spend products)
                   (setq my/agent-shell--budget-display
                         (if (and (numberp spend) (numberp limit))
                             (format "Budget $%.2f/$%.2f" spend limit)
@@ -2437,7 +2605,24 @@ explicit CJK-capable font."
           (unless (null my/agent-shell--budget-file-mtime)
             (setq my/agent-shell--budget-file-mtime nil)
             (setq my/agent-shell--budget-display "Budget: --")
+            (setq my/agent-shell--product-spend nil)
             t))))
+
+    (defun my/agent-shell--budget-for-buffer ()
+      "Return the shared budget followed by this buffer's product spend."
+      (let* ((identifier (map-nested-elt (agent-shell--state)
+                                         '(:agent-config :identifier)))
+             (product (pcase identifier
+                        ('copilot "copilot")
+                        ('claude-code "claudeCode")))
+             (amount (and product
+                          (cdr (assoc-string
+                                "amount"
+                                (cdr (assoc-string
+                                      product my/agent-shell--product-spend)))))))
+        (if (numberp amount)
+            (format "%s $%.2f" my/agent-shell--budget-display amount)
+          my/agent-shell--budget-display)))
 
     (defun my/agent-shell--pricing-file (time)
       "Return the local Copilot pricing snapshot path for TIME."
@@ -2745,7 +2930,7 @@ The two extra lines use a slightly smaller font and are memoized per buffer."
                 ((eq (plist-get (cdr display) :type) 'svg))
                 (data (plist-get (cdr display) :data)))
           (let* ((me-line (or (my/agent-shell--visible-input-first-line) ""))
-                 (budget my/agent-shell--budget-display)
+                 (budget (my/agent-shell--budget-for-buffer))
                  (price-info (my/agent-shell--price-info))
                  (price (plist-get price-info :price))
                  (comparison (plist-get price-info :comparison))
@@ -3097,7 +3282,7 @@ conversation usually starts from the bottom."
               (save-excursion
                 (agent-shell-branch--delete-tags)
                 (dolist (anchor anchors)
-                  (when-let ((pos (agent-shell-branch--find-anchor-position anchor)))
+                  (when-let* ((pos (agent-shell-branch--find-anchor-position anchor)))
                     (push (cons pos anchor) positions)))
                 (dolist (cell (nreverse positions))
                   (goto-char (car cell))
@@ -3471,6 +3656,30 @@ in-Emacs markdown preview, since this build has no xwidget support.
   ;; 터미널에서 WezTerm이 보내는 C-RET 신호를 이맥스가 이해하도록 매핑
   (unless (display-graphic-p)
     (define-key input-decode-map "\e[13;5u" [C-return]))
+
+  ;; Windows console Emacs (emacs -nw) only.  The console (ConPTY) drops or changes
+  ;; the modifiers of some keys: Ctrl+Enter and Ctrl+J both arrive as a plain RET,
+  ;; Ctrl+H arrives as <backspace> (so the help prefix was unreachable), and
+  ;; Shift+Enter arrives as M-<return> (the same as Alt+Enter), and Ctrl+Shift+Backspace
+  ;; arrives as C-\ (the same as the real Ctrl+\ key, i.e. toggle-input-method).
+  ;; Ctrl+Space and Ctrl+Shift+2 (C-@) lose their Ctrl and are inserted as plain text.
+  ;; Modified function keys do survive, so wezterm.lua sends those instead and they
+  ;; are translated back here.  GUI Emacs, macOS and Linux are not touched.
+  ;;
+  ;;   C-S-<f9>  -> C-<return>   (Ctrl+Enter; Org: C-RET inserts a heading)
+  ;;   C-S-<f10> -> C-j          (Ctrl+J; e.g. enters a directory in the minibuffer)
+  ;;   C-S-<f11> -> C-h          (Ctrl+H; the help prefix; Backspace is unchanged)
+  ;;   C-S-<f12> -> S-<return>   (Shift+Enter; Org: org-table-copy-down in a table)
+  ;;   C-S-<f8>  -> C-S-<backspace>  (Ctrl+Shift+Backspace; kill-whole-line)
+  ;;   C-S-<f7>  -> C-SPC        (Ctrl+Space; set-mark-command)
+  ;;   C-S-<f6>  -> er/expand-region, bound in the expand-region section (Ctrl+Shift+2)
+  (when (and (eq system-type 'windows-nt) (not (display-graphic-p)))
+    (define-key function-key-map (kbd "<C-S-f9>") (kbd "<C-return>"))
+    (define-key function-key-map (kbd "<C-S-f10>") (kbd "C-j"))
+    (define-key function-key-map (kbd "<C-S-f11>") (kbd "C-h"))
+    (define-key function-key-map (kbd "<C-S-f12>") (kbd "<S-return>"))
+    (define-key function-key-map (kbd "<C-S-f8>") (kbd "<C-S-backspace>"))
+    (define-key function-key-map (kbd "<C-S-f7>") (kbd "C-SPC")))
 #+end_src
 * font size
 ** default text scale
