@@ -160,6 +160,75 @@ Double prefix uses `my/browse-url-third-browser-function'."
     (define-key dired-mode-map (kbd "W") #'my/browse-url-of-dired-file))
 #+end_src
 
+** cdp browser
+#+begin_src emacs-lisp
+  ;; Launch a Chromium based browser with the DevTools protocol (CDP) enabled
+  ;; so that agents (e.g. MCP servers) can attach to it.  A dedicated profile
+  ;; is required: recent Chrome ignores the debugging port on the default one.
+  (defcustom my/cdp-browser-port 9223
+    "Remote debugging port of the CDP browser."
+    :type 'integer
+    :group 'browse-url)
+
+  (defcustom my/cdp-browser-profile-dir (expand-file-name "~/chrome-cdp")
+    "User data directory dedicated to the CDP browser."
+    :type 'directory
+    :group 'browse-url)
+
+  (defcustom my/cdp-browser-executable nil
+    "Executable of the CDP browser.  When nil, detect it automatically."
+    :type '(choice (const :tag "Auto detect" nil) file)
+    :group 'browse-url)
+
+  (defun my/cdp-browser-find-executable ()
+    "Return a Chromium based browser executable, or nil if none is found."
+    (cond
+     ((eq system-type 'windows-nt)
+      (let ((roots (delq nil (list (getenv "ProgramFiles")
+                                   (getenv "ProgramFiles(x86)")
+                                   (getenv "LOCALAPPDATA")))))
+        (seq-some
+         (lambda (rel)
+           (seq-some (lambda (root)
+                       (let ((file (expand-file-name rel root)))
+                         (and (file-exists-p file) file)))
+                     roots))
+         '("Google/Chrome/Application/chrome.exe"
+           "Microsoft/Edge/Application/msedge.exe"))))
+     ((eq system-type 'darwin)
+      (let ((file "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))
+        (and (file-exists-p file) file)))
+     (t
+      (seq-some #'executable-find
+                '("google-chrome" "google-chrome-stable"
+                  "chromium" "chromium-browser")))))
+
+  (defun my/cdp-browser-open (&optional url)
+    "Open URL in the CDP browser, starting it when needed.
+If a browser already runs with the same profile, URL opens as a new tab
+there and the debugging flags are ignored by the running instance."
+    (interactive (list (read-string "URL (empty for none): "
+                                    (thing-at-point 'url t))))
+    (let ((exe (or my/cdp-browser-executable
+                   (my/cdp-browser-find-executable))))
+      (unless exe
+        (user-error "No Chromium based browser found"))
+      (apply #'start-process "cdp-browser" nil exe
+             (format "--remote-debugging-port=%d" my/cdp-browser-port)
+             (format "--user-data-dir=%s"
+                     (expand-file-name my/cdp-browser-profile-dir))
+             (unless (or (null url) (string-empty-p url))
+               (list url)))
+      (message "CDP browser: port %d" my/cdp-browser-port)))
+
+  (defun my/browse-url-cdp-browser (url &optional _new-window)
+    "Open URL with the CDP browser."
+    (my/cdp-browser-open url))
+
+  ;; Double prefix of `my/browse-url-of-dired-file' uses the CDP browser.
+  (setq my/browse-url-third-browser-function #'my/browse-url-cdp-browser)
+#+end_src
+
 #+RESULTS:
 : #[nil ((shell-command-to-string "pbpaste")) nil]
 
@@ -224,6 +293,7 @@ for default encoding is best that utf-8
   ;; resets the terminal coding system to cp1252.
   (defun my/w32-tty-use-utf-8 ()
     "Switch a Windows console Emacs (emacs -nw) to UTF-8 input and output."
+    (interactive)
     (when (and (eq system-type 'windows-nt)
                (not (display-graphic-p))
                (fboundp 'w32-set-console-output-codepage))
@@ -233,6 +303,13 @@ for default encoding is best that utf-8
       (set-keyboard-coding-system 'utf-8)))
 
   (my/w32-tty-use-utf-8)
+
+  ;; C-z suspends a Windows console Emacs into a subshell, which resets the
+  ;; console code page and garbles Hangul. psmux prefix is also C-z, so it is
+  ;; easy to hit by accident. Disable it there only (C-x C-z still works).
+  (when (and (eq system-type 'windows-nt)
+             (not (display-graphic-p)))
+    (global-unset-key (kbd "C-z")))
 #+end_src
 
 * my custom function
