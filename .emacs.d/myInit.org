@@ -2168,6 +2168,42 @@ server name \"server\".  Refuse if that server runs in another Emacs."
                    (if (equal name "server")
                        "emacsclient FILE"
                      (format "emacsclient --server-file=%s FILE" name)))))))
+
+  (defun my/open-in-gui ()
+    "Open the file at point (dired) or the current file in the GUI Emacs.
+Meant for a terminal Emacs, which cannot show images.  The file is sent to
+the server named \"server\" with `emacsclient -n'.  In a GUI frame, or in an
+Emacs that itself serves \"server\", calling emacsclient would wait on this
+very Emacs, so the file is simply visited here instead."
+    (interactive)
+    (let* ((file (cond ((derived-mode-p 'dired-mode) (dired-get-filename))
+                       (buffer-file-name)
+                       (t (read-file-name "Open in GUI: "))))
+           (line (and buffer-file-name
+                      (file-equal-p file buffer-file-name)
+                      (line-number-at-pos))))
+      (cond
+       ((or (display-graphic-p)
+            (and (my/server-running-here-p) (equal server-name "server")))
+        (find-file file))
+       (t
+        (when (and buffer-file-name
+                   (file-equal-p file buffer-file-name)
+                   (buffer-modified-p))
+          (message "Buffer has unsaved changes; the GUI shows the saved file"))
+        (let ((exe (or (executable-find "emacsclient")
+                       (user-error "emacsclient not found")))
+              (args (append (if (eq system-type 'windows-nt)
+                                '("--server-file=server")
+                              '("-s" "server"))
+                            '("-n")
+                            (and line (list (format "+%d" line)))
+                            (list (expand-file-name file)))))
+          (with-temp-buffer
+            (if (zerop (apply #'call-process exe nil t nil args))
+                (message "Opened in GUI: %s" (file-name-nondirectory file))
+              (user-error "No GUI Emacs server: %s"
+                          (string-trim (buffer-string))))))))))
 #+end_src
 ** edit server
 #+begin_src emacs-lisp
