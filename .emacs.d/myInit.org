@@ -970,6 +970,10 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
     (require 'org-tempo)
     (require 'subr-x)
 
+    (with-eval-after-load 'ox-html
+      (setq org-html-head
+            "<style type=\"text/css\">#content { max-width: 85%; }</style>"))
+
     (use-package ob-mermaid
       :ensure t
       :config
@@ -1155,12 +1159,14 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
     ;; bindings stay dynamic under lexical-binding.
     (defvar org-export-with-sub-superscripts)
     (defvar org-export-preserve-breaks)
+    (defvar org-export-with-broken-links)
 
     (defun my/org-export-html-default-options (original backend &rest args)
-      "Use literal subscripts and preserve line breaks for HTML exports."
+      "Use literal subscripts, preserve line breaks, and mark broken HTML links."
       (if (org-export-derived-backend-p backend 'html)
           (let ((org-export-with-sub-superscripts nil)
-                (org-export-preserve-breaks t))
+                (org-export-preserve-breaks t)
+                (org-export-with-broken-links 'mark))
             (apply original backend args))
         (apply original backend args)))
 
@@ -1168,6 +1174,82 @@ If KEEP-VISIBLE is non-nil, keep the current Eshell buffer visible."
                              'org-export-as)
       (advice-add 'org-export-as :around
                   #'my/org-export-html-default-options))
+
+    (defun my/org-export-latex-preserve-breaks (original backend &rest args)
+      "Preserve source line breaks in LaTeX exports."
+      (if (org-export-derived-backend-p backend 'latex)
+          (let ((org-export-preserve-breaks t))
+            (apply original backend args))
+        (apply original backend args)))
+
+    (unless (advice-member-p #'my/org-export-latex-preserve-breaks
+                             'org-export-as)
+      (advice-add 'org-export-as :around
+                  #'my/org-export-latex-preserve-breaks))
+
+    (defun my/org-latex-separate-low-level-headline-body
+        (original headline contents info)
+      "Start the body of a low-level LaTeX HEADLINE in a new paragraph."
+      (let ((section (car (org-element-contents headline))))
+        (when (and contents
+                   (org-export-low-level-p headline info)
+                   (zerop (or (org-element-property :pre-blank headline) 0))
+                   (eq (org-element-type section) 'section)
+                   (org-element-contents section))
+          (setq contents (concat "\\par\n" contents))))
+      (funcall original headline contents info))
+
+    (with-eval-after-load 'ox-latex
+      (unless (advice-member-p
+               #'my/org-latex-separate-low-level-headline-body
+               'org-latex-headline)
+        (advice-add 'org-latex-headline :around
+                    #'my/org-latex-separate-low-level-headline-body)))
+
+    (defun my/latex/insert-org-pdf-settings ()
+      "Insert XeLaTeX Korean PDF settings into the current Org buffer."
+      (interactive)
+      (unless (derived-mode-p 'org-mode)
+        (user-error "This command requires an Org buffer"))
+      (let ((settings '("#+LATEX_COMPILER: xelatex"
+                        "#+LATEX_HEADER: \\usepackage{kotex}"
+                        "#+LATEX_HEADER: \\setmainhangulfont{Malgun Gothic}"
+                        "#+LATEX_HEADER: \\usepackage[a4paper,margin=20mm]{geometry}"))
+            (case-fold-search t))
+        (save-excursion
+          (save-restriction
+            (widen)
+            (dolist (entry
+                     '(("^[ \t]*#\\+LATEX_COMPILER:" . "#+LATEX_COMPILER: xelatex")
+                       ("^[ \t]*#\\+LATEX_HEADER:.*\\\\usepackage\\(?:\\[[^]]*\\]\\)?{kotex}"
+                        . "#+LATEX_HEADER: \\usepackage{kotex}")
+                       ("^[ \t]*#\\+LATEX_HEADER:.*\\\\setmainhangulfont"
+                        . "#+LATEX_HEADER: \\setmainhangulfont{Malgun Gothic}")
+                       ("^[ \t]*#\\+LATEX_HEADER:.*\\\\usepackage\\(?:\\[[^]]*\\]\\)?{geometry}"
+                        . "#+LATEX_HEADER: \\usepackage[a4paper,margin=20mm]{geometry}")))
+              (goto-char (point-min))
+              (while (re-search-forward (car entry) nil t)
+                (let ((existing
+                       (string-trim
+                        (buffer-substring-no-properties
+                         (line-beginning-position) (line-end-position)))))
+                  (unless (string-equal (downcase existing)
+                                        (downcase (cdr entry)))
+                    (user-error "Conflicting LaTeX setting: %s" existing)))))
+            (let (missing)
+              (dolist (setting settings)
+                (goto-char (point-min))
+                (unless (re-search-forward
+                         (concat "^[ \t]*" (regexp-quote setting) "[ \t]*$")
+                         nil t)
+                  (push setting missing)))
+              (if missing
+                  (progn
+                    (goto-char (point-min))
+                    (insert (mapconcat #'identity (nreverse missing) "\n")
+                            "\n")
+                    (message "Inserted LaTeX PDF settings"))
+                (message "LaTeX PDF settings already present")))))))
 
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)
@@ -1373,17 +1455,22 @@ Named blocks show their name; unnamed blocks show heading + index."
 #+end_src
 
 ** ox reveal
+Resolve the local reveal.js URL from the home directory without hardcoding a username.
+
 #+begin_src emacs-lisp
   (use-package ox-reveal
     :ensure t
     :config
+    (require 'browse-url)
     (cond
      ((eq system-type 'windows-nt)
       (progn
-        (setq org-reveal-root "file:///c:/Users/myjung/reveal.js")))
+        (setq org-reveal-root
+              (browse-url-file-url (expand-file-name "~/reveal.js")))))
      ((eq system-type 'darwin)
       (progn
-        (setq org-reveal-root "file:///Users/kino/reveal.js")
+        (setq org-reveal-root
+              (browse-url-file-url (expand-file-name "~/reveal.js")))
         (advice-add 'org-reveal-export-to-html-and-browse :override
                     (lambda (&optional async subtreep visible-only body-only ext-plist)
                       "Export current buffer to a reveal.js and browse HTML file."
@@ -1658,6 +1745,32 @@ possible multi edit
   	:ensure t)
 
 #+end_src
+** marktext
+#+begin_src emacs-lisp
+  (defun my/open-in-marktext ()
+    "Open the current buffer's markdown file in MarkText without blocking Emacs."
+    (interactive)
+    (let ((file (buffer-file-name))
+          (exe (or (executable-find "marktext")
+                   (let ((path (expand-file-name
+                                "Programs/marktext/marktext.exe"
+                                (getenv "LOCALAPPDATA"))))
+                     (and (file-executable-p path) path)))))
+      (unless file
+        (user-error "Buffer is not visiting a file"))
+      (unless (string-match-p "\\.\\(md\\|markdown\\)\\'" file)
+        (user-error "Not a markdown file: %s" (file-name-nondirectory file)))
+      (unless exe
+        (user-error "MarkText executable not found"))
+      (when (and (buffer-modified-p) (y-or-n-p "Save buffer before opening? "))
+        (save-buffer))
+      (start-process "marktext" nil exe (convert-standard-filename file))
+      (message "Opened in MarkText: %s" (file-name-nondirectory file))))
+#+end_src
+
+#+RESULTS:
+: my/open-in-marktext
+
 ** plantuml
 #+begin_src emacs-lisp
 
@@ -2016,6 +2129,8 @@ Juego logic tree
 #+end_src
 * translate
 ** google
+Popup translations from =C-c t t t= also update =*Google Translate*= without
+displaying another window. Use =C-x b= to revisit and copy the latest result.
 #+begin_src emacs-lisp
   ;; `google-translate-smooth-translate' picks its direction from
   ;; `google-translate-last-translation-direction', an index into
@@ -2055,8 +2170,21 @@ Juego logic tree
   ;; binding stays dynamic under lexical-binding.
   (defvar google-translate-output-destination)
 
+  (defvar my/translate-keep-result-buffer nil
+    "Whether popup output should also update the translation buffer.")
+
+  (defun my/translate--keep-popup-result (gtos)
+    "Keep GTOS in the translation buffer when requested by the popup command."
+    (when my/translate-keep-result-buffer
+      (with-current-buffer (get-buffer-create "*Google Translate*")
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (google-translate-buffer-insert-translation gtos)
+          (goto-char (point-min))
+          (set-buffer-modified-p nil)))))
+
   (defun my/google-translate-smooth-translate-popup ()
-    "Run smooth translation in a popup, picking the direction from the text."
+    "Translate in a popup and retain the result, picking the direction from text."
     (interactive)
     (let* ((text (my/translate--target-text))
            (index (if (my/translate--korean-p text)
@@ -2064,7 +2192,8 @@ Juego logic tree
                     (my/translate--direction-index "en" "ko"))))
       (when index
         (setq google-translate-last-translation-direction index))
-      (let ((google-translate-output-destination 'popup))
+      (let ((google-translate-output-destination 'popup)
+            (my/translate-keep-result-buffer t))
         (call-interactively #'google-translate-smooth-translate))))
 
   (use-package google-translate
@@ -2074,6 +2203,8 @@ Juego logic tree
            ("C-c t t t" . my/google-translate-smooth-translate-popup))
     :config
     (require 'google-translate-smooth-ui)
+    (advice-add 'google-translate-popup-output-translation :before
+                #'my/translate--keep-popup-result)
     )
   (setq google-translate-translation-directions-alist '(("en" . "ko")
                                                         ("ko" . "en")))
@@ -2378,6 +2509,11 @@ rendering uses only those cached values.
 Both model pickers show compact prices from this same in-memory cache.
 Candidate filtering and ACP model selection continue to use the original
 agent-shell implementation.
+
+The composed header cache includes the source SVG data explicitly because
+Elisp's =equal= ignores string text properties, including =display= . A model
+change must invalidate the composed image even when the header string's
+plain text is unchanged.
 
 #+begin_src emacs-lisp
   (defun my/agent-shell-send-file-or-region-to ()
@@ -3050,7 +3186,7 @@ The two extra lines use a slightly smaller font and are memoized per buffer."
                  (change-state (plist-get price-info :change-state))
                  (me-label "Me: ")
                  (window-width (agent-shell--header-width (current-buffer)))
-                 (cache-key (list result price comparison change-state budget
+                 (cache-key (list result data price comparison change-state budget
                                   me-line window-width)))
             (if (and my/agent-shell--me-line-cache
                      (equal (car my/agent-shell--me-line-cache) cache-key))
