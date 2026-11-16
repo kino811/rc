@@ -436,6 +436,13 @@ try apply package for temp package that not download
 #+begin_src emacs-lisp
   (use-package project-x
     :load-path "~/.emacs.d/site-lisp/project-x"
+    :commands (project-x-open
+               project-x-open-recent
+               project-x-close
+               project-x-find-file
+               project-x-refresh
+               project-x-import-visual-studio-solution
+               project-x-switch-buffer-project)
     :bind-keymap ("C-c p x" . project-x-map))
 #+end_src
 
@@ -1561,7 +1568,124 @@ undo, redo window layout.
     )
 #+end_src
 ** windmove
+Directional moves keep both buffers: left/right place the current buffer above
+the target; up/down place it to the target's left.  Only the destination
+group's heights or widths are equalized.  Without a left/right neighbor,
+create a full-height edge column and equalize the resulting columns.
+Compatible split groups remain combinable for subsequent window balancing.
+Without an up/down neighbor, or with only one window, do nothing.
 #+begin_src emacs-lisp
+  (defun my/windmove--edge-column (root direction)
+    "Return ROOT's outermost full-height column in DIRECTION."
+    (let ((window root))
+      (while (and (window-child window)
+                  (window-combined-p (window-child window) t))
+        (setq window (window-child window))
+        (when (eq direction 'right)
+          (while (window-next-sibling window)
+            (setq window (window-next-sibling window)))))
+      window))
+
+  (defun my/windmove--balance-group (window horizontal)
+    "Equalize WINDOW's sibling sizes along the HORIZONTAL axis."
+    (let* ((parent (window-parent window))
+           (child (window-child parent))
+           (children nil))
+      (while child
+        (push child children)
+        (setq child (window-next-sibling child)))
+      (setq children (nreverse children))
+      (let ((total (apply #'+ (mapcar
+                              (lambda (w) (window-total-size w horizontal))
+                              children)))
+            (count (length children))
+            (position 0)
+            (index 0))
+        (dolist (w (butlast children))
+          (setq index (1+ index)
+                position (+ position (window-total-size w horizontal)))
+          (let ((delta (- (/ (* total index) count) position)))
+            (unless (zerop delta)
+              (adjust-window-trailing-edge w delta horizontal))
+            (setq position (+ position delta))))
+        (let ((sizes (mapcar (lambda (w) (window-total-size w horizontal))
+                             children)))
+          (when (> (- (apply #'max sizes) (apply #'min sizes)) 1)
+            (user-error "Cannot equalize destination windows"))))))
+
+  (defun my/windmove-buffer (direction)
+    "Move the current buffer into a new split beside DIRECTION's neighbor.
+Left/right moves split above the neighbor; up/down moves split to its
+left.  Close the original window, balance the destination group, and
+select the moved buffer.  Without a left/right neighbor, create an edge
+column.  Without an up/down neighbor, leave everything unchanged."
+    (let* ((source (selected-window))
+           (target (window-in-direction direction source nil nil nil))
+           (horizontal (memq direction '(up down)))
+           (root (frame-root-window (window-frame source)))
+           (new-column (and (not target) (not horizontal)
+                            (not (window-live-p root))))
+           (split-target (if new-column
+                             (my/windmove--edge-column root direction)
+                           target))
+           (split-horizontal (or new-column horizontal)))
+      (when (or new-column
+                (and target (not (window-minibuffer-p target))))
+        (when (or (window-dedicated-p source)
+                  (and target (window-dedicated-p target))
+                  (window-parameter source 'window-side)
+                  (and target (window-parameter target 'window-side)))
+          (user-error "Cannot move buffers through dedicated or side windows"))
+        (when (< (/ (window-total-size split-target split-horizontal) 2)
+                 (max (window-min-size source split-horizontal)
+                      (window-min-size split-target split-horizontal)))
+          (user-error "Destination window is too small to split equally"))
+        (let ((configuration (current-window-configuration))
+              (overlays (with-current-buffer (window-buffer source)
+                          (delq nil
+                                (mapcar
+                                 (lambda (overlay)
+                                   (and (eq (overlay-get overlay 'window) source)
+                                        overlay))
+                                 (overlays-in (point-min) (point-max))))))
+              completed)
+          (unwind-protect
+              (let* ((window-combination-limit (if new-column nil
+                                                 window-combination-limit))
+                     (destination (split-window
+                                   split-target nil
+                                   (if new-column direction
+                                     (if horizontal 'left 'above)))))
+                (window-swap-states source destination)
+                (delete-window source)
+                (my/windmove--balance-group destination split-horizontal)
+                (select-window destination)
+                (setq completed t))
+            (unless completed
+              (set-window-configuration configuration)
+              (dolist (overlay overlays)
+                (overlay-put overlay 'window source))))))))
+
+  (defun my/windmove-buffer-left ()
+    "Move the current buffer above the left neighbor."
+    (interactive)
+    (my/windmove-buffer 'left))
+
+  (defun my/windmove-buffer-right ()
+    "Move the current buffer above the right neighbor."
+    (interactive)
+    (my/windmove-buffer 'right))
+
+  (defun my/windmove-buffer-up ()
+    "Move the current buffer to the left of the upper neighbor."
+    (interactive)
+    (my/windmove-buffer 'up))
+
+  (defun my/windmove-buffer-down ()
+    "Move the current buffer to the left of the lower neighbor."
+    (interactive)
+    (my/windmove-buffer 'down))
+
   (use-package windmove
     :ensure t
     :bind (("C-c w h" . windmove-left)
@@ -1572,6 +1696,10 @@ undo, redo window layout.
            ("C-c w s j" . windmove-swap-states-down)
            ("C-c w s k" . windmove-swap-states-up)
            ("C-c w s l" . windmove-swap-states-right)
+           ("C-c w m h" . my/windmove-buffer-left)
+           ("C-c w m j" . my/windmove-buffer-down)
+           ("C-c w m k" . my/windmove-buffer-up)
+           ("C-c w m l" . my/windmove-buffer-right)
            ))
 #+end_src
 
