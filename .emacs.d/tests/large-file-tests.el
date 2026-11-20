@@ -2,13 +2,32 @@
 
 (require 'ert)
 
-(let ((source (expand-file-name "../myInit.org"
-                                (file-name-directory load-file-name))))
+(load (expand-file-name "../large-file-setup.el"
+                        (file-name-directory load-file-name))
+      nil t)
+
+(ert-deftest my/large-file-hook-registered ()
+  (should (memq #'my-find-fie-check-make-large-file-read-only-hook
+                find-file-hook)))
+
+(ert-deftest my/large-file-line-numbers-off ()
   (with-temp-buffer
-    (insert-file-contents source)
-    (search-forward "(defun my-find-fie-check-make-large-file-read-only-hook ")
-    (goto-char (match-beginning 0))
-    (eval (read (current-buffer)) t)))
+    (insert (make-string (1+ (* 1024 1024)) ?x))
+    (text-mode)
+    (display-line-numbers-mode 1)
+    (my-find-fie-check-make-large-file-read-only-hook)
+    (should-not display-line-numbers-mode)))
+
+(ert-deftest my/large-file-line-numbers-off-with-global-mode ()
+  (let ((was-on global-display-line-numbers-mode))
+    (unwind-protect
+        (with-temp-buffer
+          (global-display-line-numbers-mode 1)
+          (insert (make-string (1+ (* 1024 1024)) ?x))
+          (text-mode)
+          (my-find-fie-check-make-large-file-read-only-hook)
+          (should-not display-line-numbers-mode))
+      (global-display-line-numbers-mode (if was-on 1 -1)))))
 
 (ert-deftest my/large-file-image-mode-preserved ()
   (with-temp-buffer

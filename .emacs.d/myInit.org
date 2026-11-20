@@ -286,30 +286,17 @@ for default encoding is best that utf-8
 
   (setq default-process-coding-system '(utf-8 . utf-8))
 
-  ;; In a Windows console Emacs (emacs -nw) the console code page is 437, so
-  ;; Hangul and powerline glyphs are shown as \uXXXX. `chcp 65001' does not
-  ;; change the output code page that Emacs reads, so switch the console to
-  ;; UTF-8 here. This must run after `set-locale-environment' above, which
-  ;; resets the terminal coding system to cp1252.
-  (defun my/w32-tty-use-utf-8 ()
-    "Switch a Windows console Emacs (emacs -nw) to UTF-8 input and output."
-    (interactive)
-    (when (and (eq system-type 'windows-nt)
-               (not (display-graphic-p))
-               (fboundp 'w32-set-console-output-codepage))
-      (w32-set-console-codepage 65001)
-      (w32-set-console-output-codepage 65001)
-      (set-terminal-coding-system 'utf-8)
-      (set-keyboard-coding-system 'utf-8)))
-
-  (my/w32-tty-use-utf-8)
-
-  ;; C-z suspends a Windows console Emacs into a subshell, which resets the
-  ;; console code page and garbles Hangul. psmux prefix is also C-z, so it is
-  ;; easy to hit by accident. Disable it there only (C-x C-z still works).
-  (when (and (eq system-type 'windows-nt)
-             (not (display-graphic-p)))
-    (global-unset-key (kbd "C-z")))
+  ;; Windows console Emacs (emacs -nw) support lives in w32-tty.el next to
+  ;; this file, shared with quick-init.el (windows/bin/emacs-q): UTF-8
+  ;; console, C-z disabled, WezTerm carrier keys, input freeze guard.  It must
+  ;; run after `set-locale-environment' above, which resets the terminal
+  ;; coding system to cp1252.  Does nothing in GUI Emacs or on macOS/Linux.
+  (let ((w32-tty (expand-file-name "w32-tty.el"
+                                   (file-name-directory
+                                    (or load-file-name buffer-file-name)))))
+    (if (load w32-tty t t)
+        (my/w32-tty-setup)
+      (message "w32-tty.el not found: %s" w32-tty)))
 #+end_src
 
 * my custom function
@@ -317,20 +304,16 @@ for default encoding is best that utf-8
 Keep image buffers in their image mode; the large-file fallback is only
 for non-image buffers.
 
-#+begin_src emacs-lisp
-  (defun my-find-fie-check-make-large-file-read-only-hook ()
-    "Make non-image buffers over 1 MiB read only for speed."
-    (when (and (not (derived-mode-p 'image-mode))
-               (> (buffer-size) (* 1024 1024)))
-      (setq buffer-read-only t)
-      (buffer-disable-undo)
-      (fundamental-mode)
-      (display-line-numbers-mode nil)))
-#+end_src
+The hook function and its =find-file-hook= entry live in large-file-setup.el next
+to this file, shared with quick-init.el (windows/bin/emacs-q) and tested by
+tests/large-file-tests.el.
 
-*** set when find file
 #+begin_src emacs-lisp
-  (add-hook 'find-file-hook 'my-find-fie-check-make-large-file-read-only-hook)
+  (let ((setup (expand-file-name "large-file-setup.el"
+                                 (file-name-directory
+                                  (or load-file-name buffer-file-name)))))
+    (unless (load setup t t)
+      (message "large-file-setup.el not found: %s" setup)))
 #+end_src
 ** current buffer name
 #+begin_src emacs-lisp
@@ -2264,82 +2247,17 @@ Juego logic tree
 Popup translations from =C-c t t t= also update =*Google Translate*= without
 displaying another window. Use =C-x b= to revisit and copy the latest result.
 #+begin_src emacs-lisp
-  ;; `google-translate-smooth-translate' picks its direction from
-  ;; `google-translate-last-translation-direction', an index into
-  ;; `google-translate-translation-directions-alist'. Setting that index before
-  ;; the call switches the direction to match the text, while leaving the
-  ;; minibuffer's own C-n/C-p direction cycling intact.
-  (defun my/translate--count-matches (regexp text)
-    "Return how many characters in TEXT match REGEXP."
-    (let ((count 0)
-          (start 0))
-      (while (string-match regexp text start)
-        (setq count (1+ count))
-        (setq start (match-end 0)))
-      count))
-
-  (defun my/translate--korean-p (text)
-    "Return non-nil when TEXT holds more Hangul than Latin characters."
-    (> (my/translate--count-matches "[가-힣ㄱ-ㅎㅏ-ㅣ]" text)
-       (my/translate--count-matches "[A-Za-z]" text)))
-
-  (defun my/translate--target-text ()
-    "Return the text `google-translate-smooth-translate' would translate."
-    (if (use-region-p)
-        (buffer-substring-no-properties (region-beginning) (region-end))
-      (or (current-word t t) "")))
-
-  (defun my/translate--direction-index (source target)
-    "Return the index of SOURCE to TARGET in the directions alist, or nil."
-    (seq-position google-translate-translation-directions-alist
-                  (cons source target)
-                  (lambda (item want)
-                    (and (equal (car item) (car want))
-                         (equal (cdr item) (cdr want))))))
-
-  ;; google-translate defines this variable, but only after this function has
-  ;; `let'-bound it (the package loads on first use).  Declare it special so the
-  ;; binding stays dynamic under lexical-binding.
-  (defvar google-translate-output-destination)
-
-  (defvar my/translate-keep-result-buffer nil
-    "Whether popup output should also update the translation buffer.")
-
-  (defun my/translate--keep-popup-result (gtos)
-    "Keep GTOS in the translation buffer when requested by the popup command."
-    (when my/translate-keep-result-buffer
-      (with-current-buffer (get-buffer-create "*Google Translate*")
-        (let ((inhibit-read-only t))
-          (erase-buffer)
-          (google-translate-buffer-insert-translation gtos)
-          (goto-char (point-min))
-          (set-buffer-modified-p nil)))))
-
-  (defun my/google-translate-smooth-translate-popup ()
-    "Translate in a popup and retain the result, picking the direction from text."
-    (interactive)
-    (let* ((text (my/translate--target-text))
-           (index (if (my/translate--korean-p text)
-                      (my/translate--direction-index "ko" "en")
-                    (my/translate--direction-index "en" "ko"))))
-      (when index
-        (setq google-translate-last-translation-direction index))
-      (let ((google-translate-output-destination 'popup)
-            (my/translate-keep-result-buffer t))
-        (call-interactively #'google-translate-smooth-translate))))
-
+  ;; use-package only installs the package here.  The commands, the direction
+  ;; picking and the C-c t t keys live in google-translate-setup.el next to
+  ;; this file, shared with quick-init.el (windows/bin/emacs-q).
   (use-package google-translate
     :ensure t
-    :bind (("C-c t t a" . google-translate-at-point)
-           ("C-c t t q" . google-translate-query-translate)
-           ("C-c t t t" . my/google-translate-smooth-translate-popup))
-    :config
-    (require 'google-translate-smooth-ui)
-    (advice-add 'google-translate-popup-output-translation :before
-                #'my/translate--keep-popup-result)
-    )
-  (setq google-translate-translation-directions-alist '(("en" . "ko")
-                                                        ("ko" . "en")))
+    :defer t)
+  (let ((setup (expand-file-name "google-translate-setup.el"
+                                 (file-name-directory
+                                  (or load-file-name buffer-file-name)))))
+    (unless (load setup t t)
+      (message "google-translate-setup.el not found: %s" setup)))
 #+end_src
 * server
 ** emacs server
@@ -4077,64 +3995,10 @@ in-Emacs markdown preview, since this build has no xwidget support.
   (unless (display-graphic-p)
     (define-key input-decode-map "\e[13;5u" [C-return]))
 
-  ;; Windows console Emacs (emacs -nw) only.  The console (ConPTY) drops or changes
-  ;; the modifiers of some keys: Ctrl+Enter and Ctrl+J both arrive as a plain RET,
-  ;; Ctrl+H arrives as <backspace> (so the help prefix was unreachable), and
-  ;; Shift+Enter arrives as M-<return> (the same as Alt+Enter), and Ctrl+Shift+Backspace
-  ;; arrives as C-\ (the same as the real Ctrl+\ key, i.e. toggle-input-method).
-  ;; Ctrl+Space and Ctrl+Shift+2 (C-@) lose their Ctrl and are inserted as plain text.
-  ;; Modified function keys do survive, so wezterm.lua sends those instead and they
-  ;; are translated back here.  GUI Emacs, macOS and Linux are not touched.
-  ;;
-  ;;   C-S-<f9>  -> C-<return>   (Ctrl+Enter; Org: C-RET inserts a heading)
-  ;;   C-S-<f10> -> C-j          (Ctrl+J; e.g. enters a directory in the minibuffer)
-  ;;   C-S-<f11> -> C-h          (Ctrl+H; the help prefix; Backspace is unchanged)
-  ;;   C-S-<f12> -> S-<return>   (Shift+Enter; Org: org-table-copy-down in a table)
-  ;;   C-S-<f8>  -> C-S-<backspace>  (Ctrl+Shift+Backspace; kill-whole-line)
-  ;;   C-S-<f7>  -> C-SPC        (Ctrl+Space; set-mark-command)
-  ;;   C-S-<f6>  -> er/expand-region, bound in the expand-region section (Ctrl+Shift+2)
-  (when (and (eq system-type 'windows-nt) (not (display-graphic-p)))
-    (define-key function-key-map (kbd "<C-S-f9>") (kbd "<C-return>"))
-    (define-key function-key-map (kbd "<C-S-f10>") (kbd "C-j"))
-    (define-key function-key-map (kbd "<C-S-f11>") (kbd "C-h"))
-    (define-key function-key-map (kbd "<C-S-f12>") (kbd "<S-return>"))
-    (define-key function-key-map (kbd "<C-S-f8>") (kbd "<C-S-backspace>"))
-    (define-key function-key-map (kbd "<C-S-f7>") (kbd "C-SPC")))
-#+end_src
-** input freeze guard
-Windows terminal Emacs in a WezTerm + psmux pane sometimes stops taking keys because
-the console input mode gets the VT input flag (0x200).  Start
-~/rc/windows/emacs-input-guard.ps1 for this Emacs only: it clears the flag, logs
-diagnostics to ~/.emacs-input-guard.log, and exits with Emacs, so no logon auto-start
-entry is needed.
-#+begin_src emacs-lisp
-  (defun my/w32-tty-start-input-guard ()
-    "Start emacs-input-guard.ps1 for this Emacs process.
-Windows terminal Emacs only.  Does nothing when the script or
-powershell.exe is missing, or when the guard is already running."
-    (interactive)
-    (let ((script (expand-file-name "~/rc/windows/emacs-input-guard.ps1"))
-          (powershell (executable-find "powershell")))
-      (cond
-       ((not (and (eq system-type 'windows-nt) (not (display-graphic-p))))
-        (message "Input guard is only for Windows terminal Emacs"))
-       ((not (and powershell (file-exists-p script)))
-        (message "Input guard not started: %s or powershell.exe not found" script))
-       ((process-live-p (get-process "emacs-input-guard"))
-        (message "Input guard is already running"))
-       (t
-        (make-process
-         :name "emacs-input-guard"
-         :buffer nil
-         :connection-type 'pipe
-         :noquery t
-         :command (list powershell "-NoProfile" "-NonInteractive"
-                        "-ExecutionPolicy" "Bypass" "-File" script
-                        "-TargetPid" (number-to-string (emacs-pid))))))))
-
-  (when (and (eq system-type 'windows-nt) (not (display-graphic-p))
-             (not noninteractive))
-    (my/w32-tty-start-input-guard))
+  ;; Windows console Emacs (emacs -nw): the WezTerm carrier keys
+  ;; (Ctrl+Shift+Fn -> C-RET, C-j, C-h, S-RET, C-S-BS, C-SPC) and the input
+  ;; freeze guard (emacs-input-guard.ps1) are set up by w32-tty.el, loaded in
+  ;; the language/encoding section.
 #+end_src
 * font size
 ** default text scale
