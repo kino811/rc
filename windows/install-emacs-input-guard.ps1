@@ -4,6 +4,10 @@
 # Run once per Windows machine that uses terminal Emacs (emacs -nw) in WezTerm + psmux.
 # Re-running is safe: the shortcut is overwritten and only one guard runs at a time.
 #
+# Optional since 2026-11-20: myInit.org now starts a guard for each Windows terminal Emacs
+# (emacs-input-guard.ps1 -TargetPid), which needs no logon auto-start entry.  Use this
+# installer only for terminal Emacs started without that config (e.g. emacs -Q).
+#
 # Usage:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File install-emacs-input-guard.ps1
 #   powershell -NoProfile -ExecutionPolicy Bypass -File install-emacs-input-guard.ps1 -Uninstall

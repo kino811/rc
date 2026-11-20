@@ -4101,6 +4101,41 @@ in-Emacs markdown preview, since this build has no xwidget support.
     (define-key function-key-map (kbd "<C-S-f8>") (kbd "<C-S-backspace>"))
     (define-key function-key-map (kbd "<C-S-f7>") (kbd "C-SPC")))
 #+end_src
+** input freeze guard
+Windows terminal Emacs in a WezTerm + psmux pane sometimes stops taking keys because
+the console input mode gets the VT input flag (0x200).  Start
+~/rc/windows/emacs-input-guard.ps1 for this Emacs only: it clears the flag, logs
+diagnostics to ~/.emacs-input-guard.log, and exits with Emacs, so no logon auto-start
+entry is needed.
+#+begin_src emacs-lisp
+  (defun my/w32-tty-start-input-guard ()
+    "Start emacs-input-guard.ps1 for this Emacs process.
+Windows terminal Emacs only.  Does nothing when the script or
+powershell.exe is missing, or when the guard is already running."
+    (interactive)
+    (let ((script (expand-file-name "~/rc/windows/emacs-input-guard.ps1"))
+          (powershell (executable-find "powershell")))
+      (cond
+       ((not (and (eq system-type 'windows-nt) (not (display-graphic-p))))
+        (message "Input guard is only for Windows terminal Emacs"))
+       ((not (and powershell (file-exists-p script)))
+        (message "Input guard not started: %s or powershell.exe not found" script))
+       ((process-live-p (get-process "emacs-input-guard"))
+        (message "Input guard is already running"))
+       (t
+        (make-process
+         :name "emacs-input-guard"
+         :buffer nil
+         :connection-type 'pipe
+         :noquery t
+         :command (list powershell "-NoProfile" "-NonInteractive"
+                        "-ExecutionPolicy" "Bypass" "-File" script
+                        "-TargetPid" (number-to-string (emacs-pid))))))))
+
+  (when (and (eq system-type 'windows-nt) (not (display-graphic-p))
+             (not noninteractive))
+    (my/w32-tty-start-input-guard))
+#+end_src
 * font size
 ** default text scale
 #+begin_src emacs-lisp
