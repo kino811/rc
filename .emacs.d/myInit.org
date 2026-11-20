@@ -25,7 +25,7 @@
 #+end_src
 ** customization file
 #+begin_src emacs-lisp
-  (let ((emacs-custom-path "~/.emacs.d/emacs-custom.el"))
+  (let ((emacs-custom-path "~/rc/.emacs.d/emacs-custom.el"))
     (when (file-exists-p emacs-custom-path)
       (setq custom-file emacs-custom-path)
       (load custom-file)
