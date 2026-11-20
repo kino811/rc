@@ -314,10 +314,14 @@ for default encoding is best that utf-8
 
 * my custom function
 ** check big file
+Keep image buffers in their image mode; the large-file fallback is only
+for non-image buffers.
+
 #+begin_src emacs-lisp
   (defun my-find-fie-check-make-large-file-read-only-hook ()
-    "If a file is over a given size, make the buffer read only for speed."
-    (when (> (buffer-size) (* 1024 1024))
+    "Make non-image buffers over 1 MiB read only for speed."
+    (when (and (not (derived-mode-p 'image-mode))
+               (> (buffer-size) (* 1024 1024)))
       (setq buffer-read-only t)
       (buffer-disable-undo)
       (fundamental-mode)
@@ -2638,6 +2642,11 @@ Both model pickers show compact prices from this same in-memory cache.
 Candidate filtering and ACP model selection continue to use the original
 agent-shell implementation.
 
+Model config changes verify the updated option before running the success
+callback. If the agent returns a different model, report the requested and
+current models through the failure callback (or a message), leaving the
+agent's returned state and header unchanged.
+
 The composed header cache includes the source SVG data explicitly because
 Elisp's =equal= ignores string text properties, including =display= . A model
 change must invalidate the composed image even when the header string's
@@ -2736,6 +2745,36 @@ plain text is unchanged.
           (funcall original url))
       (funcall original url)))
 
+  (defun my/agent-shell-verify-model-change (original &rest args)
+    "Prevent a model success message when the updated option differs."
+    (let* ((config-id (plist-get args :config-id))
+           (option (agent-shell--config-option-get
+                    :state (agent-shell--state) :id config-id)))
+      (if (not (equal (map-elt option :category) "model"))
+          (apply original args)
+        (let ((requested (plist-get args :value))
+              (on-success (plist-get args :on-success))
+              (on-failure (plist-get args :on-failure)))
+          (apply original
+                 (plist-put
+                  (copy-sequence args) :on-success
+                  (lambda ()
+                    (let* ((updated (agent-shell--config-option-get
+                                     :state (agent-shell--state) :id config-id))
+                           (actual (map-elt updated :current-value)))
+                      (if (equal requested actual)
+                          (when on-success
+                            (funcall on-success))
+                        (let ((text
+                               (format
+                                "Model change not applied: requested %s; current model: %s"
+                                (agent-shell--config-option-value-name option requested)
+                                (or (agent-shell--config-option-value-name updated actual)
+                                    "unknown"))))
+                          (if on-failure
+                              (funcall on-failure `((message . ,text)) nil)
+                            (message "%s" text))))))))))))
+
   (use-package agent-shell
     :ensure t
     :hook ((agent-shell-mode . (lambda ()
@@ -2746,6 +2785,10 @@ plain text is unchanged.
            ("C-c a a c l" . agent-shell-copy-link-url-at-point)
            )
     :config
+    (unless (advice-member-p #'my/agent-shell-verify-model-change
+                             'agent-shell--set-session-config-option)
+      (advice-add 'agent-shell--set-session-config-option :around
+                  #'my/agent-shell-verify-model-change))
     (unless (advice-member-p #'my/agent-shell-parse-windows-link
                              'agent-shell-markdown--parse-local-link)
       (advice-add 'agent-shell-markdown--parse-local-link :around
