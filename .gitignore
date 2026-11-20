@@ -8,3 +8,4 @@
 *.lua#
 # yazi plugins are installed from .config/yazi/package.toml (`ya pkg install`).
 /.config/yazi/plugins/
+__pycache__/

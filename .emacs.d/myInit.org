@@ -4200,7 +4200,7 @@ in-Emacs markdown preview, since this build has no xwidget support.
         :config
         (setq eaf-pyqterminal-module-path
               (expand-file-name
-               "site-lisp/eaf-overrides/pyqterminal_unicode.py"
+               "~/rc/.emacs.d/site-lisp/eaf-overrides/pyqterminal_unicode.py"
                user-emacs-directory))
         (add-hook 'eaf-pyqterminal-hook
                   #'my/eaf-pyqterminal-enable-input-method)
