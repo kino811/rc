@@ -1,0 +1,2 @@
+# Shell scripts must keep LF endings even with core.autocrlf=true.
+windows/bin/emacs-q text eol=lf

@@ -1,0 +1,6 @@
+#!/bin/sh
+# emacs-q - quick terminal Emacs with a minimal config (Git Bash on Windows).
+# Usage: emacs-q [file ...]
+# Loads .emacs.d/quick-init.el from this repo instead of the full init.
+here=$(cd "$(dirname "$0")" && pwd)
+exec emacs -nw -Q -l "$here/../../.emacs.d/quick-init.el" "$@"
