@@ -1,0 +1,22 @@
+[opener]
+edit = [
+  { run = 'emacs-q %s', block = true, desc = "emacs-q (terminal)", for = "windows" },
+]
+# `start` hands the launch to the shell (keeps focus rights); Code.exe is found by name.
+code = [
+  { run = 'cmd /c start "" Code.exe %s', block = false, orphan = true, desc = "VS Code", for = "windows" },
+]
+# Opens with the app associated with the file type (like double-clicking in Explorer).
+assoc = [
+  { run = 'cmd /c start "" %s', block = false, orphan = true, desc = "Open (default app)", for = "windows" },
+]
+# Opens in the always-running GUI Emacs (server "server"); -n returns at once.
+emacs = [
+  { run = 'emacsclient -n %s', block = false, orphan = true, desc = "Emacs (GUI)", for = "windows" },
+]
+
+[open]
+prepend_rules = [
+  { mime = "text/*",           use = ["edit", "code", "emacs", "assoc"] },
+  { mime = "application/json", use = ["edit", "code", "emacs", "assoc"] },
+]

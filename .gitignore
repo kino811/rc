@@ -6,3 +6,5 @@
 *.log
 *.org_archive
 *.lua#
+# yazi plugins are installed from .config/yazi/package.toml (`ya pkg install`).
+/.config/yazi/plugins/

@@ -1,0 +1,86 @@
+[[mgr.prepend_keymap]]
+on   = "!"
+run  = 'shell "pwsh" --block'
+desc = "PowerShell here"
+
+# o + h/j/k/l (vim keys): open the selected files in emacs-q in a new psmux pane ("other" pane)
+# on that side of this pane. o o: pick the side automatically (longer side).
+# Done by windows/bin/yazi-pane-open.cmd in the rc repo. yazi does not wait; the pane closes when Emacs exits.
+# Enter still opens in this pane.
+[[mgr.prepend_keymap]]
+on   = ["o", "h"]
+run  = "shell 'yazi-pane-open left %s' --orphan"
+desc = "emacs-q in a new pane on the left"
+
+[[mgr.prepend_keymap]]
+on   = ["o", "l"]
+run  = "shell 'yazi-pane-open right %s' --orphan"
+desc = "emacs-q in a new pane on the right"
+
+[[mgr.prepend_keymap]]
+on   = ["o", "k"]
+run  = "shell 'yazi-pane-open up %s' --orphan"
+desc = "emacs-q in a new pane above"
+
+[[mgr.prepend_keymap]]
+on   = ["o", "j"]
+run  = "shell 'yazi-pane-open down %s' --orphan"
+desc = "emacs-q in a new pane below"
+
+[[mgr.prepend_keymap]]
+on   = ["o", "o"]
+run  = "shell 'yazi-pane-open auto %s' --orphan"
+desc = "emacs-q in a new pane (auto side)"
+
+# q: quit without moving the shell. Q: quit and move the shell to this folder.
+# Both rely on the `yazi` wrapper (windows/bin/yazi.ps1 in the rc repo), which passes --cwd-file.
+[[mgr.prepend_keymap]]
+on   = "q"
+run  = "quit --no-cwd-file"
+desc = "Quit without changing the shell directory"
+
+[[mgr.prepend_keymap]]
+on   = "Q"
+run  = "quit"
+desc = "Quit and change the shell directory to here"
+
+# yamb.yazi bookmarks (u = bookmark prefix). Setup is in init.lua.
+[[mgr.prepend_keymap]]
+on   = ["u", "a"]
+run  = "plugin yamb -- save"
+desc = "Add bookmark"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "g"]
+run  = "plugin yamb -- jump_by_key"
+desc = "Jump bookmark by key"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "G"]
+run  = "plugin yamb -- jump_by_fzf"
+desc = "Jump bookmark by fzf"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "d"]
+run  = "plugin yamb -- delete_by_key"
+desc = "Delete bookmark by key"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "D"]
+run  = "plugin yamb -- delete_by_fzf"
+desc = "Delete bookmark by fzf"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "A"]
+run  = "plugin yamb -- delete_all"
+desc = "Delete all bookmarks"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "r"]
+run  = "plugin yamb -- rename_by_key"
+desc = "Rename bookmark by key"
+
+[[mgr.prepend_keymap]]
+on   = ["u", "R"]
+run  = "plugin yamb -- rename_by_fzf"
+desc = "Rename bookmark by fzf"
