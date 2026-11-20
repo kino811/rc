@@ -9,7 +9,9 @@ end
 config.disable_default_key_bindings = true
 
 -- 2. [핵심] 현대적 키보드 프로토콜 활성화
-config.enable_csi_u_key_encoding = true
+--    Off on Windows: ConPTY drops Shift from the CSI u Shift+Enter, so Claude Code
+--    saw a plain Enter (submit) instead of a newline.
+config.enable_csi_u_key_encoding = not wezterm.target_triple:find('windows')
 
 -- 3. [핵심] 한글 입력 및 물리 키 신호 관련
 config.use_ime = true
