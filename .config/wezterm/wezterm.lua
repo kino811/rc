@@ -79,8 +79,8 @@ end
 --   Ctrl+Enter -> Ctrl+Shift+F9   (Emacs: C-S-<f9>  -> C-<return>)
 --   Ctrl+J     -> Ctrl+Shift+F10  (Emacs: C-S-<f10> -> C-j)
 --   Ctrl+H     -> Ctrl+Shift+F11  (Emacs: C-S-<f11> -> C-h, the help prefix)
---   Shift+Enter-> Ctrl+Shift+F12  (Emacs: C-S-<f12> -> S-<return>; Org uses it for
---                                  org-table-copy-down)
+--   (Shift+Enter is intentionally not remapped, so it reaches every program the
+--    same way, e.g. as a newline in Claude Code.  Terminal Emacs gets M-<return>.)
 --   Ctrl+Shift+Backspace -> Ctrl+Shift+F8
 --                                 (Emacs: C-S-<f8> -> C-S-<backspace>, kill-whole-line)
 --   Ctrl+Space   -> Ctrl+Shift+F7 (Emacs: C-S-<f7> -> C-SPC, set-mark-command)
@@ -89,8 +89,7 @@ end
 --
 -- Side effects: in other programs inside WezTerm, Ctrl+J no longer acts as Enter,
 -- Ctrl+H no longer acts as Backspace (the Backspace key itself is unchanged), and
--- Shift+Enter no longer inserts a newline in Claude Code: use Alt+Enter there.  Ctrl+Space
--- and Ctrl+Shift+2 no longer insert a space or an @.
+-- Ctrl+Space and Ctrl+Shift+2 no longer insert a space or an @.
 -- macOS and Linux are not affected by this block.
 if wezterm.target_triple:find('windows') then
   local carriers = {
@@ -99,7 +98,6 @@ if wezterm.target_triple:find('windows') then
     -- phys: keeps it working while the Korean IME is on
     { 'phys:J', 'CTRL', '\x1b[21;6~' },  -- Ctrl+Shift+F10
     { 'phys:H', 'CTRL', '\x1b[23;6~' },  -- Ctrl+Shift+F11
-    { 'Enter', 'SHIFT', '\x1b[24;6~' },  -- Ctrl+Shift+F12
     { 'Backspace', 'CTRL|SHIFT', '\x1b[19;6~' },  -- Ctrl+Shift+F8
     { 'phys:Space', 'CTRL', '\x1b[18;6~' },  -- Ctrl+Shift+F7
     { 'phys:2', 'CTRL|SHIFT', '\x1b[17;6~' },  -- Ctrl+Shift+F6
