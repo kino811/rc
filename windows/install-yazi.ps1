@@ -7,13 +7,14 @@
 #      which needs no admin rights). An existing config folder is renamed to config.bak-<time>.
 #   2. Writes small forwarder scripts that call the real scripts in windows\bin:
 #        <WrapperDir>\yazi.ps1        `yazi` wrapper; q/Q in yazi move the shell (cwd-file).
-#                                     WrapperDir must come before the yazi.exe folder in PATH.
+#                                     WrapperDir must come before the yazi.exe folder in PATH
+#                                     (default ~/bin, put first in the system PATH by install.ps1).
 #        <BinDir>\yazi-pane-open.cmd  used by the yazi "o" keys (emacs-q in a new psmux pane).
 #   3. Installs the plugins listed in .config\yazi\package.toml (`ya pkg install`).
 #   4. Reports missing tools and PATH problems. It does not change PATH and does not
 #      register anything to run at logon.
 param(
-    [string]$WrapperDir = 'C:\usr\bin',
+    [string]$WrapperDir = (Join-Path $HOME 'bin'),
     [string]$BinDir = (Join-Path $HOME 'bin')
 )
 $ErrorActionPreference = 'Stop'
