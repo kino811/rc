@@ -1387,6 +1387,16 @@ Named blocks show their name; unnamed blocks show heading + index."
 #+RESULTS:
 : my/org-babel-select-named-src-block
 
+** html single file
+Make NAME-single.html with the local images embedded, so an exported HTML can be
+sent as one file.  =M-x my/html-make-single-file= asks for the HTML file (default:
+the file at point in dired, or the .html of the Org buffer), and the Org export
+menu gets =C-c C-e h s= (=h S= also opens the result).  The code is in
+lisp/html-single-file.el, shared with quick-init.el (windows/bin/emacs-q).
+#+begin_src emacs-lisp
+  (require 'html-single-file nil t)
+#+end_src
+
 ** org bullets
 #+begin_src emacs-lisp
   ;; next package's bullet sharp is breaked in solar theme.

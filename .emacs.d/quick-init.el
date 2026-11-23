@@ -152,6 +152,13 @@ installed package."
   (global-set-key (kbd "C-c s s e s") #'swiper-all)
   (global-set-key (kbd "C-c s s e a") #'swiper-all-thing-at-point))
 
+;;;; Shared commands in lisp/ (same folder as the full config's ~/.emacs.d/lisp)
+
+(add-to-list 'load-path (expand-file-name "lisp" my/quick-directory))
+
+;; M-x my/html-make-single-file, and C-c C-e h s in the Org export menu.
+(require 'html-single-file nil t)
+
 ;;;; Org display (org itself loads only when an .org file is opened)
 
 (setq org-hide-emphasis-markers t)
