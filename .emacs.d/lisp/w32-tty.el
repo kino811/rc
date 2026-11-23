@@ -9,8 +9,10 @@
 ;;; Code:
 
 (defconst my/w32-tty-directory
-  (file-name-directory (or load-file-name buffer-file-name))
-  "Directory that holds w32-tty.el (the .emacs.d folder of the rc repo).")
+  ;; `file-truename': loaded through the ~/.emacs.d/lisp link, the path
+  ;; must still resolve to the rc repo so ../../windows is found.
+  (file-name-directory (file-truename (or load-file-name buffer-file-name)))
+  "Directory that holds w32-tty.el (.emacs.d/lisp of the rc repo).")
 
 (defun my/w32-tty-p ()
   "Return non-nil in a Windows console Emacs (emacs -nw)."
@@ -67,7 +69,7 @@
 Windows terminal Emacs only.  Does nothing when the script or
 powershell.exe is missing, or when the guard is already running."
   (interactive)
-  (let ((script (expand-file-name "../windows/emacs-input-guard.ps1"
+  (let ((script (expand-file-name "../../windows/emacs-input-guard.ps1"
                                   my/w32-tty-directory))
         (powershell (executable-find "powershell")))
     (cond

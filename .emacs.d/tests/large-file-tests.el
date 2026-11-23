@@ -2,7 +2,7 @@
 
 (require 'ert)
 
-(load (expand-file-name "../large-file-setup.el"
+(load (expand-file-name "../lisp/large-file-setup.el"
                         (file-name-directory load-file-name))
       nil t)
 

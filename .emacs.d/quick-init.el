@@ -58,8 +58,9 @@ installed package."
 
 ;; Windows console support (UTF-8 console, WezTerm carrier keys, C-z,
 ;; input freeze guard).  Must come after `set-locale-environment'.
-(let ((w32-tty (expand-file-name "w32-tty.el" my/quick-directory)))
-  (if (load w32-tty t t)
+;; lisp/ is put on `load-path' only later, so give `require' the file.
+(let ((w32-tty (expand-file-name "lisp/w32-tty" my/quick-directory)))
+  (if (require 'w32-tty w32-tty t)
       (my/w32-tty-setup)
     (message "w32-tty.el not found: %s" w32-tty)))
 
@@ -101,7 +102,7 @@ installed package."
 ;; Files with very long lines, and files over 1 MiB (read only, no undo,
 ;; fundamental-mode, no line numbers), stay responsive.
 (global-so-long-mode 1)
-(load (expand-file-name "large-file-setup.el" my/quick-directory) t t)
+(require 'large-file-setup (expand-file-name "lisp/large-file-setup" my/quick-directory) t)
 
 ;;;; Editing packages (same keys as the full config; load on first use)
 
@@ -177,6 +178,7 @@ installed package."
 
 (when (and (my/quick-use-elpa "popup")
            (my/quick-use-elpa "google-translate"))
-  (load (expand-file-name "google-translate-setup.el" my/quick-directory) t t))
+  (require 'google-translate-setup
+           (expand-file-name "lisp/google-translate-setup" my/quick-directory) t))
 
 ;;; quick-init.el ends here

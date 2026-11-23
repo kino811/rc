@@ -286,15 +286,16 @@ for default encoding is best that utf-8
 
   (setq default-process-coding-system '(utf-8 . utf-8))
 
-  ;; Windows console Emacs (emacs -nw) support lives in w32-tty.el next to
-  ;; this file, shared with quick-init.el (windows/bin/emacs-q): UTF-8
-  ;; console, C-z disabled, WezTerm carrier keys, input freeze guard.  It must
-  ;; run after `set-locale-environment' above, which resets the terminal
-  ;; coding system to cp1252.  Does nothing in GUI Emacs or on macOS/Linux.
-  (let ((w32-tty (expand-file-name "w32-tty.el"
+  ;; Windows console Emacs (emacs -nw) support lives in lisp/w32-tty.el,
+  ;; shared with quick-init.el (windows/bin/emacs-q): UTF-8 console, C-z
+  ;; disabled, WezTerm carrier keys, input freeze guard.  It must run after
+  ;; `set-locale-environment' above, which resets the terminal coding system
+  ;; to cp1252.  Does nothing in GUI Emacs or on macOS/Linux.  The file name
+  ;; is given to `require' because lisp/ is put on `load-path' only later.
+  (let ((w32-tty (expand-file-name "lisp/w32-tty"
                                    (file-name-directory
                                     (or load-file-name buffer-file-name)))))
-    (if (load w32-tty t t)
+    (if (require 'w32-tty w32-tty t)
         (my/w32-tty-setup)
       (message "w32-tty.el not found: %s" w32-tty)))
 #+end_src
@@ -304,15 +305,15 @@ for default encoding is best that utf-8
 Keep image buffers in their image mode; the large-file fallback is only
 for non-image buffers.
 
-The hook function and its =find-file-hook= entry live in large-file-setup.el next
-to this file, shared with quick-init.el (windows/bin/emacs-q) and tested by
+The hook function and its =find-file-hook= entry live in lisp/large-file-setup.el,
+shared with quick-init.el (windows/bin/emacs-q) and tested by
 tests/large-file-tests.el.
 
 #+begin_src emacs-lisp
-  (let ((setup (expand-file-name "large-file-setup.el"
+  (let ((setup (expand-file-name "lisp/large-file-setup"
                                  (file-name-directory
                                   (or load-file-name buffer-file-name)))))
-    (unless (load setup t t)
+    (unless (require 'large-file-setup setup t)
       (message "large-file-setup.el not found: %s" setup)))
 #+end_src
 ** current buffer name
@@ -2248,15 +2249,15 @@ Popup translations from =C-c t t t= also update =*Google Translate*= without
 displaying another window. Use =C-x b= to revisit and copy the latest result.
 #+begin_src emacs-lisp
   ;; use-package only installs the package here.  The commands, the direction
-  ;; picking and the C-c t t keys live in google-translate-setup.el next to
-  ;; this file, shared with quick-init.el (windows/bin/emacs-q).
+  ;; picking and the C-c t t keys live in lisp/google-translate-setup.el,
+  ;; shared with quick-init.el (windows/bin/emacs-q).
   (use-package google-translate
     :ensure t
     :defer t)
-  (let ((setup (expand-file-name "google-translate-setup.el"
+  (let ((setup (expand-file-name "lisp/google-translate-setup"
                                  (file-name-directory
                                   (or load-file-name buffer-file-name)))))
-    (unless (load setup t t)
+    (unless (require 'google-translate-setup setup t)
       (message "google-translate-setup.el not found: %s" setup)))
 #+end_src
 * server
