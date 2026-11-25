@@ -16,7 +16,8 @@
 #   5. Terminal: ~/.tmux.conf forwarder (`source-file` this repo's .tmux.conf, no admin needed);
 #      ~/.config/wezterm and ~/.config/herdr junctions; user env HERDR_CONFIG_PATH points herdr
 #      at ~/.config/herdr/config.toml (herdr reads %APPDATA%\herdr\config.toml otherwise).
-#   6. ~/bin forwarders for windows/bin: ec, ec.cmd, emacs-q, emacs-q.cmd, chrome-cdp.cmd, yazi.cmd.
+#   6. ~/bin forwarders for windows/bin: ec, ec.cmd, emacs-q, emacs-q.cmd, claude-editor.cmd,
+#      chrome-cdp.cmd, yazi.cmd. claude-editor.cmd is Claude Code's EDITOR (its settings "env").
 #   7. yazi: runs install-yazi.ps1 with the same BinDir.
 # It never registers anything to run at logon.
 [CmdletBinding(SupportsShouldProcess)]
@@ -198,7 +199,7 @@ foreach ($name in 'ec', 'emacs-q') {
         "exec `"$repoFwd/windows/bin/$name`" `"`$@`""
     ) -Lf
 }
-foreach ($name in 'ec.cmd', 'emacs-q.cmd', 'chrome-cdp.cmd', 'yazi.cmd') {
+foreach ($name in 'ec.cmd', 'emacs-q.cmd', 'claude-editor.cmd', 'chrome-cdp.cmd', 'yazi.cmd') {
     $extra = if ($name -eq 'yazi.cmd') { @('rem It must stay in a PATH folder that comes before the folder of yazi.exe.') } else { @() }
     Set-Forwarder (Join-Path $BinDir $name) (@(
         '@echo off',
