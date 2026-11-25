@@ -14,7 +14,8 @@
 #      SSH alias git@github.com-kino811) and runs `npm ci` in eat-pty-win/node-bridge.
 #      EAF is not handled; see the install comments in the EAF section of myInit.org.
 #   5. Terminal: ~/.tmux.conf forwarder (`source-file` this repo's .tmux.conf, no admin needed);
-#      ~/.config/wezterm junction.
+#      ~/.config/wezterm and ~/.config/herdr junctions; user env HERDR_CONFIG_PATH points herdr
+#      at ~/.config/herdr/config.toml (herdr reads %APPDATA%\herdr\config.toml otherwise).
 #   6. ~/bin forwarders for windows/bin: ec, ec.cmd, emacs-q, emacs-q.cmd, chrome-cdp.cmd, yazi.cmd.
 #   7. yazi: runs install-yazi.ps1 with the same BinDir.
 # It never registers anything to run at logon.
@@ -86,6 +87,7 @@ $tools = [ordered]@{
     'git' = 'Git for Windows'; 'pwsh' = 'PowerShell 7'; 'emacs' = 'Emacs'; 'wezterm' = 'WezTerm'
     'tmux' = 'psmux (choco install psmux)'; 'yazi' = 'yazi'; 'ya' = 'yazi (ya)'; 'fzf' = 'fzf'
     'rg' = 'ripgrep'; 'fd' = 'fd'; 'node' = 'Node.js'; 'npm' = 'Node.js (npm)'; 'gsudo' = 'gsudo'
+    'herdr' = 'herdr (choco install herdr)'
 }
 foreach ($t in $tools.Keys) {
     $cmd = Get-Command $t -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -167,12 +169,25 @@ if ($SkipSiteLisp) {
 }
 
 # 5. Terminal ------------------------------------------------------------------------------
-Write-Step 'Terminal (tmux, wezterm)'
+Write-Step 'Terminal (tmux, wezterm, herdr)'
 Set-Forwarder (Join-Path $HomeDir '.tmux.conf') @(
     '# Forwarder: the real config lives in the rc repo.',
     "source-file `"$repoFwd/.tmux.conf`""
 ) -Lf
 Set-Junction (Join-Path $HomeDir '.config\wezterm') (Join-Path $repo '.config\wezterm')
+Set-Junction (Join-Path $HomeDir '.config\herdr') (Join-Path $repo '.config\herdr')
+# herdr has no home-folder lookup on Windows: HERDR_CONFIG_PATH (or XDG_CONFIG_HOME, which
+# other tools read too) is the only way off %APPDATA%\herdr. A running herdr server keeps
+# its old environment, so restart it to pick this up.
+$herdrConfig = Join-Path $HomeDir '.config\herdr\config.toml'
+if ([Environment]::GetEnvironmentVariable('HERDR_CONFIG_PATH', 'User') -eq $herdrConfig) {
+    Write-Info "already set: HERDR_CONFIG_PATH=$herdrConfig"
+} elseif ($dry) {
+    Write-Would "set user env HERDR_CONFIG_PATH=$herdrConfig"
+} else {
+    [Environment]::SetEnvironmentVariable('HERDR_CONFIG_PATH', $herdrConfig, 'User')
+    Write-Info "set user env HERDR_CONFIG_PATH=$herdrConfig (restart the herdr server to use it)"
+}
 
 # 6. ~/bin forwarders ----------------------------------------------------------------------
 Write-Step "Forwarders in $BinDir"

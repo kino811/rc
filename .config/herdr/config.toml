@@ -1,0 +1,14 @@
+onboarding = false
+
+[experimental]
+switch_ascii_input_source_in_prefix = true
+
+[terminal]
+default_shell = "cmd.exe"
+
+# Ctrl+J: WezTerm (Windows) sends it as Ctrl+Shift+F10. ctrl-j.js sends Alt+Enter (newline)
+# to a Claude Code pane and passes the key through unchanged to any other pane (Emacs: C-j).
+[[keys.command]]
+key = "ctrl+shift+f10"
+type = "shell"
+command = 'node "%USERPROFILE%\.config\herdr\ctrl-j.js"'
