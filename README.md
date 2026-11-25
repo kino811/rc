@@ -23,9 +23,13 @@ my resource files
      `~/.emacs.d/site-lisp/p4-review`; clones project-x and eat-pty-win into `~/.emacs.d/site-lisp`
      over HTTPS (push URL: SSH alias `github.com-kino811`) and runs `npm ci` for eat-pty-win.
    - `~/.tmux.conf` forwarder (`source-file`), `~/.config/wezterm` junction.
-   - `~/bin` forwarders for `windows/bin` scripts, then `install-yazi.ps1`.
+   - `~/bin` forwarders for `windows/bin` scripts, then `install-yazi.ps1`. The yazi wrapper
+     forwarders (`yazi.cmd`, `yazi.ps1`) go to `-WrapperDir` (default: the same `~/bin`).
    - Existing files are kept as `<name>.bak-<time>`. Nothing is registered to run at logon.
-   - Options: `-BinDir`, `-SkipPath`, `-SkipSiteLisp`, `-SkipYazi`, `-HomeDir` (for testing).
+   - Options: `-BinDir`, `-WrapperDir`, `-SkipPath`, `-SkipSiteLisp`, `-SkipYazi`, `-HomeDir`
+     (for testing).
+   - A machine that keeps another folder ahead of `chocolatey\bin` for the yazi wrappers (e.g.
+     `C:\usr\bin` in the system PATH) runs `install.ps1 -WrapperDir C:\usr\bin`.
 3. Start Emacs once; `use-package` installs the packages.
 4. EAF is optional and not installed by the script; see the install comments in the EAF section of
    `.emacs.d/myInit.org`.
@@ -37,7 +41,9 @@ my resource files
   - `ec`, `ec.cmd`: `emacsclient`.
   - `chrome-cdp.cmd`: Chrome with CDP on port 9223 and a dedicated profile.
   - `yazi.ps1`, `yazi.cmd`: `yazi` wrappers; q/Q move the shell to yazi's last folder. Their
-    forwarders must come before the yazi.exe folder in PATH.
+    forwarders (in `-WrapperDir`) must come before the yazi.exe folder in PATH.
+  - `claude-editor.cmd` (+ `console-enter.ps1`): Claude Code's `EDITOR` for Ctrl+G (emacs-q after
+    one Enter that ends Claude Code's pending console read).
   - `yazi-pane-open.cmd`: used by the yazi `o` keys.
 - yazi
   - `install-yazi.ps1` (run by `install.ps1`) links `%APPDATA%\yazi\config` to `.config/yazi`

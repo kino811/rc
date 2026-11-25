@@ -17,19 +17,27 @@
 #      ~/.config/wezterm and ~/.config/herdr junctions; user env HERDR_CONFIG_PATH points herdr
 #      at ~/.config/herdr/config.toml (herdr reads %APPDATA%\herdr\config.toml otherwise).
 #   6. ~/bin forwarders for windows/bin: ec, ec.cmd, emacs-q, emacs-q.cmd, claude-editor.cmd,
-#      chrome-cdp.cmd, yazi.cmd. claude-editor.cmd is Claude Code's EDITOR (its settings "env").
-#   7. yazi: runs install-yazi.ps1 with the same BinDir.
+#      chrome-cdp.cmd. claude-editor.cmd is Claude Code's EDITOR (its settings "env").
+#      The yazi wrapper forwarder (yazi.cmd) goes to <WrapperDir> instead.
+#   7. yazi: runs install-yazi.ps1 with -WrapperDir <WrapperDir> -BinDir <BinDir>
+#      (yazi.ps1 wrapper in WrapperDir, yazi-pane-open.cmd in BinDir).
+# -WrapperDir (default: BinDir) is where the yazi.cmd/yazi.ps1 wrappers go. They must come
+# before the yazi.exe folder (chocolatey\bin) in PATH. On a new machine ~/bin is first in the
+# system PATH, so the default works; a machine that keeps another folder ahead of
+# chocolatey\bin (e.g. C:\usr\bin) runs `install.ps1 -WrapperDir C:\usr\bin`.
 # It never registers anything to run at logon.
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$HomeDir = $HOME,
     [string]$BinDir,
+    [string]$WrapperDir,
     [switch]$SkipPath,
     [switch]$SkipSiteLisp,
     [switch]$SkipYazi
 )
 $ErrorActionPreference = 'Stop'
 if (-not $BinDir) { $BinDir = Join-Path $HomeDir 'bin' }
+if (-not $WrapperDir) { $WrapperDir = $BinDir }
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $repoFwd = $repo -replace '\\', '/'
@@ -199,19 +207,26 @@ foreach ($name in 'ec', 'emacs-q') {
         "exec `"$repoFwd/windows/bin/$name`" `"`$@`""
     ) -Lf
 }
-foreach ($name in 'ec.cmd', 'emacs-q.cmd', 'claude-editor.cmd', 'chrome-cdp.cmd', 'yazi.cmd') {
-    $extra = if ($name -eq 'yazi.cmd') { @('rem It must stay in a PATH folder that comes before the folder of yazi.exe.') } else { @() }
-    Set-Forwarder (Join-Path $BinDir $name) (@(
+foreach ($name in 'ec.cmd', 'emacs-q.cmd', 'claude-editor.cmd', 'chrome-cdp.cmd') {
+    Set-Forwarder (Join-Path $BinDir $name) @(
         '@echo off',
-        "rem Forwarder: the real script lives in the rc repo (windows/bin/$name)."
-    ) + $extra + @("call `"$repo\windows\bin\$name`" %*"))
+        "rem Forwarder: the real script lives in the rc repo (windows/bin/$name).",
+        "call `"$repo\windows\bin\$name`" %*"
+    )
 }
+Write-Step "yazi.cmd wrapper forwarder in $WrapperDir"
+Set-Forwarder (Join-Path $WrapperDir 'yazi.cmd') @(
+    '@echo off',
+    'rem Forwarder: the real script lives in the rc repo (windows/bin/yazi.cmd).',
+    'rem It must stay in a PATH folder that comes before the folder of yazi.exe.',
+    "call `"$repo\windows\bin\yazi.cmd`" %*"
+)
 
 # 7. yazi ----------------------------------------------------------------------------------
 Write-Step 'yazi (install-yazi.ps1)'
 if ($SkipYazi) { Write-Info 'skipped (-SkipYazi)' }
-elseif ($dry) { Write-Would "pwsh -File $repo\windows\install-yazi.ps1 -WrapperDir $BinDir -BinDir $BinDir" }
-else { & (Join-Path $PSScriptRoot 'install-yazi.ps1') -WrapperDir $BinDir -BinDir $BinDir }
+elseif ($dry) { Write-Would "pwsh -File $repo\windows\install-yazi.ps1 -WrapperDir $WrapperDir -BinDir $BinDir" }
+else { & (Join-Path $PSScriptRoot 'install-yazi.ps1') -WrapperDir $WrapperDir -BinDir $BinDir }
 
 # Summary ----------------------------------------------------------------------------------
 Write-Step 'Done'
