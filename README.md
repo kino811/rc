@@ -49,6 +49,9 @@ my resource files
   (clears the console flag ENABLE_VIRTUAL_TERMINAL_INPUT, 0x200, that sometimes gets set on its console).
   Terminal Emacs starts it for its own process (`w32-tty.el`), so no logon entry is needed.
   `install-emacs-input-guard.ps1` (optional) registers it in the Startup folder; `-Uninstall` removes it.
+- `psmux-split-here.ps1`: psmux `prefix %` / `prefix "` (`.tmux.conf`) split in the working
+  directory of what runs in the pane: PowerShell `cd`, a `claude` session's cwd (follows `/cd`),
+  or for `claude agents` the session that got the last prompt (read from the noty plugin state).
 - Windows terminal Emacs also relies on the Windows-only key block in `.config/wezterm/wezterm.lua`
   (sends Ctrl+Shift+Fn "carrier" keys that `.emacs.d/myInit.org` translates back) and on
   `C-S-F7` in `.tmux.conf`.
